@@ -1,0 +1,24 @@
+return {
+	-- {
+	-- 	"JoosepAlviste/nvim-ts-context-commentstring",
+	-- 	lazy = true,
+	-- 	init = function()
+	-- 		vim.g.skip_ts_context_commentstring_module = true
+	-- 	end,
+	-- 	opts = {
+	-- 		enable_autocmd = false,
+	-- 	},
+	-- },
+	-- {
+	-- 	"echasnovski/mini.comment",
+	-- 	event = "VeryLazy",
+	-- 	init = function()
+	-- 		vim.api.nvim_create_autocmd("FileType", {
+	-- 			pattern = { "hcl", "terraform", "helm" },
+	-- 			desc = "terraform/hcl commentstring configuration",
+	-- 			command = "setlocal commentstring=#\\ %s",
+	-- 		})
+	-- 	end,
+	-- 	config = true,
+	-- },
+}
