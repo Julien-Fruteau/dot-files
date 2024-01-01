@@ -1,0 +1,7 @@
+git:
+  log:
+    showGraph: always
+gui:
+  theme:
+    selectedLineBgColor:
+      - reverse
