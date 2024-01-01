@@ -6,10 +6,12 @@ return {
 		"nvim-lua/plenary.nvim",
 		{ "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
 		"nvim-tree/nvim-web-devicons",
+		"dawsers/telescope-file-history.nvim",
 	},
 	config = function()
 		local telescope = require("telescope")
 		local actions = require("telescope.actions")
+		local file_history = require("file_history")
 
 		telescope.setup({
 			defaults = {
@@ -27,6 +29,14 @@ return {
 		})
 
 		telescope.load_extension("fzf")
+
+		file_history.setup({
+			-- This is the location where it will create your file history repository
+			backup_dir = "~/.file-history-git",
+			-- command line to execute git
+			git_cmd = "git",
+		})
+		telescope.load_extension("file_history")
 
 		-- -- set keymaps
 		-- local keymap = vim.keymap -- for conciseness
