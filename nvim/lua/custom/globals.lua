@@ -1,5 +1,8 @@
 local g = vim.g -- for conciseness
 
+-- disable autoformat
+g.autoformat = false
+
 -- wsl clipboard
 local in_wsl = os.getenv("WSL_DISTRO_NAME") ~= nil
 if in_wsl then
