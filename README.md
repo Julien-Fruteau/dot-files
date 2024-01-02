@@ -6,7 +6,9 @@ Bellow usage is advisable to keep a clean $HOME/.config folder, by having this r
 
 ```bash
 git clone --bare https://github.com/Julien-Fruteau/dot-files.git $HOME/.config/.dot-files
-cd $HOME/.config
+cd $HOME/.config/.dot-files
+git worktree add main
+cd ..
 ln -s .dot-files/main/lazygit lazygit
 ln -s .dot-files/main/nvim nvim
 ```
