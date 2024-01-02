@@ -65,6 +65,8 @@ keymap.set(
 	"<CMD>lua require('telescope').extensions.git_worktree.create_git_worktree()<CR>",
 	{ desc = "Create worktree" }
 )
+-- show current buffer commits
+keymap.set("n", "<leader>gb", "<CMD>Telescope git_bcommits<CR>", { desc = "Show current buffer commits" })
 
 -- glow - markdown preview
 keymap.set("n", "<leader>ug", "<CMD>Glow<CR>", { desc = "Preview markdown file" })
