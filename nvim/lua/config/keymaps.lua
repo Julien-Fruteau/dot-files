@@ -65,3 +65,6 @@ keymap.set(
 	"<CMD>lua require('telescope').extensions.git_worktree.create_git_worktree()<CR>",
 	{ desc = "Create worktree" }
 )
+
+-- glow - markdown preview
+keymap.set("n", "<leader>ug", "<CMD>Glow<CR>", { desc = "Preview markdown file" })
