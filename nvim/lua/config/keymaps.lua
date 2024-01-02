@@ -57,13 +57,11 @@ keymap.set(
 	"n",
 	"<leader>gr",
 	"<CMD>lua require('telescope').extensions.git_worktree.git_worktree()<CR>",
-	silent,
 	{ desc = "Switch between worktree" }
 )
 keymap.set(
 	"n",
 	"<leader>gR",
 	"<CMD>lua require('telescope').extensions.git_worktree.create_git_worktree()<CR>",
-	silent,
 	{ desc = "Create worktree" }
 )
