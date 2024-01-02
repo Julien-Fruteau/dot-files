@@ -13,6 +13,9 @@ gui:
   theme:
     selectedLineBgColor:
       - reverse
+    selectedRangeBgColor:
+      # - "#efdea8"
+      - "#e7ce7d"
 customCommands:
   - key: b
     command: tig blame -- {{.SelectedFile.Name}}
