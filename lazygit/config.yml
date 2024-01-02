@@ -2,11 +2,12 @@ git:
   log:
     showGraph: always
   paging:
-    colorArg: never
-    pager: ydiff -p cat -s --width={{columnWidth}}
+    # colorArg: always
+    # useConfig: true
     # colorArg: always
     # pager: diff-so-fancy
-    # pager: ydiff -p cat -s --wrap --width={{columnWidth}}
+    colorArg: never
+    pager: ydiff -p cat -s --wrap --width={{columnWidth}}
 gui:
   sidePanelWidth: 0.25
   theme:
