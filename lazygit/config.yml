@@ -1,6 +1,6 @@
 git:
-  log:
-    showGraph: always
+  # log:
+  #   showGraph: always
   paging:
     # colorArg: always
     # useConfig: true
