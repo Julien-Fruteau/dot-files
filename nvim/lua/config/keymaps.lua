@@ -70,3 +70,6 @@ keymap.set("n", "<leader>gb", "<CMD>Telescope git_bcommits<CR>", { desc = "Show 
 
 -- glow - markdown preview
 keymap.set("n", "<leader>ug", "<CMD>Glow<CR>", { desc = "Preview markdown file" })
+
+-- maximiser 
+keymap.set("n", "<leader>wm", "<CMD>MaximizerToggle<CR>", { desc = "Maximize/minimize a split" })
