@@ -1,1 +1,1 @@
-require("custom.globals")
+require("custom.global")
