@@ -73,3 +73,6 @@ keymap.set("n", "<leader>ug", "<CMD>Glow<CR>", { desc = "Preview markdown file" 
 
 -- maximiser 
 keymap.set("n", "<leader>wm", "<CMD>MaximizerToggle<CR>", { desc = "Maximize/minimize a split" })
+
+-- dapui
+keymap.set("n", "<leader>dd", "<CMD>DapShowLog<CR>", { desc = "Dap show logs"})
