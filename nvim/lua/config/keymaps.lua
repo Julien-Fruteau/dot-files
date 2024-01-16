@@ -76,3 +76,9 @@ keymap.set("n", "<leader>wm", "<CMD>MaximizerToggle<CR>", { desc = "Maximize/min
 
 -- dapui
 keymap.set("n", "<leader>dd", "<CMD>DapShowLog<CR>", { desc = "Dap show logs"})
+
+if vim.g.vscode then
+	-- undo/REDO via vscode
+	keymap.set("n", "u", [[<CMD>call VSCodeNotify('undo')<CR>]])
+	keymap.set("n", "<C-r>", [[<CMD>call VSCodeNotify('redo')<CR>]])
+end
