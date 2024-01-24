@@ -44,7 +44,7 @@ keymap.set("n", "<leader>tp", "<CMD>tabp<CR>", { desc = "Go to previous tab" }) 
 keymap.set("n", "<leader>tf", "<CMD>tabnew %<CR>", { desc = "Open current buffer in new tab" }) --  move current buffer to new tab
 
 -- buffer management
-keymap.set("n", "<M-z>", ":b#<CR>", { desc = "Focus to previous active buffer" }) --  Focus to previous active buffer
+keymap.set("n", "<M-w>", ":b#<CR>", { desc = "Focus to previous active buffer" }) --  Focus to previous active buffer
 
 keymap.set("n", "<leader>fs", "<CMD>w<CR>", { desc = "File save" }) -- file save
 
