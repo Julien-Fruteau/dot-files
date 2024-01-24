@@ -71,11 +71,26 @@ keymap.set("n", "<leader>gb", "<CMD>Telescope git_bcommits<CR>", { desc = "Show 
 -- glow - markdown preview
 keymap.set("n", "<leader>ug", "<CMD>Glow<CR>", { desc = "Preview markdown file" })
 
--- maximiser 
+-- maximiser
 keymap.set("n", "<leader>wm", "<CMD>MaximizerToggle<CR>", { desc = "Maximize/minimize a split" })
 
 -- dapui
-keymap.set("n", "<leader>dd", "<CMD>DapShowLog<CR>", { desc = "Dap show logs"})
+keymap.set("n", "<leader>dd", "<CMD>DapShowLog<CR>", { desc = "Dap show logs" })
+
+keymap.set("n", "<leader>dv", function()
+	if vim.fn.filereadable(".vscode/launch.json") then
+		require("dap.ext.vscode").load_launchjs()
+	end
+	require("dap").continue()
+end, { desc = "Start/Continue debug" })
+
+-- keymap.set("n", "<leader>dv", function()
+-- 	require("dap.ext.vscode").load_launchjs(
+-- 		nil,
+-- 		{ node = { "javascript", "typescript" }, ["pwa-node"] = { "javascript", "typescript" } }
+-- 	)
+-- end, { desc = "Load vscode launch file" })
+
 
 if vim.g.vscode then
 	-- undo/REDO via vscode
