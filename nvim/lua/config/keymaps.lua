@@ -79,10 +79,10 @@ keymap.set("n", "<leader>dd", "<CMD>DapShowLog<CR>", { desc = "Dap show logs" })
 
 keymap.set("n", "<leader>dv", function()
 	if vim.fn.filereadable(".vscode/launch.json") then
-		require("dap.ext.vscode").load_launchjs()
+		require("dap.ext.vscode").load_launchjs(nil, { ["pwa-node"] = { "javascript", "typescript" } })
 	end
 	require("dap").continue()
-end, { desc = "Start/Continue debug" })
+end, { desc = "Extend pwa-node .vscode/launch.json to dap config" })
 
 -- keymap.set("n", "<leader>dv", function()
 -- 	require("dap.ext.vscode").load_launchjs(
@@ -91,9 +91,20 @@ end, { desc = "Start/Continue debug" })
 -- 	)
 -- end, { desc = "Load vscode launch file" })
 
-
 if vim.g.vscode then
 	-- undo/REDO via vscode
 	keymap.set("n", "u", [[<CMD>call VSCodeNotify('undo')<CR>]])
 	keymap.set("n", "<C-r>", [[<CMD>call VSCodeNotify('redo')<CR>]])
 end
+
+keymap.set("n", "<leader>df", function()
+	local dap = require("dap")
+
+	for filetype, configs in pairs(dap.configurations) do
+		print("Filetype:", filetype)
+		for _, config in ipairs(configs) do
+			print(vim.inspect(config))
+		end
+	end
+end, { desc = "Print dap configurations" })
+
