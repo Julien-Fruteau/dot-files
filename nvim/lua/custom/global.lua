@@ -1,7 +1,7 @@
 local g = vim.g -- for conciseness
 
 -- disable autoformat
-g.autoformat = false
+g.autoformat = true
 
 -- cliptboard
 -- nb: wsl or linux just install xsel, with apt package manager 
