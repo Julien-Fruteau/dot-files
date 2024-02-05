@@ -1,19 +1,19 @@
--- catppuccin
-return {
-	{
-		"catppuccin/nvim",
-		name = "catppuccin",
-		lazy = true,
-		priority = 1000,
-		opts = { flavour = "macchiato" }, -- latte, frappe, macchiato, mocha }
-	},
-	{
-		"LazyVim/LazyVim",
-		opts = {
-			colorscheme = "catppuccin",
-		},
-	},
-}
+-- -- catppuccin
+-- return {
+-- 	{
+-- 		"catppuccin/nvim",
+-- 		name = "catppuccin",
+-- 		lazy = true,
+-- 		priority = 1000,
+-- 		opts = { flavour = "macchiato" }, -- latte, frappe, macchiato, mocha }
+-- 	},
+-- 	{
+-- 		"LazyVim/LazyVim",
+-- 		opts = {
+-- 			colorscheme = "catppuccin",
+-- 		},
+-- 	},
+-- }
 
 -- -- tokyonight
 -- return {
@@ -23,17 +23,16 @@ return {
 -- 	opts = { style = "storm" },
 -- }
 
--- -- onedark
--- return {
--- 	{ "navarasu/onedark.nvim", priority = 1000 },
--- 	{
--- 		"LazyVim/LazyVim",
--- 		opts = {
--- 			colorscheme = "onedark",
--- 		},
--- 	},
--- }
---
+-- onedark
+return {
+	{ "navarasu/onedark.nvim", priority = 1000 },
+	{
+		"LazyVim/LazyVim",
+		opts = {
+			colorscheme = "onedark",
+		},
+	},
+}
 
 -- -- kanagawa
 -- return {
