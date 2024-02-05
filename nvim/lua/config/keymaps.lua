@@ -76,14 +76,14 @@ keymap.set("n", "<leader>dv", function()
 		require("dap.ext.vscode").load_launchjs(nil, { ["pwa-node"] = { "javascript", "typescript" } })
 	end
 	require("dap").continue()
-end, { desc = "Extend pwa-node .vscode/launch.json to dap config" })
+end, { desc = "Extend pwa-node to js|ts config" })
 
--- keymap.set("n", "<leader>dv", function()
--- 	require("dap.ext.vscode").load_launchjs(
--- 		nil,
--- 		{ node = { "javascript", "typescript" }, ["pwa-node"] = { "javascript", "typescript" } }
--- 	)
--- end, { desc = "Load vscode launch file" })
+keymap.set("n", "<leader>dF", function()
+	if vim.fn.filereadable(".vscode/launch.json") then
+		require("dap.ext.vscode").load_launchjs(nil, { ["firefox"] = { "javascript", "typescript" } })
+	end
+	require("dap").continue()
+end, { desc = "Extend firefox to js|ts debug config" })
 
 if vim.g.vscode then
 	-- undo/REDO via vscode
@@ -101,4 +101,3 @@ keymap.set("n", "<leader>df", function()
 		end
 	end
 end, { desc = "Print dap configurations" })
-
