@@ -1,13 +1,7 @@
--- set leader key to space
-vim.g.mapleader = " "
-
 local keymap = vim.keymap -- for conciseness
-local opts = { noremap = true, silent = true }
----------------------
--- General Keymaps -------------------
 
--- use jk to exit insert mode
--- keymap.set("i", "jj", "<ESC>", { desc = "Exit insert mode with jk" })
+-- Additional Keymaps to defaults https://www.lazyvim.org/keymaps -------------------
+-- telescope shortcuts : https://github.com/nvim-telescope/telescope.nvim?tab=readme-ov-file#usage
 
 -- clear search highlights
 keymap.set("n", "<leader>nh", ":nohl<CR>", { desc = "Clear search highlights" })
@@ -46,7 +40,7 @@ keymap.set("n", "<leader>tf", "<CMD>tabnew %<CR>", { desc = "Open current buffer
 -- buffer management
 keymap.set("n", "<M-w>", ":b#<CR>", { desc = "Focus to previous active buffer" }) --  Focus to previous active buffer
 
-keymap.set("n", "<leader>fs", "<CMD>w<CR>", { desc = "File save" }) -- file save
+keymap.set("n", "<leader>fs", "<CMD>w<CR>", { desc = "File save" }) -- file save, NB: by default lazyvim put it to C-s
 
 -- neo-tree
 keymap.set("n", "<leader>e", ":Neotree focus<cr>", { desc = "Explorer focus on File Explorer" })
