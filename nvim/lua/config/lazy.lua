@@ -19,12 +19,14 @@ require("lazy").setup({
 			"LazyVim/LazyVim",
 			import = "lazyvim.plugins",
 			opts = {
+				-- colorscheme = "onedark",
+				colorscheme = "tokyonight",
+				style = "storm",
 				news = {
 					lazyim = true,
 					neovim = true,
 				},
 				lazy = true,
-				style = "storm",
 			},
 		},
 		-- import any extras modules here
@@ -50,7 +52,7 @@ require("lazy").setup({
 		version = false, -- always use the latest git commit
 		-- version = "*", -- try installing the latest stable version for plugins that support semver
 	},
-	install = { colorscheme = { "nightfly", "tokyonight", "habamax", "onedark" } },
+	-- install = { colorscheme = { "nightfly", "tokyonight", "habamax", "onedark" } },
 	checker = { enabled = true }, -- automatically check for plugin updates
 	performance = {
 		cache = {
