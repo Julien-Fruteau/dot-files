@@ -6,8 +6,10 @@ git:
     # useConfig: true
     # colorArg: always
     # pager: diff-so-fancy
-    colorArg: never
-    pager: ydiff -p cat -s --wrap --width={{columnWidth}}
+    # colorArg: never
+    # pager: ydiff -p cat -s --wrap --width={{columnWidth}}
+    colorArg: always
+    pager: diff-so-fancy
 gui:
   sidePanelWidth: 0.25
   theme:
@@ -48,7 +50,8 @@ customCommands:
     description: tig branch (`t` again to browse files at revision)
     subprocess: true
   - key: t
-    command: tig {{.SelectedSubCommit.Sha}} -- {{.SelectedCommitFile.Name}}
+    # command: tig {{.SelectedSubCommit.Sha}} -- {{.SelectedCommitFile.Name}}
+    command: tig {{.SelectedCommitFile.Name}}
     context: commitFiles
     description: tig file (history of commits affecting file)
     subprocess: true
