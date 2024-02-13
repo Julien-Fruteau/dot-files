@@ -53,6 +53,9 @@ keymap.set(
 	"<CMD>lua require('telescope').extensions.git_worktree.git_worktree()<CR>",
 	{ desc = "Switch between worktree" }
 )
+-- -- <Enter> - switches to that worktree
+-- <c-d> - deletes that worktree
+-- <c-f> - toggles forcing of the next deletion
 keymap.set(
 	"n",
 	"<leader>gR",
