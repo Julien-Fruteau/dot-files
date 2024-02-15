@@ -2,23 +2,6 @@ return {
 	"nvim-treesitter/nvim-treesitter",
 	-- enriche default config https://www.lazyvim.org/plugins/treesitter
 	opts = {
-		ensure_installed = {
-			"angular",
-			"arduino",
-			"comment",
-			"dockerfile",
-			"dot",
-			"gitignore",
-			"gitcommit",
-			"go",
-			"gomod",
-			"gosum",
-			"gowork",
-			"rust",
-			"terraform",
-			"toml",
-			"typescript",
-		},
 		textobjects = {
 			select = {
 				enable = true,
