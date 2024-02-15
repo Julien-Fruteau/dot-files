@@ -3,6 +3,8 @@ local keymap = vim.keymap -- for conciseness
 -- Additional Keymaps to defaults https://www.lazyvim.org/keymaps -------------------
 -- telescope shortcuts : https://github.com/nvim-telescope/telescope.nvim?tab=readme-ov-file#usage
 
+-- write all buffers :wa
+--
 -- clear search highlights
 keymap.set("n", "<leader>nh", ":nohl<CR>", { desc = "Clear search highlights" })
 
@@ -17,7 +19,7 @@ keymap.set("n", "<C-a>", "gg<S-v>G", { desc = "Select all" })
 
 -- window management
 keymap.set("n", "sv", "<C-w>v", { desc = "Split window vertically" }) -- split window vertically
-keymap.set("n", "ss", "<C-w>s", { desc = "Split window horizontally" }) -- split window horizontally
+-- keymap.set("n", "ss", "<C-w>s", { desc = "Split window horizontally" }) -- split window horizontally
 keymap.set("n", "se", "<C-w>=", { desc = "Make splits equal size" }) -- make split windows equal width & height
 
 -- Disable continuations
