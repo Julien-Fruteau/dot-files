@@ -26,7 +26,7 @@ return {
 				set_jumps = true, -- whether to set jumps in the jumplist
 				goto_next = {
 					["]i"] = "@conditional.inner",
-					["]p"] = "@parameter.outer",
+					["]p"] = "@parameter.inner",
 				},
 				goto_previous = {
 					["[i"] = "@conditional.inner",
