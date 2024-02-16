@@ -24,9 +24,12 @@ keymap.set("n", "<leader>cc", "g~w", { desc = "Case word: invert" })
 --  gU5j : Change 5 lines below to upper case
 --  gu3k : Change 3 lines above to lower case
 --
+
+-- lookup word
+keymap.set("n", "<leader>fw", "g*N", { desc = "Lookup word" })
+--
 -- clear search highlights
 keymap.set("n", "<leader>nh", ":nohl<CR>", { desc = "Clear search highlights" })
-
 -- keymap.set("n", "dw", "vb_d", { desc = "Delete a word backward" })
 -- delete single character without copying into register
 -- keymap.set("n", "x", '"_x')
@@ -88,6 +91,7 @@ keymap.set("n", "<leader>gb", "<CMD>Telescope git_bcommits<CR>", { desc = "Show 
 
 -- glow - markdown preview
 keymap.set("n", "<leader>ug", "<CMD>Glow<CR>", { desc = "Preview markdown file" })
+-- keymap.set("n", "<leader>cMp", "<CMD>MarkdownPreviewToggle<CR>", { desc = "Markdown Preview" })
 
 -- maximiser
 keymap.set("n", "<leader>wm", "<CMD>MaximizerToggle<CR>", { desc = "Maximize/minimize a split" })

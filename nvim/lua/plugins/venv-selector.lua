@@ -15,14 +15,14 @@ return {
 			{ "<leader>cpc", "<cmd>VenvSelectCached<cr>" },
 		},
 	},
-	-- which key integration
-	{
-		"folke/which-key.nvim",
-		optional = true,
-		opts = {
-			defaults = {
-				["<leader>cp"] = { name = "+python" },
-			},
-		},
-	},
+	-- which key integration: see plugins/which-key.lua
+	-- {
+	-- 	"folke/which-key.nvim",
+	-- 	optional = true,
+	-- 	opts = {
+	-- 		defaults = {
+	-- 			["<leader>cp"] = { name = "+python" },
+	-- 		},
+	-- 	},
+	-- },
 }
