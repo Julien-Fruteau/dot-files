@@ -17,6 +17,7 @@ local keymap = vim.keymap -- for conciseness
 --  gUaw : Change all of current WORD to upper.
 --  g~~  : Invert case to entire line
 --  g~w  : Invert case to current WORD
+keymap.set("n", "<leader>cc", "g~w", { desc = "Case word: invert" })
 --  guG  : Change to lowercase until the end of document.
 --  gU)  : Change until end of sentence to upper case
 --  gu}  : Change to end of paragraph to lower case
