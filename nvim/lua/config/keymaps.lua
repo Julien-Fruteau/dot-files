@@ -7,7 +7,7 @@ local keymap = vim.keymap -- for conciseness
 
 -- write all buffers :wa
 --
--- -- case
+-- -- case or not to case, that is the question
 -- ~    : Changes the case of current character
 --  guu  : Change current line from upper to lower.
 --  gUU  : Change current LINE from lower to upper.
