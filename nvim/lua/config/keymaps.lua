@@ -70,6 +70,10 @@ keymap.set("n", "<leader>fs", "<CMD>w<CR>", { desc = "File save" }) -- file save
 keymap.set("n", "<leader>e", ":Neotree focus<cr>", { desc = "Explorer focus on File Explorer" })
 -- keymap.set("n", "<leader>E", ":Neotree toggle<cr>", { desc = "Explorer toggle File Explorer" })
 
+-- gitsigns 
+-- git toggle blame line
+keymap.set("n", "<leader>gl", ":Gitsigns toggle_current_line_blame<cr>", { desc = "Toggle git blame line" })
+
 -- git-worktree
 keymap.set(
 	"n",
