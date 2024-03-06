@@ -1,4 +1,10 @@
 local opt = vim.opt -- for conciseness
+local g = vim.g -- for conciseness
+
+-- disable autoformat
+g.autoformat = false
+
+
 
 -- line numbers
 opt.relativenumber = true -- show relative line numbers
