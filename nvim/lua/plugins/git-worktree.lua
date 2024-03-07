@@ -1,5 +1,8 @@
 return {
 	"ThePrimeagen/git-worktree.nvim",
+	dependencies = {
+		"nvim-telescope/telescope.nvim",
+	},
 	config = function()
 		local gitworktree = require("git-worktree")
 		local telescope = require("telescope")
