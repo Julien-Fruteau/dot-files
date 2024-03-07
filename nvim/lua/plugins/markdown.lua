@@ -2,19 +2,20 @@ return {
 	{ "ellisonleao/glow.nvim", config = true, cmd = "Glow" },
 	{
 		"iamcco/markdown-preview.nvim",
-		lazy = false, -- to enable which key correctly
+		cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+		build = function()
+			vim.fn["mkdp#util#install"]()
+		end,
 		keys = {
-			{ "<leader>cMp", ft = "markdown", "<cmd>MarkdownPreviewToggle<cr>", { desc = "Markdown Preview" } },
+			{
+				"<leader>cMp",
+				ft = "markdown",
+				"<cmd>MarkdownPreviewToggle<cr>",
+				desc = "Markdown Preview",
+			},
 		},
+		config = function()
+			vim.cmd([[do FileType]])
+		end,
 	},
-	-- which key integration: see plugins/which-key.lua
-	-- {
-	-- 	"folke/which-key.nvim",
-	-- 	optional = true,
-	-- 	opts = {
-	-- 		defaults = {
-	-- 			["<leader>cM"] = { name = "+markdown" },
-	-- 		},
-	-- 	},
-	-- },
 }
