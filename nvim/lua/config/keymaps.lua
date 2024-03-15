@@ -117,6 +117,28 @@ keymap.set("n", "<leader>dF", function()
 	require("dap").continue()
 end, { desc = "Extend firefox to js|ts debug config" })
 
+keymap.set("n", "<leader>dV", function()
+  local launchFile = ".vscode/launch.json"
+  local file = io.open(launchFile, 'r')
+  if not file then return end
+  local content = file:read('*a')
+  file:close()
+
+  local filetype = vim.api.nvim_buf_get_option(0, "filetype")
+  local dap_vscode = require("dap.ext.vscode")
+  local parse = require("json5").parse
+
+  local data = parse(content)
+  assert(data.configurations, "Launch.json must have a 'configurations' key")
+
+  for _, config in ipairs(data.configurations) do
+    assert(config.type, "Configuration in launch.json must have a 'type' key")
+    dap_vscode.load_launchjs(nil, { [ config.type ] = { filetype } })
+  end
+	require("dap").continue()
+end, { desc = "Run including vscode config" })
+
+-- vscode 
 if vim.g.vscode then
 	-- undo/REDO via vscode
 	keymap.set("n", "u", [[<CMD>call VSCodeNotify('undo')<CR>]])
