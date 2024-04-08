@@ -7,9 +7,22 @@ local js_based_languages = {
 }
 
 return {
+  {
+    "yriveiro/dap-go.nvim",
+    config = function()
+      require("dap-go").setup({
+        external_config = {
+          enable = true,
+        }
+      })
+    end
+  },
 	{
 		"leoluz/nvim-dap-go",
 		config = true,
+    requires= {
+      "yriveiro/dap-go.nvim"
+    }
 	},
 	{
 		"microsoft/vscode-js-debug",

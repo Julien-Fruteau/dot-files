@@ -7,6 +7,7 @@ return {
 		{ "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
 		"nvim-tree/nvim-web-devicons",
 		"dawsers/telescope-file-history.nvim",
+    "nvim-telescope/telescope-dap.nvim",
 		{
 			"ahmedkhalf/project.nvim",
 			opts = {
@@ -45,6 +46,7 @@ return {
 		})
 
 		telescope.load_extension("fzf")
+    telescope.load_extension("dap")
 
 		file_history.setup({
 			-- This is the location where it will create your file history repository

@@ -145,13 +145,4 @@ if vim.g.vscode then
 	keymap.set("n", "<C-r>", [[<CMD>call VSCodeNotify('redo')<CR>]])
 end
 
-keymap.set("n", "<leader>df", function()
-	local dap = require("dap")
-
-	for filetype, configs in pairs(dap.configurations) do
-		print("Filetype:", filetype)
-		for _, config in ipairs(configs) do
-			print(vim.inspect(config))
-		end
-	end
-end, { desc = "Print dap configurations" })
+keymap.set("n", "<leader>df", "<CMD>Telescope dap configurations<CR>", { desc = "Show dap configurations" })
