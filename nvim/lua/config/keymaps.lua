@@ -70,7 +70,7 @@ keymap.set("n", "<leader>fs", "<CMD>w<CR>", { desc = "File save" }) -- file save
 keymap.set("n", "<leader>e", ":Neotree focus<cr>", { desc = "Explorer focus on File Explorer" })
 -- keymap.set("n", "<leader>E", ":Neotree toggle<cr>", { desc = "Explorer toggle File Explorer" })
 
--- gitsigns 
+-- gitsigns
 -- git toggle blame line
 keymap.set("n", "<leader>gl", ":Gitsigns toggle_current_line_blame<cr>", { desc = "Toggle git blame line" })
 
@@ -117,28 +117,68 @@ keymap.set("n", "<leader>dF", function()
 	require("dap").continue()
 end, { desc = "Extend firefox to js|ts debug config" })
 
+-- extend vscode config
+-- problem is do not take into consideration envFile or other because
+-- this depends on the dap-<language> configurations... :(
 keymap.set("n", "<leader>dV", function()
-  local launchFile = ".vscode/launch.json"
-  local file = io.open(launchFile, 'r')
-  if not file then return end
-  local content = file:read('*a')
-  file:close()
+	local launchFile = ".vscode/launch.json"
+	local file = io.open(launchFile, "r")
+	if not file then
+		return
+	end
+	local content = file:read("*a")
+	file:close()
 
-  local filetype = vim.api.nvim_buf_get_option(0, "filetype")
-  local dap_vscode = require("dap.ext.vscode")
-  local parse = require("json5").parse
+	local filetype = vim.api.nvim_buf_get_option(0, "filetype")
+	local dap_vscode = require("dap.ext.vscode")
+	local parse = require("json5").parse
 
-  local data = parse(content)
-  assert(data.configurations, "Launch.json must have a 'configurations' key")
+	local data = parse(content)
+	assert(data.configurations, "Launch.json must have a 'configurations' key")
 
-  for _, config in ipairs(data.configurations) do
-    assert(config.type, "Configuration in launch.json must have a 'type' key")
-    dap_vscode.load_launchjs(nil, { [ config.type ] = { filetype } })
-  end
+	for _, config in ipairs(data.configurations) do
+		assert(config.type, "Configuration in launch.json must have a 'type' key")
+		dap_vscode.load_launchjs(nil, { [config.type] = { filetype } })
+	end
 	require("dap").continue()
 end, { desc = "Run including vscode config" })
 
--- vscode 
+-- dap-go configurations
+-- NOTE: not necessary since launchjs works with env (instead of envFile, at least for go)
+keymap.set("n", "<leader>dG", function()
+	local launchFile = "dap-go.json"
+	local file = io.open(launchFile, "r")
+	if not file then
+		print("No dap-go.json file found")
+		return
+	end
+	local content = file:read("*a")
+	file:close()
+
+	local filetype = vim.api.nvim_buf_get_option(0, "filetype")
+	local dap = require("dap")
+	-- local dap_go = require("dap-go")
+	local parse = require("json5").parse
+
+	configurations = dap.configurations[filetype]
+	local data = parse(content)
+	for _, config in ipairs(data) do
+		print(config.type)
+		assert(config.type, "Configuration must have a 'type' key")
+		assert(config.name, "Configuration must a have a 'name' key")
+		for _, dap_config in pairs(configurations) do
+			print(dap_config)
+			if dap_config.name == config.name then
+				table.remove(configurations, config)
+			end
+		end
+		table.insert(configurations, config)
+	end
+	dap.configurations[filetype] = configurations
+	require("dap").continue()
+end, { desc = "Run including dap-go.json config" })
+--
+-- vscode
 if vim.g.vscode then
 	-- undo/REDO via vscode
 	keymap.set("n", "u", [[<CMD>call VSCodeNotify('undo')<CR>]])

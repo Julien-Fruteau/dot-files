@@ -7,22 +7,29 @@ local js_based_languages = {
 }
 
 return {
-  {
-    "yriveiro/dap-go.nvim",
-    config = function()
-      require("dap-go").setup({
-        external_config = {
-          enable = true,
-        }
-      })
-    end
-  },
+	-- {
+	-- 	"yriveiro/dap-go.nvim",
+	-- },
+	-- 	requires = {
+	-- 		"mfussenegger/nvim-dap",
+	-- 	},
+	-- 	config = function()
+	-- 		require("dap-go").setup({
+	-- 			external_config = {
+	-- 				enable = true,
+	-- 			},
+	-- 		})
+	-- 	end,
+	-- },
 	{
 		"leoluz/nvim-dap-go",
-		config = true,
-    requires= {
-      "yriveiro/dap-go.nvim"
-    }
+		-- config = true,
+		requires = {
+			"yriveiro/dap-go.nvim",
+		},
+		config = function()
+			require("dap-go").setup()
+		end,
 	},
 	{
 		"microsoft/vscode-js-debug",
@@ -96,12 +103,6 @@ return {
 						protocol = "inspector",
 						sourceMaps = true,
 						userDataDir = false,
-					},
-					-- Divider for the launch.json derived configs
-					{
-						name = "----- ↓ launch.json configs ↓ -----",
-						type = "",
-						request = "launch",
 					},
 				}
 			end
