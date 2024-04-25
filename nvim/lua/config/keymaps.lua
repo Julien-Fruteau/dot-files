@@ -42,7 +42,6 @@ keymap.set("n", "<C-a>", "gg<S-v>G", { desc = "Select all" })
 -- window management
 keymap.set("n", "sv", "<C-w>v", { desc = "Split window vertically" }) -- split window vertically
 -- keymap.set("n", "ss", "<C-w>s", { desc = "Split window horizontally" }) -- split window horizontally
-keymap.set("n", "se", "<C-w>=", { desc = "Make splits equal size" }) -- make split windows equal width & height
 
 -- Disable continuations
 keymap.set("n", "<Leader>o", "o<Esc>^Da", { desc = "Continue below" })
@@ -53,7 +52,8 @@ keymap.set("n", "te", ":tabedit")
 -- keymap.set("n", "<tab>", ":tabnext<Return>", opts)
 -- keymap.set("n", "<s-tab>", ":tabprev<Return>", opts)
 
-keymap.set("n", "<leader>sx", "<CMD>close<CR>", { desc = "Close current split" }) -- close current split window
+keymap.set("n", "<leader>we", "<C-w>=", { desc = "Make splits equal size" }) -- make split windows equal width & height
+keymap.set("n", "<leader>wx", "<CMD>close<CR>", { desc = "Close current split" }) -- close current split window
 
 keymap.set("n", "<leader>to", "<CMD>tabnew<CR>", { desc = "Open new tab" }) -- open new tab
 keymap.set("n", "<leader>tx", "<CMD>tabclose<CR>", { desc = "Close current tab" }) -- close current tab
@@ -93,33 +93,18 @@ keymap.set(
 -- show current buffer commits
 keymap.set("n", "<leader>gb", "<CMD>Telescope git_bcommits<CR>", { desc = "Show current buffer commits" })
 
--- glow - markdown preview
-keymap.set("n", "<leader>ug", "<CMD>Glow<CR>", { desc = "Preview markdown file" })
--- keymap.set("n", "<leader>cMp", "<CMD>MarkdownPreviewToggle<CR>", { desc = "Markdown Preview" })
-
 -- maximiser
 keymap.set("n", "<leader>wm", "<CMD>MaximizerToggle<CR>", { desc = "Maximize/minimize a split" })
 
--- dapui
+-- dap
 keymap.set("n", "<leader>dd", "<CMD>DapShowLog<CR>", { desc = "Dap show logs" })
 
-keymap.set("n", "<leader>dv", function()
-	if vim.fn.filereadable(".vscode/launch.json") then
-		require("dap.ext.vscode").load_launchjs(nil, { ["pwa-node"] = { "javascript", "typescript" } })
-	end
-	require("dap").continue()
-end, { desc = "Extend pwa-node to js|ts config" })
-
-keymap.set("n", "<leader>dF", function()
-	if vim.fn.filereadable(".vscode/launch.json") then
-		require("dap.ext.vscode").load_launchjs(nil, { ["firefox"] = { "javascript", "typescript" } })
-	end
-	require("dap").continue()
-end, { desc = "Extend firefox to js|ts debug config" })
+keymap.set("n", "<leader>df", "<CMD>Telescope dap configurations<CR>", { desc = "Show dap configurations" })
 
 -- extend vscode config
 -- problem is do not take into consideration envFile or other because
 -- this depends on the dap-<language> configurations... :(
+-- but language like go take env property
 keymap.set("n", "<leader>dV", function()
 	local launchFile = ".vscode/launch.json"
 	local file = io.open(launchFile, "r")
@@ -143,41 +128,6 @@ keymap.set("n", "<leader>dV", function()
 	require("dap").continue()
 end, { desc = "Run including vscode config" })
 
--- dap-go configurations
--- NOTE: not necessary since launchjs works with env (instead of envFile, at least for go)
-keymap.set("n", "<leader>dG", function()
-	local launchFile = "dap-go.json"
-	local file = io.open(launchFile, "r")
-	if not file then
-		print("No dap-go.json file found")
-		return
-	end
-	local content = file:read("*a")
-	file:close()
-
-	local filetype = vim.api.nvim_buf_get_option(0, "filetype")
-	local dap = require("dap")
-	-- local dap_go = require("dap-go")
-	local parse = require("json5").parse
-
-	configurations = dap.configurations[filetype]
-	local data = parse(content)
-	for _, config in ipairs(data) do
-		print(config.type)
-		assert(config.type, "Configuration must have a 'type' key")
-		assert(config.name, "Configuration must a have a 'name' key")
-		for _, dap_config in pairs(configurations) do
-			print(dap_config)
-			if dap_config.name == config.name then
-				table.remove(configurations, config)
-			end
-		end
-		table.insert(configurations, config)
-	end
-	dap.configurations[filetype] = configurations
-	require("dap").continue()
-end, { desc = "Run including dap-go.json config" })
---
 -- vscode
 if vim.g.vscode then
 	-- undo/REDO via vscode
@@ -185,4 +135,3 @@ if vim.g.vscode then
 	keymap.set("n", "<C-r>", [[<CMD>call VSCodeNotify('redo')<CR>]])
 end
 
-keymap.set("n", "<leader>df", "<CMD>Telescope dap configurations<CR>", { desc = "Show dap configurations" })
