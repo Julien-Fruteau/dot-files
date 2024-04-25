@@ -15,4 +15,7 @@ return {
 		priority = 1000,
 		opts = { style = "moon" }, -- storm, night, moon, day
 	},
+  {
+    'drewtempelmeyer/palenight.vim',
+  }
 }

@@ -17,7 +17,7 @@ local keymap = vim.keymap -- for conciseness
 --  gUaw : Change all of current WORD to upper.
 --  g~~  : Invert case to entire line
 --  g~w  : Invert case to current WORD
-keymap.set("n", "<leader>cc", "g~w", { desc = "Case word: invert" })
+keymap.set("n", "<leader>cw", "g~w", { desc = "Case word: invert" })
 --  guG  : Change to lowercase until the end of document.
 --  gU)  : Change until end of sentence to upper case
 --  gu}  : Change to end of paragraph to lower case
@@ -38,6 +38,10 @@ keymap.set("n", "<leader>nh", ":nohl<CR>", { desc = "Clear search highlights" })
 keymap.set("n", "<leader>+", "<C-a>", { desc = "Increment number" }) -- increment
 keymap.set("n", "<leader>-", "<C-x>", { desc = "Decrement number" }) -- decrement
 keymap.set("n", "<C-a>", "gg<S-v>G", { desc = "Select all" })
+
+
+keymap.set("n", "<leader>ls", "<CMD>Lazy show<CR>", {desc = "Lazy Show"})
+keymap.set("n", "<leader>lS", "<CMD>Lazy sync<CR>", {desc = "Lazy Sync"})
 
 -- window management
 keymap.set("n", "sv", "<C-w>v", { desc = "Split window vertically" }) -- split window vertically

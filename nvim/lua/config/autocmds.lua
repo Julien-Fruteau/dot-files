@@ -10,26 +10,6 @@ api.nvim_create_autocmd({ "FileType" }, {
 	end,
 })
 
--- vim.cmd([[ autocmd FileType helm setlocal commentstring=#\ %s ]])
-
--- - vim.api.nvim_create_autocmd("FileType", {
--- 	group = vim.api.nvim_create_augroup("CommentString", { clear = false }),
--- 	pattern = { "helm" },
--- 	callback = function()
--- 		vim.bo.commentstring = "# %s"
--- 	end,
--- })
-
--- api.nvim_create_autocmd({ "FileType" }, {
--- 	pattern = { "helm", "yaml", "yml" },
--- 	command = "setlocal commentstring=#\\ %s",
--- 	-- command = "echo 'filetype %s'",
--- 	-- callback = function()
--- 	-- 	vim.bo.commentstring = "# %s"
--- 	-- end,
--- 	-- desc = "Change commentstring for helm files",
--- })
-
 -- Turn off paste mode when leaving insert
 api.nvim_create_autocmd("InsertLeave", {
 	pattern = "*",
