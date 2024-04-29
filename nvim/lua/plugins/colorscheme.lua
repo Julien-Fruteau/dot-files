@@ -15,7 +15,14 @@ return {
 		priority = 1000,
 		opts = { style = "moon" }, -- storm, night, moon, day
 	},
-  {
-    'drewtempelmeyer/palenight.vim',
-  }
+	{
+		"drewtempelmeyer/palenight.vim",
+	},
+	{ "ellisonleao/gruvbox.nvim", priority = 1000, config = true, opts = ... },
+	-- Using lazy.nvim
+	{
+		"ribru17/bamboo.nvim",
+		lazy = false,
+		priority = 1000,
+	},
 }

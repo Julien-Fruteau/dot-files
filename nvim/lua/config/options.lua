@@ -4,8 +4,6 @@ local g = vim.g -- for conciseness
 -- disable autoformat
 g.autoformat = false
 
-
-
 -- line numbers
 opt.relativenumber = true -- show relative line numbers
 opt.number = true -- shows absolute line number on cursor line (when relative number is on)
@@ -17,7 +15,7 @@ opt.expandtab = true -- expand tab to spaces
 opt.autoindent = true -- copy indent from current line when starting new one
 
 -- line wrapping
-opt.wrap = true 
+opt.wrap = true
 
 -- buffer scroll
 opt.scrolloff = 10
