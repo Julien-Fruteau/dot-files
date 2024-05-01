@@ -75,6 +75,7 @@ keymap.set("n", "<leader>e", ":Neotree focus<cr>", { desc = "Explorer focus on F
 
 -- noice
 keymap.set("n", "<leader>snt", "<CMD>Telescope noice<CR>", { desc = "Telescope noice messages" })
+keymap.set("n", "<C-l>", "<CMD>Noice dismiss<CR>", { desc = "Telescope noice messages" })
 -- gitsigns
 -- git toggle blame line
 keymap.set("n", "<leader>gl", ":Gitsigns toggle_current_line_blame<cr>", { desc = "Toggle git blame line" })
