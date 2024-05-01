@@ -3,7 +3,7 @@ return {
 	event = "VeryLazy",
 	opts = {
 		presets = {
-			bottom_search = false,
+			-- bottom_search = false,
 		},
 	},
 }
