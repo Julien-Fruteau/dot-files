@@ -39,9 +39,8 @@ keymap.set("n", "<leader>+", "<C-a>", { desc = "Increment number" }) -- incremen
 keymap.set("n", "<leader>-", "<C-x>", { desc = "Decrement number" }) -- decrement
 keymap.set("n", "<C-a>", "gg<S-v>G", { desc = "Select all" })
 
-
-keymap.set("n", "<leader>ls", "<CMD>Lazy show<CR>", {desc = "Lazy Show"})
-keymap.set("n", "<leader>lS", "<CMD>Lazy sync<CR>", {desc = "Lazy Sync"})
+keymap.set("n", "<leader>ls", "<CMD>Lazy show<CR>", { desc = "Lazy Show" })
+keymap.set("n", "<leader>lS", "<CMD>Lazy sync<CR>", { desc = "Lazy Sync" })
 
 -- window management
 keymap.set("n", "sv", "<C-w>v", { desc = "Split window vertically" }) -- split window vertically
@@ -74,6 +73,8 @@ keymap.set("n", "<leader>fs", "<CMD>w<CR>", { desc = "File save" }) -- file save
 keymap.set("n", "<leader>e", ":Neotree focus<cr>", { desc = "Explorer focus on File Explorer" })
 -- keymap.set("n", "<leader>E", ":Neotree toggle<cr>", { desc = "Explorer toggle File Explorer" })
 
+-- noice
+keymap.set("n", "<leader>snt", "<CMD>Telescope noice<CR>", { desc = "Telescope noice messages" })
 -- gitsigns
 -- git toggle blame line
 keymap.set("n", "<leader>gl", ":Gitsigns toggle_current_line_blame<cr>", { desc = "Toggle git blame line" })
@@ -138,4 +139,3 @@ if vim.g.vscode then
 	keymap.set("n", "u", [[<CMD>call VSCodeNotify('undo')<CR>]])
 	keymap.set("n", "<C-r>", [[<CMD>call VSCodeNotify('redo')<CR>]])
 end
-
