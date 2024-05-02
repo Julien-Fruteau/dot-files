@@ -140,3 +140,7 @@ if vim.g.vscode then
 	keymap.set("n", "u", [[<CMD>call VSCodeNotify('undo')<CR>]])
 	keymap.set("n", "<C-r>", [[<CMD>call VSCodeNotify('redo')<CR>]])
 end
+
+-- diagnostic 
+keymap.set("n", "<leader>xb","<CMD>Telescope diagnostics<CR>", { desc = "Show buffers diagnostics (Telescope)" })
+
