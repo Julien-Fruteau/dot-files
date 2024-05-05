@@ -5,6 +5,7 @@ return {
 		name = "catppuccin",
 		priority = 1000,
 		opts = { flavour = "macchiato" }, -- latte, frappe, macchiato, mocha }
+    lazy = false,
 	},
 	{ "navarasu/onedark.nvim", priority = 1000 },
 	{ "rebelot/kanagawa.nvim", priority = 1000 },
