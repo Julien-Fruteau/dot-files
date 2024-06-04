@@ -46,6 +46,18 @@ keymap.set("n", "<leader>lS", "<CMD>Lazy sync<CR>", { desc = "Lazy Sync" })
 keymap.set("n", "sv", "<C-w>v", { desc = "Split window vertically" }) -- split window vertically
 -- keymap.set("n", "ss", "<C-w>s", { desc = "Split window horizontally" }) -- split window horizontally
 
+keymap.set("n", "<leader>wl", function()
+	local buf = vim.api.nvim_get_current_buf()
+	vim.cmd.wincmd("l")
+	vim.cmd.buffer(buf)
+end, { desc = "Open buffer on right" })
+
+keymap.set("n", "<leader>wh", function()
+	local buf = vim.api.nvim_get_current_buf()
+	vim.cmd.wincmd("h")
+	vim.cmd.buffer(buf)
+end, { desc = "Open buffer on left" })
+
 -- Disable continuations
 keymap.set("n", "<Leader>o", "o<Esc>^Da", { desc = "Continue below" })
 keymap.set("n", "<Leader>O", "O<Esc>^Da", { desc = "Continue above" })
@@ -141,6 +153,5 @@ if vim.g.vscode then
 	keymap.set("n", "<C-r>", [[<CMD>call VSCodeNotify('redo')<CR>]])
 end
 
--- diagnostic 
-keymap.set("n", "<leader>xb","<CMD>Telescope diagnostics<CR>", { desc = "Show buffers diagnostics (Telescope)" })
-
+-- diagnostic
+keymap.set("n", "<leader>xb", "<CMD>Telescope diagnostics<CR>", { desc = "Show buffers diagnostics (Telescope)" })
