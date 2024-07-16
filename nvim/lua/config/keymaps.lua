@@ -39,11 +39,11 @@ keymap.set("n", "<leader>+", "<C-a>", { desc = "Increment number" }) -- incremen
 keymap.set("n", "<leader>-", "<C-x>", { desc = "Decrement number" }) -- decrement
 keymap.set("n", "<C-a>", "gg<S-v>G", { desc = "Select all" })
 
-keymap.set("n", "<leader>ls", "<CMD>Lazy show<CR>", { desc = "Lazy Show" })
-keymap.set("n", "<leader>lS", "<CMD>Lazy sync<CR>", { desc = "Lazy Sync" })
+-- keymap.set("n", "<leader>ls", "<CMD>Lazy show<CR>", { desc = "Lazy Show" })
+-- keymap.set("n", "<leader>lS", "<CMD>Lazy sync<CR>", { desc = "Lazy Sync" })
 
 -- window management
-keymap.set("n", "sv", "<C-w>v", { desc = "Split window vertically" }) -- split window vertically
+-- keymap.set("n", "sv", "<C-w>v", { desc = "Split window vertically" }) -- split window vertically
 -- keymap.set("n", "ss", "<C-w>s", { desc = "Split window horizontally" }) -- split window horizontally
 
 keymap.set("n", "<leader>wl", function()
@@ -63,7 +63,7 @@ keymap.set("n", "<Leader>o", "o<Esc>^Da", { desc = "Continue below" })
 keymap.set("n", "<Leader>O", "O<Esc>^Da", { desc = "Continue above" })
 
 -- New tab
-keymap.set("n", "te", ":tabedit")
+-- keymap.set("n", "te", ":tabedit")
 -- keymap.set("n", "<tab>", ":tabnext<Return>", opts)
 -- keymap.set("n", "<s-tab>", ":tabprev<Return>", opts)
 
@@ -154,4 +154,5 @@ if vim.g.vscode then
 end
 
 -- diagnostic
-keymap.set("n", "<leader>xb", "<CMD>Telescope diagnostics<CR>", { desc = "Show buffers diagnostics (Telescope)" })
+keymap.set("n", "<leader>cb", "<CMD>Telescope diagnostics<CR>", { desc = "Show buffers diagnostics (Telescope)" })
+

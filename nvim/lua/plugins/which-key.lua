@@ -6,7 +6,7 @@ return {
 		vim.o.timeoutlen = 500
 	end,
 	opts = {
-		defaults = {
+		spec = {
 			["<leader>cp"] = { name = "+python" },
 			["<leader>n"] = { name = "+nils" },
 			["<leader>cM"] = { name = "+markdown" },
