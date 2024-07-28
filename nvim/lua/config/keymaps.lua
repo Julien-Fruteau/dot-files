@@ -39,6 +39,9 @@ keymap.set("n", "<leader>+", "<C-a>", { desc = "Increment number" }) -- incremen
 keymap.set("n", "<leader>-", "<C-x>", { desc = "Decrement number" }) -- decrement
 keymap.set("n", "<C-a>", "gg<S-v>G", { desc = "Select all" })
 
+
+-- paste do not overwrite the register
+-- keymap.set("n", "p", "P", { desc = "Paste without overwriting register" })
 -- keymap.set("n", "<leader>ls", "<CMD>Lazy show<CR>", { desc = "Lazy Show" })
 -- keymap.set("n", "<leader>lS", "<CMD>Lazy sync<CR>", { desc = "Lazy Sync" })
 
@@ -46,17 +49,85 @@ keymap.set("n", "<C-a>", "gg<S-v>G", { desc = "Select all" })
 -- keymap.set("n", "sv", "<C-w>v", { desc = "Split window vertically" }) -- split window vertically
 -- keymap.set("n", "ss", "<C-w>s", { desc = "Split window horizontally" }) -- split window horizontally
 
+local function get_total_buffers()
+	local buffers = vim.api.nvim_list_bufs()
+	return #buffers
+end
+
 keymap.set("n", "<leader>wl", function()
+	local current_win = vim.fn.winnr()
+	local right_win = vim.fn.winnr("l")
 	local buf = vim.api.nvim_get_current_buf()
+	local total_buffers = get_total_buffers()
+	if total_buffers < 2 then
+		return
+	end
+
+	if current_win == right_win then
+		-- No right split exists, create one
+		vim.cmd("vsplit")
+	end
 	vim.cmd.wincmd("l")
 	vim.cmd.buffer(buf)
-end, { desc = "Open buffer on right" })
+	vim.cmd.wincmd("h")
+	vim.cmd("b#")
+	vim.cmd.wincmd("l")
+end, { desc = "Move buffer to right split" })
+
+keymap.set("n", "<leader>wL", function()
+	local current_win = vim.fn.winnr()
+	local right_win = vim.fn.winnr("l")
+	local buf = vim.api.nvim_get_current_buf()
+	local total_buffers = get_total_buffers()
+	if total_buffers < 2 then
+		return
+	end
+
+	if current_win == right_win then
+		-- No right split exists, create one
+		vim.cmd("vsplit")
+	end
+	vim.cmd.wincmd("l")
+	vim.cmd.buffer(buf)
+end, { desc = "Split buffer to right" })
 
 keymap.set("n", "<leader>wh", function()
+	local current_win = vim.fn.winnr()
+	local right_win = vim.fn.winnr("h")
 	local buf = vim.api.nvim_get_current_buf()
+	local total_buffers = get_total_buffers()
+	if total_buffers < 2 then
+		return
+	end
+
+	if current_win == right_win then
+		-- No right split exists, create one
+		vim.cmd("vsplit")
+	end
 	vim.cmd.wincmd("h")
 	vim.cmd.buffer(buf)
-end, { desc = "Open buffer on left" })
+	vim.cmd.wincmd("l")
+	vim.cmd("b#")
+	vim.cmd.wincmd("h")
+end, { desc = "Move buffer to right split" })
+
+keymap.set("n", "<leader>wH", function()
+	local buf = vim.api.nvim_get_current_buf()
+	local current_win = vim.fn.winnr()
+	local right_win = vim.fn.winnr("h")
+	local buf = vim.api.nvim_get_current_buf()
+	local total_buffers = get_total_buffers()
+	if total_buffers < 2 then
+		return
+	end
+
+	if current_win == right_win then
+		-- No right split exists, create one
+		vim.cmd("vsplit")
+	end
+	vim.cmd.wincmd("h")
+	vim.cmd.buffer(buf)
+end, { desc = "Split buffer to left" })
 
 -- Disable continuations
 keymap.set("n", "<Leader>o", "o<Esc>^Da", { desc = "Continue below" })
@@ -151,8 +222,27 @@ if vim.g.vscode then
 	-- undo/REDO via vscode
 	keymap.set("n", "u", [[<CMD>call VSCodeNotify('undo')<CR>]])
 	keymap.set("n", "<C-r>", [[<CMD>call VSCodeNotify('redo')<CR>]])
+	keymap.set("n", "U", [[<CMD>call VSCodeNotify('redo')<CR>]])
+  keymap.set("n", "zz", [[<CMD> call VSCodeNotify('center-editor-window.center')<CR>]])
 end
 
 -- diagnostic
 keymap.set("n", "<leader>cb", "<CMD>Telescope diagnostics<CR>", { desc = "Show buffers diagnostics (Telescope)" })
 
+-- magma (python jupyter)
+-- Required Python packages:
+-- pynvim (for the Remote Plugin API)
+-- jupyter_client (for interacting with Jupyter)
+-- ueberzug (for displaying images. Not available on MacOS, but see #15 for alternatives)
+-- Pillow (also for displaying images, should be installed with ueberzug)
+-- cairosvg (for displaying SVG images)
+-- pnglatex (for displaying TeX formulas)
+-- plotly and kaleido (for displaying Plotly figures)
+-- pyperclip if you want to use magma_copy_output
+
+keymap.set("n", "<leader>mo", ":MagmaEvaluateOperator<CR>", { desc = "Magma (jupy) eval operator" })
+keymap.set("n", "<leader>mr", ":MagmaEvaluateLine<CR>", { desc = "Magma (jupy) eval line" })
+keymap.set("n", "<leader>mu", ":<C-u>MagmaEvaluateVisual<CR>", { desc = "Magma (jupy) eval visual" })
+keymap.set("n", "<leader>mc", ":MagmaReevaluateCell<CR>", { desc = "Magma (jupy) reeval cell" })
+keymap.set("n", "<leader>md", ":MagmaDelete<CR>", { desc = "Magma (jupy) delete" })
+keymap.set("n", "<leader>mo", ":MagmaShowOutput<CR>", { desc = "Magma (jupy) show output" })
