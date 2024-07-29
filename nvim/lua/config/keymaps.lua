@@ -38,6 +38,7 @@ keymap.set("n", "<leader>nh", ":nohl<CR>", { desc = "Clear search highlights" })
 keymap.set("n", "<leader>+", "<C-a>", { desc = "Increment number" }) -- increment
 keymap.set("n", "<leader>-", "<C-x>", { desc = "Decrement number" }) -- decrement
 keymap.set("n", "<C-a>", "gg<S-v>G", { desc = "Select all" })
+keymap.set("n", "<A-v>", "<C-v>", { desc = "Visual block mode" })
 
 
 -- paste do not overwrite the register
