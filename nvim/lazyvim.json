@@ -28,10 +28,11 @@
     "lazyvim.plugins.extras.test.core",
     "lazyvim.plugins.extras.ui.treesitter-context",
     "lazyvim.plugins.extras.util.dot",
-    "lazyvim.plugins.extras.util.mini-hipatterns"
+    "lazyvim.plugins.extras.util.mini-hipatterns",
+    "lazyvim.plugins.extras.vscode"
   ],
   "news": {
-    "NEWS.md": "6296",
+    "NEWS.md": "6520",
     "doc/news.txt": "24447"
   },
   "version": 6

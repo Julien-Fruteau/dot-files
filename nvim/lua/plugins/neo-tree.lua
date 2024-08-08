@@ -1,5 +1,6 @@
 return {
 	"nvim-neo-tree/neo-tree.nvim",
+  enabled = not vim.g.vscode,
 	branch = "v3.x",
 	cmd = "Neotree",
 	-- keys = {

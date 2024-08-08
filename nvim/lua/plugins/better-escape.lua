@@ -1,10 +1,11 @@
 return {
 	"max397574/better-escape.nvim",
+  enabled = false,
 	config = function()
 		-- lua, default settings
 		require("better_escape").setup({
 			timeout = vim.o.timeoutlen,
-			default_mappings = true,
+			-- default_mappings = true,
 			mappings = {
 				i = {
 					j = {

@@ -1,5 +1,5 @@
--- catppuccin
-return {{
+return {
+  {
     "catppuccin/nvim",
     name = "catppuccin",
     priority = 1000,
@@ -27,7 +27,7 @@ return {{
     "folke/tokyonight.nvim",
     priority = 1000,
     opts = {
-        style = "moon"
+        style = "storm"
     }, -- storm, night, moon, day
     lazy = false
 }, {"drewtempelmeyer/palenight.vim"}, {

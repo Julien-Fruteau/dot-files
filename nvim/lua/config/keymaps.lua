@@ -43,6 +43,7 @@ keymap.set("n", "<A-v>", "<C-v>", { desc = "Visual block mode" })
 
 -- paste do not overwrite the register
 -- keymap.set("n", "p", "P", { desc = "Paste without overwriting register" })
+keymap.set("n", "U", "<C-R>", { desc = "Paste without overwriting register" })
 -- keymap.set("n", "<leader>ls", "<CMD>Lazy show<CR>", { desc = "Lazy Show" })
 -- keymap.set("n", "<leader>lS", "<CMD>Lazy sync<CR>", { desc = "Lazy Sync" })
 
