@@ -91,8 +91,30 @@ return {
 }, {
     "rose-pine/neovim",
     name = "rose-pine",
-    priority = 1000
+    priority = 1000,
+    config = function()
+      require("rose-pine").setup({
+        variant = "moon",
+        dark_variant = "moon",
+        dim_inactive_windows = true,
+        styles = {
+          bold = true,
+          italic = false,
+          transparency = false,
+        }
+      })
+    end
 }, {
     "EdenEast/nightfox.nvim",
     priority = 1000
-}}
+},
+{
+  'uloco/bluloco.nvim',
+  lazy = false,
+  priority = 1000,
+  dependencies = { 'rktjmp/lush.nvim' },
+  config = function()
+    -- your optional config goes here, see below.
+  end,
+},
+}
