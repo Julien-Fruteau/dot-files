@@ -40,7 +40,6 @@ keymap.set("n", "<leader>-", "<C-x>", { desc = "Decrement number" }) -- decremen
 keymap.set("n", "<C-a>", "gg<S-v>G", { desc = "Select all" })
 keymap.set("n", "<A-v>", "<C-v>", { desc = "Visual block mode" })
 
-
 -- paste do not overwrite the register
 -- keymap.set("n", "p", "P", { desc = "Paste without overwriting register" })
 keymap.set("n", "U", "<C-R>", { desc = "Paste without overwriting register" })
@@ -225,7 +224,7 @@ if vim.g.vscode then
 	keymap.set("n", "u", [[<CMD>call VSCodeNotify('undo')<CR>]])
 	keymap.set("n", "<C-r>", [[<CMD>call VSCodeNotify('redo')<CR>]])
 	keymap.set("n", "U", [[<CMD>call VSCodeNotify('redo')<CR>]])
-  keymap.set("n", "zz", [[<CMD> call VSCodeNotify('center-editor-window.center')<CR>]])
+	keymap.set("n", "zz", [[<CMD> call VSCodeNotify('center-editor-window.center')<CR>]])
 end
 
 -- diagnostic
@@ -248,3 +247,4 @@ keymap.set("n", "<leader>mu", ":<C-u>MagmaEvaluateVisual<CR>", { desc = "Magma (
 keymap.set("n", "<leader>mc", ":MagmaReevaluateCell<CR>", { desc = "Magma (jupy) reeval cell" })
 keymap.set("n", "<leader>md", ":MagmaDelete<CR>", { desc = "Magma (jupy) delete" })
 keymap.set("n", "<leader>mo", ":MagmaShowOutput<CR>", { desc = "Magma (jupy) show output" })
+

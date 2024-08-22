@@ -27,7 +27,7 @@ return {
     "folke/tokyonight.nvim",
     priority = 1000,
     opts = {
-        style = "storm"
+        style = "moon"
     }, -- storm, night, moon, day
     lazy = false
 }, {"drewtempelmeyer/palenight.vim"}, {
