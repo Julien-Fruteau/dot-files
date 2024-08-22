@@ -34,3 +34,10 @@ api.nvim_create_autocmd("User", {
 		vim.wo.wrap = true
 	end,
 })
+
+local function KotlinLspJvm(opts)
+	local kotlin = require("lspconfig").kotlin_language_server
+	kotlin.setup({ settings = { kotlin = { compiler = { jvm = { target = opts.args } } } } })
+end
+
+api.nvim_create_user_command("KotlinLspJvm", KotlinLspJvm, { nargs = 1, desc = "Set Kotlin LSP to jvm version" })
