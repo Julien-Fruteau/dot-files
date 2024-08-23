@@ -225,6 +225,8 @@ if vim.g.vscode then
 	keymap.set("n", "<C-r>", [[<CMD>call VSCodeNotify('redo')<CR>]])
 	keymap.set("n", "U", [[<CMD>call VSCodeNotify('redo')<CR>]])
 	keymap.set("n", "zz", [[<CMD> call VSCodeNotify('center-editor-window.center')<CR>]])
+	keymap.set("n", "<leader>e", [[<CMD>call VSCodeNotify('workbench.explorer.fileView.focus')<CR>]])
+	keymap.set("n", "gr", [[<CMD>call VSCodeNotify('editor.action.goToReferences')<CR>]])
 end
 
 -- diagnostic
@@ -247,4 +249,3 @@ keymap.set("n", "<leader>mu", ":<C-u>MagmaEvaluateVisual<CR>", { desc = "Magma (
 keymap.set("n", "<leader>mc", ":MagmaReevaluateCell<CR>", { desc = "Magma (jupy) reeval cell" })
 keymap.set("n", "<leader>md", ":MagmaDelete<CR>", { desc = "Magma (jupy) delete" })
 keymap.set("n", "<leader>mo", ":MagmaShowOutput<CR>", { desc = "Magma (jupy) show output" })
-
