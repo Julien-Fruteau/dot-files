@@ -41,3 +41,11 @@ local function KotlinLspJvm(opts)
 end
 
 api.nvim_create_user_command("KotlinLspJvm", KotlinLspJvm, { nargs = 1, desc = "Set Kotlin LSP to jvm version" })
+
+local function KotlinLspJvm17()
+	local kotlin = require("lspconfig").kotlin_language_server
+	kotlin.setup({ settings = { kotlin = { compiler = { jvm = { target = "17" } } } } })
+end
+
+api.nvim_create_user_command("KotlinLspJvm17", KotlinLspJvm17, {})
+
