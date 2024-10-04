@@ -6,15 +6,15 @@ local js_based_languages = {
 	"vue",
 }
 return {
-	{
-		"Mgenuit/nvim-dap-kotlin",
-		config = function()
-			require("dap-kotlin").setup({
-				dap_command = "target/intranet-0.0.1-SNAPSHOT.jar",
-				project_root = "${workspaceFolder}",
-			})
-		end,
-	},
+	-- {
+	-- 	"Mgenuit/nvim-dap-kotlin",
+	-- 	config = function()
+	-- 		require("dap-kotlin").setup({
+	-- 			dap_command = "target/intranet-0.0.1-SNAPSHOT.jar",
+	-- 			project_root = "${workspaceFolder}",
+	-- 		})
+	-- 	end,
+	-- },
 }
 -- return {
 -- 	-- {

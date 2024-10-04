@@ -65,3 +65,6 @@ opt.timeout = true
 opt.timeoutlen = 300
 --  completeopt to have a better completion experience
 opt.completeopt = "menuone,noselect"
+
+-- opt.guicursor = "n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20" 
+opt.guicursor = "n-v-c-sm:block-blinkon500-blinkoff200-blinkwait300,i-ci-ve:ver25-blinkon500-blinkoff200-blinkwait300,r-cr-o:hor20-blinkon500-blinkoff200-blinkwait300"

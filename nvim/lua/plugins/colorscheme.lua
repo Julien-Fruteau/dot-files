@@ -4,7 +4,23 @@ return {
 		name = "catppuccin",
 		priority = 1000,
 		opts = {
+			-- no_italic = true,
+			-- term_colors = true,
 			flavour = "frappe",
+			-- flavour = "macchiato",
+			-- transparent_background = true,
+			-- dim_inactive = {
+			-- 	enabled = true, -- dims the background color of inactive window
+			-- 	shade = "dark",
+			-- 	percentage = 0.05, -- percentage of the shade to apply to the inactive window
+			-- },
+			color_overrides = {
+				-- frappe = {
+				-- 	base = "#000000",
+				-- 	mantle = "#000000",
+				-- 	crust = "#000000",
+				-- },
+			},
 		}, -- latte, frappe, macchiato, mocha }
 		lazy = false,
 	},
@@ -109,7 +125,7 @@ return {
 				dim_inactive_windows = true,
 				styles = {
 					bold = true,
-					italic = false,
+					italic = true,
 					transparency = false,
 				},
 			})
