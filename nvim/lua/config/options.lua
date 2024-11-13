@@ -40,6 +40,26 @@ opt.backspace = "indent,eol,start" -- allow backspace on indent, end of line or 
 
 -- clipboard
 opt.clipboard = "unnamedplus" -- use system clipboard as default register
+g.clipboard = {
+	name = "WslClipboard",
+	copy = {
+		["+"] = { "clip.exe" },
+		["*"] = { "clip.exe" },
+	},
+	paste = {
+		["+"] = {
+			"/mnt/c/Windows/System32/WindowsPowerShell/v1.0///powershell.exe",
+			"-c",
+			'[Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
+		},
+		["*"] = {
+			"/mnt/c/Windows/System32/WindowsPowerShell/v1.0///powershell.exe",
+			"-c",
+			'[Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
+		},
+	},
+	cache_enabled = false,
+}
 
 -- split windows
 opt.splitright = true -- split vertical window to the right
@@ -66,5 +86,12 @@ opt.timeoutlen = 300
 --  completeopt to have a better completion experience
 opt.completeopt = "menuone,noselect"
 
--- opt.guicursor = "n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20" 
-opt.guicursor = "n-v-c-sm:block-blinkon500-blinkoff200-blinkwait300,i-ci-ve:ver25-blinkon500-blinkoff200-blinkwait300,r-cr-o:hor20-blinkon500-blinkoff200-blinkwait300"
+-- opt.guicursor = "n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20"
+opt.guicursor =
+	"n-v-c-sm:block-blinkon500-blinkoff200-blinkwait300,i-ci-ve:ver25-blinkon500-blinkoff200-blinkwait300,r-cr-o:hor20-blinkon500-blinkoff200-blinkwait300"
+
+-- LSP Server to use for Python.
+-- Set to "basedpyright" to use basedpyright instead of pyright.
+-- vim.g.lazyvim_python_lsp = "basedpyright"
+-- Set to "ruff_lsp" to use the old LSP implementation version.
+-- vim.g.lazyvim_python_ruff = "ruff"

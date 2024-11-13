@@ -10,23 +10,23 @@ api.nvim_create_autocmd({ "FileType" }, {
 	end,
 })
 
--- Turn off paste mode when leaving insert
-api.nvim_create_autocmd("InsertLeave", {
-	pattern = "*",
-	command = "set nopaste",
-})
+-- -- Turn off paste mode when leaving insert
+-- api.nvim_create_autocmd("InsertLeave", {
+-- 	pattern = "*",
+-- 	command = "set nopaste",
+-- })
 
 local hl_group = api.nvim_create_augroup("YankHighlight", {
 	clear = true,
 })
 
-api.nvim_create_autocmd("TextYankPost", {
-	callback = function()
-		vim.highlight.on_yank()
-	end,
-	group = hl_group,
-	pattern = "*",
-})
+-- api.nvim_create_autocmd("TextYankPost", {
+-- 	callback = function()
+-- 		vim.highlight.on_yank()
+-- 	end,
+-- 	group = hl_group,
+-- 	pattern = "*",
+-- })
 
 api.nvim_create_autocmd("User", {
 	pattern = "TelescopePreviewerLoaded",

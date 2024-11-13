@@ -14,44 +14,16 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
--- if not vim.loop.fs_stat(lazypath) then
--- 	-- bootstrap lazy.nvim
--- 	vim.fn.system({
--- 		"git",
--- 		"clone",
--- 		"--filter=blob:none",
--- 		"https://github.com/folke/lazy.nvim.git",
--- 		"--branch=stable",
--- 		lazypath,
--- 	})
--- end
--- vim.opt.rtp:prepend(vim.env.LAZY or lazypath)
-
 require("lazy").setup({
 	spec = { -- add LazyVim and import its plugins
 		{
 			"LazyVim/LazyVim",
 			import = "lazyvim.plugins",
 			opts = {
-				-- colorscheme = "rose-pine",
-				colorscheme = "catppuccin",
-				-- 	-- colorscheme = "palenight",
-				-- 	-- colorscheme = "onedark",
-				-- 	colorscheme = "tokyonight",
-				-- 	news = {
-				-- 		lazyim = true,
-				-- 		neovim = true,
-				-- 	},
-				-- 	lazy = true,
+				colorscheme = "rose-pine",
+				-- colorscheme = "catppuccin",
 			},
 		}, -- import any extras modules here
-		-- { import = "lazyvim.plugins.extras.ui.mini-animate" },
-		-- { import = "lazyvim.plugins.extras.linting.eslint" },
-		-- { import = "lazyvim.plugins.extras.formatting.prettier" },
-		-- { import = "lazyvim.plugins.extras.lang.typescript" },
-		-- { import = "lazyvim.plugins.extras.lang.json" },
-		-- { import = "lazyvim.plugins.extras.lang.rust" },
-		-- { import = "lazyvim.plugins.extras.lang.tailwind" },
 		-- { import = "lazyvim.plugins.extras.util.mini-hipatterns" },
 		-- NB: some plugins are handled by LazyExtras
 		-- import/override with your plugins
@@ -78,13 +50,15 @@ require("lazy").setup({
 		rtp = {
 			-- disable some rtp plugins
 			disabled_plugins = {
-				"gzip", -- "matchit",
+				"gzip",
+        -- "matchit",
 				-- "matchparen",
 				-- "netrwPlugin",
 				"tarPlugin",
 				"tohtml",
 				"tutor",
-				"zipPlugin",
+				-- "zipPlugin",
+        "nvim-notify",
 			},
 		},
 	},

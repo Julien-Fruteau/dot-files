@@ -41,8 +41,8 @@ keymap.set("n", "<C-a>", "gg<S-v>G", { desc = "Select all" })
 keymap.set("n", "<A-v>", "<C-v>", { desc = "Visual block mode" })
 
 -- paste do not overwrite the register
--- keymap.set("n", "p", "P", { desc = "Paste without overwriting register" })
-keymap.set("n", "U", "<C-R>", { desc = "Paste without overwriting register" })
+-- keymap.set("n", "p", "P", { desc = "Paste before selection by defaults to avoid overwriting register" })
+keymap.set("n", "U", "<C-R>", { desc = "Redo" })
 -- keymap.set("n", "<leader>ls", "<CMD>Lazy show<CR>", { desc = "Lazy Show" })
 -- keymap.set("n", "<leader>lS", "<CMD>Lazy sync<CR>", { desc = "Lazy Sync" })
 
@@ -160,26 +160,7 @@ keymap.set("n", "<leader>e", ":Neotree focus<cr>", { desc = "Explorer focus on F
 -- noice
 keymap.set("n", "<leader>snt", "<CMD>Telescope noice<CR>", { desc = "Telescope noice messages" })
 keymap.set("n", "<M-l>", "<CMD>Noice dismiss<CR>", { desc = "Telescope noice messages" })
--- gitsigns
--- git toggle blame line
-keymap.set("n", "<leader>gl", ":Gitsigns toggle_current_line_blame<cr>", { desc = "Toggle git blame line" })
 
--- git-worktree
-keymap.set(
-	"n",
-	"<leader>gr",
-	"<CMD>lua require('telescope').extensions.git_worktree.git_worktree()<CR>",
-	{ desc = "Switch between worktree" }
-)
--- -- <Enter> - switches to that worktree
--- <c-d> - deletes that worktree
--- <c-f> - toggles forcing of the next deletion
-keymap.set(
-	"n",
-	"<leader>gR",
-	"<CMD>lua require('telescope').extensions.git_worktree.create_git_worktree()<CR>",
-	{ desc = "Create worktree" }
-)
 -- show current buffer commits
 keymap.set("n", "<leader>gb", "<CMD>Telescope git_bcommits<CR>", { desc = "Show current buffer commits" })
 
@@ -191,33 +172,6 @@ keymap.set("n", "<leader>dd", "<CMD>DapShowLog<CR>", { desc = "Dap show logs" })
 
 keymap.set("n", "<leader>df", "<CMD>Telescope dap configurations<CR>", { desc = "Show dap configurations" })
 
--- extend vscode config
--- problem is do not take into consideration envFile or other because
--- this depends on the dap-<language> configurations... :(
--- but language like go take env property
-keymap.set("n", "<leader>dV", function()
-	local launchFile = ".vscode/launch.json"
-	local file = io.open(launchFile, "r")
-	if not file then
-		return
-	end
-	local content = file:read("*a")
-	file:close()
-
-	local filetype = vim.api.nvim_buf_get_option(0, "filetype")
-	local dap_vscode = require("dap.ext.vscode")
-	local parse = require("json5").parse
-
-	local data = parse(content)
-	assert(data.configurations, "Launch.json must have a 'configurations' key")
-
-	for _, config in ipairs(data.configurations) do
-		assert(config.type, "Configuration in launch.json must have a 'type' key")
-		dap_vscode.load_launchjs(nil, { [config.type] = { filetype } })
-	end
-	require("dap").continue()
-end, { desc = "Run including vscode config" })
-
 -- vscode
 if vim.g.vscode then
 	-- undo/REDO via vscode
@@ -227,6 +181,13 @@ if vim.g.vscode then
 	keymap.set("n", "zz", [[<CMD> call VSCodeNotify('center-editor-window.center')<CR>]])
 	keymap.set("n", "<leader>e", [[<CMD>call VSCodeNotify('workbench.explorer.fileView.focus')<CR>]])
 	keymap.set("n", "gr", [[<CMD>call VSCodeNotify('editor.action.goToReferences')<CR>]])
+	keymap.set("n", "j", "gj", { remap = true })
+	keymap.set("n", "k", "gk", { remap = true })
+	-- keymap.set({ "n", "x", "i" }, "<C-n>", function()
+	-- vim.g.vscode.with_insert(function()
+	--   vim.g.vscode.action("editor.action.addSelectionToNextFindMatch")
+	-- end)
+	-- end)
 end
 
 -- diagnostic
