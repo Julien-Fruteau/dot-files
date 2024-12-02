@@ -110,7 +110,7 @@ keymap.set("n", "<leader>wh", function()
 	vim.cmd.wincmd("l")
 	vim.cmd("b#")
 	vim.cmd.wincmd("h")
-end, { desc = "Move buffer to right split" })
+end, { desc = "Move buffer to left split" })
 
 keymap.set("n", "<leader>wH", function()
 	local buf = vim.api.nvim_get_current_buf()
@@ -210,3 +210,6 @@ keymap.set("n", "<leader>mu", ":<C-u>MagmaEvaluateVisual<CR>", { desc = "Magma (
 keymap.set("n", "<leader>mc", ":MagmaReevaluateCell<CR>", { desc = "Magma (jupy) reeval cell" })
 keymap.set("n", "<leader>md", ":MagmaDelete<CR>", { desc = "Magma (jupy) delete" })
 keymap.set("n", "<leader>mo", ":MagmaShowOutput<CR>", { desc = "Magma (jupy) show output" })
+
+keymap.set("n", "<leader>ch", ":LivePreview start<cr>", {desc = "Preview start"})
+keymap.set("n", "<leader>cH", ":LivePreview close<cr>", {desc = "Preview stop"})
