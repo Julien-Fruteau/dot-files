@@ -204,12 +204,29 @@ keymap.set("n", "<leader>cb", "<CMD>Telescope diagnostics<CR>", { desc = "Show b
 -- plotly and kaleido (for displaying Plotly figures)
 -- pyperclip if you want to use magma_copy_output
 
-keymap.set("n", "<leader>mo", ":MagmaEvaluateOperator<CR>", { desc = "Magma (jupy) eval operator" })
-keymap.set("n", "<leader>mr", ":MagmaEvaluateLine<CR>", { desc = "Magma (jupy) eval line" })
-keymap.set("n", "<leader>mu", ":<C-u>MagmaEvaluateVisual<CR>", { desc = "Magma (jupy) eval visual" })
-keymap.set("n", "<leader>mc", ":MagmaReevaluateCell<CR>", { desc = "Magma (jupy) reeval cell" })
-keymap.set("n", "<leader>md", ":MagmaDelete<CR>", { desc = "Magma (jupy) delete" })
-keymap.set("n", "<leader>mo", ":MagmaShowOutput<CR>", { desc = "Magma (jupy) show output" })
+-- keymap.set("n", "<leader>mo", ":MagmaEvaluateOperator<CR>", { desc = "Magma (jupy) eval operator" })
+-- keymap.set("n", "<leader>mr", ":MagmaEvaluateLine<CR>", { desc = "Magma (jupy) eval line" })
+-- keymap.set("n", "<leader>mu", ":<C-u>MagmaEvaluateVisual<CR>", { desc = "Magma (jupy) eval visual" })
+-- keymap.set("n", "<leader>mc", ":MagmaReevaluateCell<CR>", { desc = "Magma (jupy) reeval cell" })
+-- keymap.set("n", "<leader>md", ":MagmaDelete<CR>", { desc = "Magma (jupy) delete" })
+-- keymap.set("n", "<leader>mo", ":MagmaShowOutput<CR>", { desc = "Magma (jupy) show output" })
 
-keymap.set("n", "<leader>ch", ":LivePreview start<cr>", {desc = "Preview start"})
-keymap.set("n", "<leader>cH", ":LivePreview close<cr>", {desc = "Preview stop"})
+keymap.set("n", "<leader>ch", ":LivePreview start<cr>", { desc = "Preview start" })
+keymap.set("n", "<leader>cH", ":LivePreview close<cr>", { desc = "Preview stop" })
+
+-- keymap.set("n", "<Leader>t_", ":lua open_floating_terminal()<CR>", { noremap = true, silent = true })
+-- Clear the terminal with Ctrl+L in terminal mode
+-- vim.keymap.set('t', '<C-l>', '<Cmd>clear<CR>', { remap = true, silent = true })
+
+-- molten jupyter kernel
+keymap.set("n", "<leader>mi", ":MoltenInit<CR>", { silent = true, desc = "Initialize the plugin" })
+keymap.set("n", "<leader>me", ":MoltenEvaluateOperator<CR>", { silent = true, desc = "run operator selection" })
+keymap.set("n", "<leader>ml", ":MoltenEvaluateLine<CR>", { silent = true, desc = "evaluate line" })
+keymap.set("n", "<leader>mc", ":MoltenReevaluateCell<CR>", { silent = true, desc = "re-evaluate cell" })
+keymap.set(
+	"v",
+	"<leader>mv",
+	":<C-u>MoltenEvaluateVisual<CR>gv",
+	{ silent = true, desc = "evaluate visual selection" }
+)
+keymap.set("n", "<leader>md", ":MoltenDeinit<CR>", { silent = true, desc = "deinit" })

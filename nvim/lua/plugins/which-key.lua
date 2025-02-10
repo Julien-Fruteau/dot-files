@@ -7,9 +7,8 @@ return {
 	end,
 	opts = {
 		spec = {
-			["<leader>cp"] = { name = "+python" },
-			["<leader>n"] = { name = "+nils" },
 			["<leader>cM"] = { name = "+markdown" },
+			["<leader>m"] = { name = "+molten" },
 		},
 
 		-- your configuration comes here

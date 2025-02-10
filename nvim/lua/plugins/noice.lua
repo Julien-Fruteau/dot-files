@@ -28,6 +28,7 @@ return {
 	-- 	-- }),
 	-- },
 	opts = function(_, opts)
+    opts.presets.lsp_doc_border = true
 		table.insert(opts.routes, {
 			filter = {
 				event = "msg_show",

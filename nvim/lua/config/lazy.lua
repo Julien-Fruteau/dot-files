@@ -20,8 +20,10 @@ require("lazy").setup({
 			"LazyVim/LazyVim",
 			import = "lazyvim.plugins",
 			opts = {
-				-- colorscheme = "rose-pine",
-				colorscheme = "catppuccin",
+        -- colorscheme = "monokai-pro-octagon",
+				colorscheme = "rose-pine",
+				-- colorscheme = "catppuccin",
+        -- colorscheme = "tokyonight",
 			},
 		}, -- import any extras modules here
 		-- { import = "lazyvim.plugins.extras.util.mini-hipatterns" },

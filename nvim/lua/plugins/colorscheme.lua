@@ -6,21 +6,22 @@ return {
 		opts = {
 			-- no_italic = true,
 			-- term_colors = true,
-			flavour = "frappe",
-			-- flavour = "macchiato",
+			-- flavour = "frappe",
+			flavour = "macchiato",
+			-- flavour = "mocha",
 			-- transparent_background = true,
 			-- dim_inactive = {
 			-- 	enabled = true, -- dims the background color of inactive window
 			-- 	shade = "dark",
-			-- 	percentage = 0.05, -- percentage of the shade to apply to the inactive window
+			-- 	percentage = 0.1, -- percentage of the shade to apply to the inactive window
 			-- },
-			color_overrides = {
-				-- frappe = {
-				-- 	base = "#000000",
-				-- 	mantle = "#000000",
-				-- 	crust = "#000000",
-				-- },
-			},
+			-- color_overrides = {
+			-- 	-- frappe = {
+			-- 	-- 	base = "#000000",
+			-- 	-- 	mantle = "#000000",
+			-- 	-- 	crust = "#000000",
+			-- 	-- },
+			-- },
 		}, -- latte, frappe, macchiato, mocha }
 		lazy = false,
 	},
@@ -49,4 +50,13 @@ return {
 			})
 		end,
 	},
+  {
+    "rebelot/kanagawa.nvim",
+    lazy = false,
+  },
+  {
+    "scottmckendry/cyberdream.nvim",
+    lazy = false,
+    priority = 1000,
+}
 }
