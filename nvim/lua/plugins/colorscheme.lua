@@ -24,6 +24,20 @@ return {
 			-- },
 		}, -- latte, frappe, macchiato, mocha }
 		lazy = false,
+		require("catppuccin").setup({
+			custom_highlights = function(colors)
+				return {
+					WhichKeyDesc = { fg = colors.mauve }, -- Change key color to purple/mauve
+				}
+			end,
+		}),
+		--     require("catppuccin").setup({
+		--     integrations = {
+		--         which_key = {
+		--
+		--         }
+		--     }
+		-- })
 	},
 	{
 		"folke/tokyonight.nvim",
@@ -50,13 +64,13 @@ return {
 			})
 		end,
 	},
-  {
-    "rebelot/kanagawa.nvim",
-    lazy = false,
-  },
-  {
-    "scottmckendry/cyberdream.nvim",
-    lazy = false,
-    priority = 1000,
-}
+	{
+		"rebelot/kanagawa.nvim",
+		lazy = false,
+	},
+	{
+		"scottmckendry/cyberdream.nvim",
+		lazy = false,
+		priority = 1000,
+	},
 }

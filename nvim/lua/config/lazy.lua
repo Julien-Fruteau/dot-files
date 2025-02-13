@@ -21,8 +21,8 @@ require("lazy").setup({
 			import = "lazyvim.plugins",
 			opts = {
         -- colorscheme = "monokai-pro-octagon",
-				colorscheme = "rose-pine",
-				-- colorscheme = "catppuccin",
+				-- colorscheme = "rose-pine",
+				colorscheme = "catppuccin",
         -- colorscheme = "tokyonight",
 			},
 		}, -- import any extras modules here
@@ -65,3 +65,4 @@ require("lazy").setup({
 		},
 	},
 })
+

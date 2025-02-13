@@ -3,6 +3,14 @@ return {
   enabled = not vim.g.vscode,
 	branch = "v3.x",
 	cmd = "Neotree",
+  -- init = function()
+  --   vim.g.neotree = {
+  --     auto_close = true,
+  --     auto_open = false,
+  --     auto_update = true,
+  --     update_to_buf_dir = true,
+  --   }
+  -- end,
 	opts = {
 		sources = { "filesystem", "buffers", "git_status", "document_symbols" },
 		open_files_do_not_replace_types = { "terminal", "Trouble", "trouble", "qf", "Outline" },
