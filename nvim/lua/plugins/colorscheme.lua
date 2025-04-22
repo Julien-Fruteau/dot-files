@@ -31,7 +31,7 @@ return {
 				}
 			end,
 			color_overrides = {
-				mocha = {
+				all = {
 					pink = "#cba6f7", -- Use a mauve-ish purple instead of default pink
 				},
 			},
