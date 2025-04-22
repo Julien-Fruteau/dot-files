@@ -30,6 +30,11 @@ return {
 					WhichKeyDesc = { fg = colors.mauve }, -- Change key color to purple/mauve
 				}
 			end,
+			color_overrides = {
+				mocha = {
+					pink = "#cba6f7", -- Use a mauve-ish purple instead of default pink
+				},
+			},
 		}),
 		--     require("catppuccin").setup({
 		--     integrations = {
