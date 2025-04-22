@@ -98,3 +98,4 @@ opt.guicursor =
 g.root_spec = { "cwd" }
 g.python3_host_prog = vim.fn.expand("/home/julien/.local/share/virtualenvs/neovim/bin/python")
 
+g.autosave_enabled = false
