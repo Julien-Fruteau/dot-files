@@ -15,34 +15,16 @@ return {
 			-- 	shade = "dark",
 			-- 	percentage = 0.1, -- percentage of the shade to apply to the inactive window
 			-- },
-			-- color_overrides = {
-			-- 	-- frappe = {
-			-- 	-- 	base = "#000000",
-			-- 	-- 	mantle = "#000000",
-			-- 	-- 	crust = "#000000",
-			-- 	-- },
-			-- },
-		}, -- latte, frappe, macchiato, mocha }
-		lazy = false,
-		require("catppuccin").setup({
-			custom_highlights = function(colors)
-				return {
-					WhichKeyDesc = { fg = colors.mauve }, -- Change key color to purple/mauve
-				}
-			end,
 			color_overrides = {
 				all = {
-					pink = "#cba6f7", -- Use a mauve-ish purple instead of default pink
+					cursor = "#cba6f7", -- use a mauve-ish purple instead of default pink
+					-- rosewater = "#cba6f7", -- use a mauve-ish purple instead of default pink
+					-- red = "#cba6f7", -- use a mauve-ish purple instead of default pink
+					-- color5 = "#cba6f7", -- use a mauve-ish purple instead of default pink
+					pink = "#cba6f7", -- use a mauve-ish purple instead of default pink
 				},
 			},
-		}),
-		--     require("catppuccin").setup({
-		--     integrations = {
-		--         which_key = {
-		--
-		--         }
-		--     }
-		-- })
+		}, -- latte, frappe, macchiato, mocha }
 	},
 	{
 		"folke/tokyonight.nvim",
