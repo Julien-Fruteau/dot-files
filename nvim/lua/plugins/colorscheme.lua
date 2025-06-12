@@ -55,9 +55,4 @@ return {
 		"rebelot/kanagawa.nvim",
 		lazy = false,
 	},
-	{
-		"scottmckendry/cyberdream.nvim",
-		lazy = false,
-		priority = 1000,
-	},
 }
