@@ -183,6 +183,7 @@ if vim.g.vscode then
 	keymap.set("n", "gr", [[<CMD>call VSCodeNotify('editor.action.goToReferences')<CR>]])
 	keymap.set("n", "j", "gj", { remap = true })
 	keymap.set("n", "k", "gk", { remap = true })
+  keymap.set("n", "gy", [[<CMD> call VSCodeNotify('editor.action.goToTypeDefinition')<CR>]])
 	-- keymap.set({ "n", "x", "i" }, "<C-n>", function()
 	-- vim.g.vscode.with_insert(function()
 	--   vim.g.vscode.action("editor.action.addSelectionToNextFindMatch")
