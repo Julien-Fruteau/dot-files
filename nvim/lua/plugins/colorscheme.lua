@@ -22,6 +22,21 @@ return {
 					-- red = "#cba6f7", -- use a mauve-ish purple instead of default pink
 					-- color5 = "#cba6f7", -- use a mauve-ish purple instead of default pink
 					pink = "#cba6f7", -- use a mauve-ish purple instead of default pink
+					-- pink = "#eed49f", -- use a mauve-ish purple instead of default pink
+          --           Soft Catppuccin Yellow:
+          -- #eed49f (Catppuccin Macchiato "yellow")
+          -- Lighter pastel yellow:
+          -- #ffe5a3
+          -- Butter yellow:
+          -- #ffe6b3
+          -- Muted golden yellow:
+          -- #f6c177
+          -- Deeper gold:
+          -- #e5b567
+          -- Bright lemon yellow:
+          -- #ffe066
+          -- Rich pastel yellow:
+          -- #ffdf8e
 				},
 			},
 		}, -- latte, frappe, macchiato, mocha }
