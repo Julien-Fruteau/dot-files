@@ -1,0 +1,201 @@
+export LC_ALL=en_US.UTF-8       #! Super important
+
+# Source environment variables for conditional loading
+if [ -f ~/.config/devops ]; then
+    source ~/.config/devops
+fi
+
+if [ -f ~/.config/dev ]; then
+    source ~/.config/dev
+fi
+
+# The following lines were added by compinstall
+zstyle ':completion:*' insert-tab false
+zstyle ':completion:*' auto-description 'specify: %d'
+zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
+zstyle ':completion:*' expand prefix suffix
+zstyle ':completion:*' format 'Completing %d'
+zstyle ':completion:*' group-name ''
+zstyle ':completion:*' list-colors ''
+zstyle ':completion:*' list-suffixes true
+zstyle ':completion:*' matcher-list '' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' 'r:|[._;]=** r:|=**' 'l:|=* r:|=*'
+zstyle ':completion:*' menu select=1
+zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p%s
+zstyle :compinstall filename '${HOME}/.zshrc'
+
+fpath=(~/.zsh/completion $fpath)
+fpath+=~/.zfunc
+autoload -Uz compinit; compinit
+
+# Lines configured by zsh-newuser-install
+HISTFILE=~/.histfile
+HISTSIZE=10000
+SAVEHIST=10000
+setopt autocd extendedglob nomatch notify shwordsplit
+unsetopt beep
+bindkey -e
+
+autoload -U +X bashcompinit && bashcompinit
+
+
+# Personal addition
+if [ -x /usr/bin/dircolors ]; then
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    alias ls='ls --color=auto'
+    alias dir='dir --color=auto'
+    alias vdir='vdir --color=auto'
+    
+    alias grep='grep --color=auto'
+    # export GREP_COLORS='ms=01;31'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+fi
+
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+alias lla='ls -la'
+alias lt='ls --tree'
+
+# personalized aliases
+alias c=clear
+alias k=kubectl
+alias h=helm
+alias s=stern
+alias g=git
+alias vim=nvim
+alias v=nvim
+alias lg=lazygit
+alias tf=terraform
+alias z=zoxide 
+alias vl="NVIM_APPNAME=LazyVim nvim"
+alias vk="NVIM_APPNAME=kickstart nvim"
+alias vc="NVIM_APPNAME=NvChad nvim"
+alias dif="diff --color=always -y"
+alias less="less -R"
+alias dkr=docker
+alias ld=lazydocker
+alias kx='f() { [ "$1" ] && kubectl config use-context $1 || kubectl config current-context ; } ; f'
+alias kn='f() { [ "$1" ] && kubectl config set-context --current --namespace $1 || kubectl config view --minify | grep namespace | cut -d" " -f6 ; } ; f'
+alias kd='kubectl config unset current-context'
+alias sct='f() { [ "$1" ] && (head /dev/urandom | tr -dc A-Za-z0-9 | head -c "$1" ; echo '') || (head /dev/urandom | tr -dc A-Za-z0-9 | head -c 13 ; echo '') ; } ; f'
+alias zsh_history_fix='f() { mv ~/.histfile ~/.histfile.bad ; strings ~/.histfile.bad ~/.histfile ; fc -R ~/.histfile ; rm ~/.histfile.bad ; } ; f'
+alias dateUpdateWsl='sudo ntpdate time.windows.com'
+alias yq='yq -C'
+alias jq='jq -C'
+
+function yless() {
+    yq . -C | less -R
+}
+alias lessy=yless
+function jless() {
+    jq . -C | less -R
+}
+alias lessj=jless
+alias uidgen='cat /proc/sys/kernel/random/uuid'
+
+function nvims() {
+  items=("default" "kickstart" "LazyVim" "NvChad")
+  # items=("default" "kickstart" "LazyVim" "NvChad" "AstroNvim")
+  config=$(printf "%s\n" "${items[@]}" | fzf --prompt=" Neovim Config  " --height=~50% --layout=reverse --border --exit-0)
+  if [[ -z $config ]]; then
+    echo "Nothing selected"
+    return 0
+  elif [[ $config == "default" ]]; then
+    config=""
+  fi
+  NVIM_APPNAME=$config nvim $@
+}
+
+
+bindkey "^ " autosuggest-accept
+# bindkey "^[L" clear-screen
+bindkey "^[[1;5C" forward-word
+bindkey "^[[1;5D" backward-word
+bindkey "^[[3~" delete-char
+
+# Add | as word boundary when deleting words backward 
+export WORDCHARS="${WORDCHARS}|"
+
+# ========== PERSO
+export MESA_D3D12_DEFAULT_ADAPTER_NAME=AMD
+
+alias cl=clip.exe
+alias clip=clip.exe
+alias pc='pwd|cl'
+# ======= END PERSO
+
+# added by pipx (https://github.com/pipxproject/pipx)
+export PATH="/home/linuxbrew/.linuxbrew/opt/rustup/bin:$PATH"
+export PATH="${HOME}/.local/bin:$PATH"
+export PATH="$PATH:$HOME/go/bin"
+export PATH="$PATH:/opt/ApacheDirectoryStudio"
+export PATH="/home/linuxbrew/.linuxbrew/bin:/usr/local/go/bin:${HOME}/.local/share/applications:${PATH}"
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+export PATH="$PATH:$HOME/minio-binaries/"
+
+source /home/linuxbrew/.linuxbrew/share/zsh-history-substring-search/zsh-history-substring-search.zsh
+source /home/linuxbrew/.linuxbrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+
+eval "$(starship init zsh)"
+
+
+# for windows terminal to keep_current_path on split
+keep_current_path() {
+  printf "\e]9;9;%s\e\\" "$(wslpath -w "$PWD")"
+}
+precmd_functions+=(keep_current_path)
+
+
+export KUBECONFIG=$HOME/.kube/config
+export KUBE_EDITOR="nvim"
+export PYENV_ROOT="$HOME/.pyenv"
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# Conditional loading of development tool configurations based on env vars
+if [[ "${PYENV:-true}" == "true" && $commands[pyenv] ]]; then
+    command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
+    eval "$(pyenv init -)"
+fi
+
+if [[ "${NVM:-true}" == "true" ]]; then
+    export NVM_DIR="/home/linuxbrew/.linuxbrew/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
+fi
+
+if [[ "${RUST:-true}" == "true" && -f ~/.cargo/env ]]; then
+    source ~/.cargo/env
+fi
+
+# Conditional loading of devops tool completions based on env vars
+if [[ "${KUBECTL:-true}" == "true" && $commands[kubectl] ]]; then
+    source <(k completion zsh)
+fi
+
+if [[ "${HELM:-true}" == "true" && $commands[helm] ]]; then
+    source <(helm completion zsh)
+    source <(helm diff completion zsh)
+fi
+
+if [[ "${STERN:-true}" == "true" && $commands[stern] ]]; then
+    source <(stern --completion=zsh)
+fi
+
+if [[ "${HELMWAVE:-true}" == "true" && $commands[helmwave] ]]; then
+    source <(helmwave completion zsh)
+fi
+
+if [[ "${MINIO:-true}" == "true" && $commands[mc] ]]; then
+    source <(mc alias completion zsh)
+fi
+
+complete -o nospace -C $(which mc) mc
+
+
+# source ~/.git-flow-zsh-completion.sh
+eval "$(direnv hook zsh)"
+
+#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+export SDKMAN_DIR="$HOME/.sdkman"
+[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"

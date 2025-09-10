@@ -1,0 +1,7 @@
+# DevOps tools installation control
+KUBECTL=true
+K9S=true
+HELM=true
+STERN=false
+HELMWAVE=false
+MINIO=false
