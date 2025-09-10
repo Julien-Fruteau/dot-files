@@ -27,7 +27,7 @@ terminal:
 	fi
 	@if ! command -v starship >/dev/null 2>&1; then \
 	    echo "❌ starship non trouvé, installation..."; \
-		brew install starship; \
+		curl -sS https://starship.rs/install.sh | sh ; \
 	else \
 	    echo "✅ starship trouvé"; \
 	fi
