@@ -160,8 +160,8 @@ if [[ "${PYENV:-true}" == "true" && $commands[pyenv] ]]; then
 fi
 
 if [[ "${NVM:-true}" == "true" ]]; then
-    export NVM_DIR="/home/linuxbrew/.linuxbrew/.nvm"
-    [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh" ] && \. "/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh"  
 fi
 
 if [[ "${RUST:-true}" == "true" && -f ~/.cargo/env ]]; then
