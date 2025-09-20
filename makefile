@@ -11,6 +11,11 @@ term: terminal config-terminal
 .PHONY: terminal
 terminal:
 	@echo "ℹ️  Configuration du terminal ☀️"
+	@if ! command -v zsh >/dev/null 2>&1; then \
+	    echo "❌ zsh non trouvé, installation..."; \
+		  sudo apt update && \
+		  sudo apt install -y zsh && \
+		  chsh -s $$(which zsh); \
 	@if ! command -v brew >/dev/null 2>&1; then \
 	    echo "❌ Homebrew non trouvé, installation..."; \
 	    /bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; \
@@ -21,7 +26,7 @@ terminal:
 	@brew update
 	@if ! command -v nvim >/dev/null 2>&1; then \
 	    echo "❌ nvim non trouvé, installation..."; \
-		brew install nvim; \
+		  brew install nvim; \
 	else \
 	    echo "✅ nvim trouvé"; \
 	fi
