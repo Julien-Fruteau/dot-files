@@ -14,7 +14,7 @@ ln -s $(pwd)/nvim ~/.config/
 ## terminal and env configuration
 
 ```bash
-cd $HOME/.config/.dot-files
+cd ${path-to-repo}/dot-files
 # 🤙: configure the config/dev and config/devops files
 # according to the tool you want to use
 make help
