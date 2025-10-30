@@ -4,6 +4,7 @@
 
 - SHELL: zsh
 - command: make, unzip
+- If installing `dev tools`, and particularly `pyenv`, please refer to the official doc to install the build packages : [link](https://github.com/pyenv/pyenv/wiki#suggested-build-environment)
 
 ## usage
 
@@ -15,8 +16,10 @@ git clone https://github.com/Julien-Fruteau/dot-files.git
 cd dot-files
 
 # terminal configuration (zsh must be installed beforehand)
-# install brew if not already done, takes time, be patient
+# nb: make term install brew if not already done, takes time, be patient
 make term
+
+# link nvim configuration
 ln -s $(pwd)/nvim ~/.config/
 
 # optional 
