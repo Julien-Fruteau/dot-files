@@ -96,6 +96,6 @@ opt.guicursor =
 -- vim.g.lazyvim_python_ruff = "ruff"
 
 g.root_spec = { "cwd" }
-g.python3_host_prog = vim.fn.expand("/home/julien/.local/share/virtualenvs/neovim/bin/python")
+-- g.python3_host_prog = vim.fn.expand("/home/julien/.local/share/virtualenvs/neovim/bin/python")
 
 g.autosave_enabled = false
