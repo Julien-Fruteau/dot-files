@@ -156,6 +156,25 @@ keymap.set("n", "<leader>fs", "<CMD>w<CR>", { desc = "File save" }) -- file save
 -- neo-tree
 -- keymap.set("n", "<leader>e", ":Neotree focus<cr>", { desc = "Explorer focus on File Explorer" })
 -- keymap.set("n", "<leader>E", ":Neotree toggle<cr>", { desc = "Explorer toggle File Explorer" })
+-- snack
+keymap.set("n", "<leader>e", function()
+	local explorer_win = nil
+
+	for _, win in ipairs(vim.api.nvim_list_wins()) do
+		local buf = vim.api.nvim_win_get_buf(win)
+		local ft = vim.bo[buf].filetype
+		if ft == "snacks_picker_list" then
+			explorer_win = win
+			break
+		end
+	end
+
+	if vim.api.nvim_get_current_win() ~= explorer_win and explorer_win then
+		vim.api.nvim_set_current_win(explorer_win)
+	else
+		Snacks.explorer()
+	end
+end, { desc = "Open Snack file explorer" })
 
 -- noice
 keymap.set("n", "<leader>snt", "<CMD>Telescope noice<CR>", { desc = "Telescope noice messages" })
@@ -183,7 +202,7 @@ if vim.g.vscode then
 	keymap.set("n", "gr", [[<CMD>call VSCodeNotify('editor.action.goToReferences')<CR>]])
 	keymap.set("n", "j", "gj", { remap = true })
 	keymap.set("n", "k", "gk", { remap = true })
-  keymap.set("n", "gy", [[<CMD> call VSCodeNotify('editor.action.goToTypeDefinition')<CR>]])
+	keymap.set("n", "gy", [[<CMD> call VSCodeNotify('editor.action.goToTypeDefinition')<CR>]])
 	-- keymap.set({ "n", "x", "i" }, "<C-n>", function()
 	-- vim.g.vscode.with_insert(function()
 	--   vim.g.vscode.action("editor.action.addSelectionToNextFindMatch")
@@ -224,10 +243,5 @@ keymap.set("n", "<leader>mi", ":MoltenInit<CR>", { silent = true, desc = "Initia
 keymap.set("n", "<leader>me", ":MoltenEvaluateOperator<CR>", { silent = true, desc = "run operator selection" })
 keymap.set("n", "<leader>ml", ":MoltenEvaluateLine<CR>", { silent = true, desc = "evaluate line" })
 keymap.set("n", "<leader>mc", ":MoltenReevaluateCell<CR>", { silent = true, desc = "re-evaluate cell" })
-keymap.set(
-	"v",
-	"<leader>mv",
-	":<C-u>MoltenEvaluateVisual<CR>gv",
-	{ silent = true, desc = "evaluate visual selection" }
-)
+keymap.set("v", "<leader>mv", ":<C-u>MoltenEvaluateVisual<CR>gv", { silent = true, desc = "evaluate visual selection" })
 keymap.set("n", "<leader>md", ":MoltenDeinit<CR>", { silent = true, desc = "deinit" })
