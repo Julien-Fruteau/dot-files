@@ -108,6 +108,7 @@ config-terminal:
 	@cp shell/zshrc $$HOME/.zshrc
 	@mkdir -p $$HOME/.config || true
 	@cp -r config/* $$HOME/.config
+	@cp -r dotfiles/.* $$HOME/
 	@echo "✅ Installation des fichiers de configuration terminée"
 
 devops:
