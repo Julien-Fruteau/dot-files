@@ -60,6 +60,14 @@ terminal:
 		echo "✅ zsh-autosuggestions trouvé"
 	fi
 
+	if ! -x $$HOME/.fzf/install >/dev/null 2>&1; then 
+		echo "❌ fzf install non trouvé, installation..."
+		git clone --depth 1 https://github.com/junegunn/fzf.git $$HOME/.fzf
+		$$HOME/.fzf/install
+	else
+		echo "✅ fzf trouvé"
+	fi
+
 	if ! command -v git >/dev/null 2>&1; then
 		echo "❌ git non trouvé, installation..."
 		brew install git
@@ -74,12 +82,12 @@ terminal:
 		echo "✅ lazygit trouvé"
 	fi
 
-	if ! command -v fzf >/dev/null 2>&1; then
-		echo "❌ fzf non trouvé, installation..."
-		brew install fzf
-	else
-		echo "✅ fzf trouvé"
-	fi
+	# if ! command -v fzf >/dev/null 2>&1; then
+	# 	echo "❌ fzf non trouvé, installation..."
+	# 	brew install fzf
+	# else
+	# 	echo "✅ fzf trouvé"
+	# fi
 
 	if ! command -v ripgrep >/dev/null 2>&1; then
 		echo "❌ ripgrep non trouvé, installation..."
