@@ -1,8 +1,8 @@
 # Development tools installation control
 PYENV=true
-NVM=true
+NVM=false
 GO=true
 NODE=true
 NPM=true
-RUST=false
-CARGO=false
+RUST=true
+CARGO=true

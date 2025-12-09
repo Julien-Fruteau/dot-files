@@ -39,12 +39,19 @@ terminal:
 		echo "✅ nvim trouvé"
 	fi
 
-	if ! command -v starship >/dev/null 2>&1; then
-		echo "❌ starship non trouvé, installation..."
-		curl -sS https://starship.rs/install.sh | sh -s -- -y
+	if ! command -v p10k >/dev/null 2>&1; then
+		echo "❌ power level 10k non trouvé, installation..."
+		brew install powerlevel10k
 	else
-		echo "✅ starship trouvé"
+		echo "✅ powerlevel10k trouvé"
 	fi
+
+	# if ! command -v starship >/dev/null 2>&1; then
+	# 	echo "❌ starship non trouvé, installation..."
+	# 	curl -sS https://starship.rs/install.sh | sh -s -- -y
+	# else
+	# 	echo "✅ starship trouvé"
+	# fi
 
 	if ! command -v zsh-history-substring-search >/dev/null 2>&1; then
 		echo "❌ zsh-history-substring-search non trouvé, installation..."

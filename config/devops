@@ -2,6 +2,6 @@
 KUBECTL=true
 K9S=true
 HELM=true
-STERN=false
-HELMWAVE=false
-MINIO=false
+STERN=true
+HELMWAVE=true
+MINIO=true
