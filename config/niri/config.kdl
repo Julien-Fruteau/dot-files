@@ -115,7 +115,7 @@ input {
 // https://yalter.github.io/niri/Configuration:-Layout
 layout {
     // Set gaps around windows in logical pixels.
-    gaps 7
+    gaps 2
 
     // When to center a column when changing focus, options are:
     // - "never", default behavior, focusing an off-screen column will keep at the left
@@ -382,7 +382,7 @@ binds {
     Mod+D hotkey-overlay-title="Run an Application: Rofi" { spawn-sh "rofi -show drun"; }
     Mod+Space hotkey-overlay-title="Run Noctalia: Launcher" { spawn-sh "qs -c noctalia-shell ipc call launcher toggle"; }
     Mod+Comma hotkey-overlay-title="Run Noctalia: Settings" { spawn-sh "qs -c noctalia-shell ipc call settings toggle"; }
-    Super+Alt+L hotkey-overlay-title="Lock the Screen: swaylock" { spawn "swaylock"; }
+    Super+Alt+L hotkey-overlay-title="Lock the Screen: Noctalia" { spawn-sh "qs -c noctalia-shell ipc call lockScreen lock"; }
 
     Mod+B hotkey-overlay-title="Run a Browser: Firefox" { spawn "firefox";}
     // Mod+S { spawn-sh "qs -c noctalia-shell ipc call controlCenter toggle"; }
