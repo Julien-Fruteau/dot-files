@@ -382,9 +382,10 @@ dev:
 
 help:
 	@echo "Commands available :"
-	@echo "  make term       - install terminal"
-	@echo "  make dev        - Install development tools"
-	@echo "  make devops     - Install devops tools"
-	@echo "  make help       - Display this help message"
+	@echo "  make term            - install terminal"
+	@echo "  make config-terminal - install les fichiers de configuration et shellrc"
+	@echo "  make dev             - Install development tools"
+	@echo "  make devops          - Install devops tools"
+	@echo "  make help            - Display this help message"
 
 
