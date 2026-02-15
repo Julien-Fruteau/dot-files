@@ -1,6 +1,6 @@
 # Development tools installation control
 PYENV=true
-NVM=false
+NVM=true
 GO=true
 NODE=true
 NPM=true

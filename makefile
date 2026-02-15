@@ -5,6 +5,9 @@ SHELL := /bin/bash
 # Cible par défaut (optionnelle)
 .DEFAULT_GOAL := help
 
+# Détection de l'OS et du gestionnaire de paquets
+OS_TYPE := $(shell if [ -f /etc/arch-release ]; then echo "arch"; elif [ "$$(uname)" = "Darwin" ]; then echo "macos"; else echo "linux"; fi)
+
 .PHONY: config term terminal config-terminal devops dev help
 
 term: terminal config-terminal
@@ -13,35 +16,62 @@ terminal:
 	@echo "ℹ️  Configuration du terminal ☀️"
 	if ! command -v zsh >/dev/null 2>&1; then
 		echo "❌ zsh non trouvé, installation..."
-		sudo apt update
-		sudo apt install -y zsh
+		if [ "$(OS_TYPE)" = "arch" ]; then
+			sudo pacman -Sy --noconfirm zsh
+		else
+			sudo apt update
+			sudo apt install -y zsh
+		fi
 		chsh -s $$(which zsh)
 	else
 		echo "✅ zsh trouvé"
 	fi
 
-	if ! command -v brew >/dev/null 2>&1; then
-		echo "❌ Homebrew non trouvé, installation..."
-		/bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+	if [ "$(OS_TYPE)" = "arch" ]; then
+		if ! command -v paru >/dev/null 2>&1; then
+			echo "❌ paru non trouvé, installation..."
+			sudo pacman -Sy --needed --noconfirm base-devel git
+			cd /tmp
+			git clone https://aur.archlinux.org/paru.git
+			cd paru
+			makepkg -si --noconfirm
+			cd -
+		else
+			echo "✅ paru trouvé"
+		fi
+		echo "🔄 Mise à jour du système..."
+		paru -Syu --noconfirm || true
 	else
-		echo "✅ Homebrew trouvé"
-	fi
-
-	echo "🔄 Mise à jour de Homebrew..."
-	if command -v brew >/dev/null 2>&1; then
-		brew update || true
+		if ! command -v brew >/dev/null 2>&1; then
+			echo "❌ Homebrew non trouvé, installation..."
+			/bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+		else
+			echo "✅ Homebrew trouvé"
+		fi
+		echo "🔄 Mise à jour de Homebrew..."
+		if command -v brew >/dev/null 2>&1; then
+			brew update || true
+		fi
 	fi
 
 	if ! command -v nvim >/dev/null 2>&1; then
 		echo "❌ nvim non trouvé, installation..."
-		brew install nvim
+		if [ "$(OS_TYPE)" = "arch" ]; then
+			paru -S --noconfirm neovim
+		else
+			brew install nvim
+		fi
 	else
 		echo "✅ nvim trouvé"
 	fi
 
 	if ! command -v p10k >/dev/null 2>&1; then
 		echo "❌ power level 10k non trouvé, installation..."
-		brew install powerlevel10k
+		if [ "$(OS_TYPE)" = "arch" ]; then
+			paru -S --noconfirm zsh-theme-powerlevel10k-git
+		else
+			brew install powerlevel10k
+		fi
 	else
 		echo "✅ powerlevel10k trouvé"
 	fi
@@ -55,14 +85,22 @@ terminal:
 
 	if ! command -v zsh-history-substring-search >/dev/null 2>&1; then
 		echo "❌ zsh-history-substring-search non trouvé, installation..."
-		brew install zsh-history-substring-search
+		if [ "$(OS_TYPE)" = "arch" ]; then
+			paru -S --noconfirm zsh-history-substring-search
+		else
+			brew install zsh-history-substring-search
+		fi
 	else
 		echo "✅ zsh-history-substring-search trouvé"
 	fi
 
 	if ! command -v zsh-autosuggestions >/dev/null 2>&1; then
 		echo "❌ zsh-autosuggestions non trouvé, installation..."
-		brew install zsh-autosuggestions
+		if [ "$(OS_TYPE)" = "arch" ]; then
+			paru -S --noconfirm zsh-autosuggestions
+		else
+			brew install zsh-autosuggestions
+		fi
 	else
 		echo "✅ zsh-autosuggestions trouvé"
 	fi
@@ -77,14 +115,22 @@ terminal:
 
 	if ! command -v git >/dev/null 2>&1; then
 		echo "❌ git non trouvé, installation..."
-		brew install git
+		if [ "$(OS_TYPE)" = "arch" ]; then
+			paru -S --noconfirm git
+		else
+			brew install git
+		fi
 	else
 		echo "✅ git trouvé"
 	fi
 
 	if ! command -v lazygit >/dev/null 2>&1; then
 		echo "❌ lazygit non trouvé, installation..."
-		brew install lazygit
+		if [ "$(OS_TYPE)" = "arch" ]; then
+			paru -S --noconfirm lazygit
+		else
+			brew install lazygit
+		fi
 	else
 		echo "✅ lazygit trouvé"
 	fi
@@ -98,21 +144,33 @@ terminal:
 
 	if ! command -v ripgrep >/dev/null 2>&1; then
 		echo "❌ ripgrep non trouvé, installation..."
-		brew install ripgrep
+		if [ "$(OS_TYPE)" = "arch" ]; then
+			paru -S --noconfirm ripgrep
+		else
+			brew install ripgrep
+		fi
 	else
 		echo "✅ ripgrep trouvé"
 	fi
 
 	if ! command -v fd >/dev/null 2>&1; then
 		echo "❌ fd non trouvé, installation..."
-		brew install fd
+		if [ "$(OS_TYPE)" = "arch" ]; then
+			paru -S --noconfirm fd
+		else
+			brew install fd
+		fi
 	else
 		echo "✅ fd trouvé"
 	fi
 
 	if ! command -v direnv >/dev/null 2>&1; then
 		echo "❌ direnv non trouvé, installation..."
-		brew install direnv
+		if [ "$(OS_TYPE)" = "arch" ]; then
+			paru -S --noconfirm direnv
+		else
+			brew install direnv
+		fi
 	else
 		echo "✅ direnv trouvé"
 	fi
@@ -132,7 +190,11 @@ devops:
 	if [ "$${KUBECTL:-true}" = "true" ]; then
 		if ! command -v kubectl >/dev/null 2>&1; then
 			echo "❌ kubectl non trouvé, installation..."
-			brew install kubectl
+			if [ "$(OS_TYPE)" = "arch" ]; then
+				paru -S --noconfirm kubectl-bin
+			else
+				brew install kubectl
+			fi
 		else
 			echo "✅ kubectl trouvé"
 		fi
@@ -143,7 +205,11 @@ devops:
 	if [ "$${K9S:-true}" = "true" ]; then
 		if ! command -v k9s >/dev/null 2>&1; then
 			echo "❌ k9s non trouvé, installation..."
-			brew install k9s
+			if [ "$(OS_TYPE)" = "arch" ]; then
+				sudo pacman -Sy --needed --noconfirm k9s
+			else
+				brew install k9s
+			fi
 		else
 			echo "✅ k9s trouvé"
 		fi
@@ -154,7 +220,11 @@ devops:
 	if [ "$${HELM:-true}" = "true" ]; then
 		if ! command -v helm >/dev/null 2>&1; then
 			echo "❌ helm non trouvé, installation..."
-			brew install helm
+			if [ "$(OS_TYPE)" = "arch" ]; then
+				paru -S --noconfirm helm
+			else
+				brew install helm
+			fi
 			helm plugin install https://github.com/databus23/helm-diff || true
 		else
 			echo "✅ helm trouvé"
@@ -166,7 +236,11 @@ devops:
 	if [ "$${STERN:-true}" = "true" ]; then
 		if ! command -v stern >/dev/null 2>&1; then
 			echo "❌ stern non trouvé, installation..."
-			brew install stern
+			if [ "$(OS_TYPE)" = "arch" ]; then
+				sudo pacman -Sy --needed --noconfirm stern
+			else
+				brew install stern
+			fi
 		else
 			echo "✅ stern trouvé"
 		fi
@@ -177,7 +251,11 @@ devops:
 	if [ "$${HELMWAVE:-true}" = "true" ]; then
 		if ! command -v helmwave >/dev/null 2>&1; then
 			echo "❌ helmwave non trouvé, installation..."
-			brew install helmwave/tap/helmwave
+			if [ "$(OS_TYPE)" = "arch" ]; then
+				echo "todo manually"
+			else
+				brew install helmwave/tap/helmwave
+			fi
 		else
 			echo "✅ helmwave trouvé"
 		fi
@@ -188,7 +266,11 @@ devops:
 	if [ "$${MINIO:-true}" = "true" ]; then
 		if ! command -v minio >/dev/null 2>&1; then
 			echo "❌ minio non trouvé, installation..."
-			brew install minio
+			if [ "$(OS_TYPE)" = "arch" ]; then
+				paru -S --noconfirm minio
+			else
+				brew install minio
+			fi
 		else
 			echo "✅ minio trouvé"
 		fi
@@ -202,7 +284,11 @@ dev:
 	if [ "$${PYENV:-true}" = "true" ]; then
 		if ! command -v pyenv >/dev/null 2>&1; then
 			echo "❌ pyenv non trouvé, installation..."
-			brew install pyenv
+			if [ "$(OS_TYPE)" = "arch" ]; then
+				paru -S --noconfirm pyenv
+			else
+				brew install pyenv
+			fi
 		else
 			echo "✅ pyenv trouvé"
 		fi
@@ -213,7 +299,11 @@ dev:
 	if [ "$${NVM:-true}" = "true" ]; then
 		if ! command -v nvm >/dev/null 2>&1; then
 			echo "❌ nvm non trouvé, installation..."
-			brew install nvm
+			if [ "$(OS_TYPE)" = "arch" ]; then
+				paru -S --noconfirm nvm
+			else
+				brew install nvm
+			fi
 		else
 			echo "✅ nvm trouvé"
 		fi
@@ -224,7 +314,11 @@ dev:
 	if [ "$${GO:-true}" = "true" ]; then
 		if ! command -v go >/dev/null 2>&1; then
 			echo "❌ go non trouvé, installation..."
-			brew install go
+			if [ "$(OS_TYPE)" = "arch" ]; then
+				paru -S --noconfirm go
+			else
+				brew install go
+			fi
 		else
 			echo "✅ go trouvé"
 		fi
@@ -235,7 +329,11 @@ dev:
 	if [ "$${NODE:-true}" = "true" ]; then
 		if ! command -v node >/dev/null 2>&1; then
 			echo "❌ node non trouvé, installation..."
-			nvm install --lts
+			if [ "$(OS_TYPE)" = "arch" ]; then
+				paru -S --noconfirm nodejs
+			else
+				nvm install --lts
+			fi
 		else
 			echo "✅ node trouvé"
 		fi
@@ -246,7 +344,11 @@ dev:
 	if [ "$${NPM:-true}" = "true" ]; then
 		if ! command -v npm >/dev/null 2>&1; then
 			echo "❌ npm non trouvé, installation..."
-			nvm install --lts
+			if [ "$(OS_TYPE)" = "arch" ]; then
+				paru -S --noconfirm npm
+			else
+				nvm install --lts
+			fi
 		else
 			echo "✅ npm trouvé"
 		fi

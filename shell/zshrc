@@ -63,7 +63,6 @@ alias k=kubectl
 alias h=helm
 alias s=stern
 alias g=git
-alias vim=nvim
 alias v=nvim
 alias lg=lazygit
 alias tf=terraform
@@ -120,24 +119,43 @@ export WORDCHARS="${WORDCHARS}|"
 # ========== PERSO
 export MESA_D3D12_DEFAULT_ADAPTER_NAME=AMD
 
-alias cl=clip.exe
-alias clip=clip.exe
-alias pc='pwd|cl'
+# WSL-specific aliases (only on WSL, not native Linux)
+if grep -qi microsoft /proc/version 2>/dev/null; then
+    alias cl=clip.exe
+    alias clip=clip.exe
+    alias pc='pwd|cl'
+fi
 # ======= END PERSO
 
 # added by pipx (https://github.com/pipxproject/pipx)
-export PATH="/home/linuxbrew/.linuxbrew/opt/rustup/bin:$PATH"
+# Detect if using Homebrew or native package manager
+if [ -d "/home/linuxbrew/.linuxbrew" ]; then
+    # Homebrew installation
+    export PATH="/home/linuxbrew/.linuxbrew/opt/rustup/bin:$PATH"
+    export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
+    ZSH_HISTORY_SUBSTRING_SEARCH="/home/linuxbrew/.linuxbrew/share/zsh-history-substring-search/zsh-history-substring-search.zsh"
+    ZSH_AUTOSUGGESTIONS="/home/linuxbrew/.linuxbrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+    POWERLEVEL10K="/home/linuxbrew/.linuxbrew/share/powerlevel10k/powerlevel10k.zsh-theme"
+    NVM_SH="/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh"
+else
+    # Arch Linux or other system package manager
+    ZSH_HISTORY_SUBSTRING_SEARCH="/usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh"
+    ZSH_AUTOSUGGESTIONS="/usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
+    POWERLEVEL10K="/usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme"
+    NVM_SH="$HOME/.nvm/nvm.sh"
+fi
+
 export PATH="${HOME}/.local/bin:$PATH"
 export PATH="$PATH:$HOME/go/bin"
 export PATH="$PATH:/opt/ApacheDirectoryStudio"
-export PATH="/home/linuxbrew/.linuxbrew/bin:/usr/local/go/bin:${HOME}/.local/share/applications:${PATH}"
+export PATH="/usr/local/go/bin:${HOME}/.local/share/applications:${PATH}"
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 export PATH="$PATH:$HOME/minio-binaries/"
 
-source /home/linuxbrew/.linuxbrew/share/zsh-history-substring-search/zsh-history-substring-search.zsh
-source /home/linuxbrew/.linuxbrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+[ -f "$ZSH_HISTORY_SUBSTRING_SEARCH" ] && source "$ZSH_HISTORY_SUBSTRING_SEARCH"
+[ -f "$ZSH_AUTOSUGGESTIONS" ] && source "$ZSH_AUTOSUGGESTIONS"
 
-source /home/linuxbrew/.linuxbrew/share/powerlevel10k/powerlevel10k.zsh-theme
+[ -f "$POWERLEVEL10K" ] && source "$POWERLEVEL10K"
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
@@ -145,11 +163,13 @@ source /home/linuxbrew/.linuxbrew/share/powerlevel10k/powerlevel10k.zsh-theme
 # eval "$(starship init zsh)"
 
 
-# for windows terminal to keep_current_path on split
-keep_current_path() {
-  printf "\e]9;9;%s\e\\" "$(wslpath -w "$PWD")"
-}
-precmd_functions+=(keep_current_path)
+# for windows terminal to keep_current_path on split (WSL only)
+if grep -qi microsoft /proc/version 2>/dev/null; then
+    keep_current_path() {
+      printf "\e]9;9;%s\e\\" "$(wslpath -w "$PWD")"
+    }
+    precmd_functions+=(keep_current_path)
+fi
 
 
 export KUBECONFIG=$HOME/.kube/config
@@ -166,7 +186,7 @@ fi
 
 if [[ "${NVM:-true}" == "true" ]]; then
     export NVM_DIR="$HOME/.nvm"
-    [ -s "/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh" ] && \. "/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh"  
+    [ -s "$NVM_SH" ] && \. "$NVM_SH"
 fi
 
 if [[ "${RUST:-true}" == "true" && -f ~/.cargo/env ]]; then
