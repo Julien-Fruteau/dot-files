@@ -11,9 +11,11 @@ return {
 		words = { enabled = true },
 		picker = {
 			hidden = true,
+			ignored = true,
 		},
 		explorer = {
 			hidden = true,
+			ignored = true,
 		},
 	},
   -- stylua: ignore
