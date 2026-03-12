@@ -23,6 +23,7 @@ terminal:
 			sudo apt install -y zsh
 		fi
 		chsh -s $$(which zsh)
+		echo "🙋‍♂️ logout login pour prendre en compte le nouveau shell"
 	else
 		echo "✅ zsh trouvé"
 	fi
@@ -45,6 +46,7 @@ terminal:
 		if ! command -v brew >/dev/null 2>&1; then
 			echo "❌ Homebrew non trouvé, installation..."
 			/bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+			exec $$SHELL
 		else
 			echo "✅ Homebrew trouvé"
 		fi
@@ -175,6 +177,29 @@ terminal:
 		echo "✅ direnv trouvé"
 	fi
 
+	if ! command -v getnf >/dev/null 2>&1; then
+		echo "❌ getnf non trouvé, installation..."
+		if [ "$(OS_TYPE)" = "arch" ]; then
+			paru -S --noconfirm getnf
+		else
+			curl -fsSL https://raw.githubusercontent.com/getnf/getnf/main/install.sh | bash
+		fi
+	else
+		echo "✅ getnf trouvé"
+	fi
+
+	if [[ ":$$PATH:" != *":$$HOME/.local/bin:"* ]]; then
+		echo "❌ ~/.local/bin n'est pas dans le PATH, ajout..."
+		echo 'export PATH="$$HOME/.local/bin:$$PATH"' >> $$HOME/.zshrc
+		export PATH="$$HOME/.local/bin:$$PATH"
+	else
+		echo "✅ ~/.local/bin est dans le PATH"
+	fi
+
+	echo "installation de nerd fonts..."
+	getnf -i Meslo,JetBrainsMono,CascadiaMono,Hack,Hasklig
+	echo "✅ nerd fonts installées"
+
 config-terminal:
 	@echo "ℹ️ Installation des fichiers de configuration"
 	@mv $$HOME/.zshrc $$HOME/.zshrc.bak || true
@@ -182,6 +207,7 @@ config-terminal:
 	@mkdir -p $$HOME/.config || true
 	@cp -r config/* $$HOME/.config
 	@cp -r dotfiles/.* $$HOME/
+	@exec $$SHELL
 	@echo "✅ Installation des fichiers de configuration terminée"
 
 devops:
@@ -304,11 +330,24 @@ dev:
 			else
 				brew install nvm
 			fi
+			exec $$SHELL
+			nvm install --lts
 		else
 			echo "✅ nvm trouvé"
 		fi
 	else
 		echo "⏭️  nvm installation skipped (NVM=false)"
+	fi
+
+	if [ "$${SDKMAN:-true}" = "true" ]; then
+		if ! command -v sdk >/dev/null 2>&1; then
+			echo "❌ sdkman non trouvé, installation..."
+			curl -s "https://get.sdkman.io" | bash
+		else
+			echo "✅ sdkman trouvé"
+		fi
+	else
+		echo "⏭️  sdkman installation skipped (sdkman=false)"
 	fi
 
 	if [ "$${GO:-true}" = "true" ]; then
