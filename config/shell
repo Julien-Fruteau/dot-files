@@ -1,0 +1,3 @@
+# Interactive/login shell selected by `make term`.
+# Supported values: fish, zsh
+DOTFILES_SHELL=fish

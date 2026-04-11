@@ -7,6 +7,8 @@ SHELL := /bin/bash
 
 # Détection de l'OS et du gestionnaire de paquets
 OS_TYPE := $(shell if [ -f /etc/arch-release ]; then echo "arch"; elif [ "$$(uname)" = "Darwin" ]; then echo "macos"; else echo "linux"; fi)
+DEFAULT_LOGIN_SHELL := fish
+SHELL_SELECTION_FILE := config/shell
 
 .PHONY: config term terminal config-terminal devops dev help
 
@@ -14,18 +16,49 @@ term: terminal config-terminal
 
 terminal:
 	@echo "ℹ️  Configuration du terminal ☀️"
-	if ! command -v zsh >/dev/null 2>&1; then
-		echo "❌ zsh non trouvé, installation..."
+	TARGET_SHELL="$(DEFAULT_LOGIN_SHELL)"
+	if [ -f "$(SHELL_SELECTION_FILE)" ]; then
+		source "$(SHELL_SELECTION_FILE)"
+		TARGET_SHELL="$${DOTFILES_SHELL:-$(DEFAULT_LOGIN_SHELL)}"
+	fi
+	case "$$TARGET_SHELL" in
+		fish|zsh) ;;
+		*)
+			echo "❌ Unsupported DOTFILES_SHELL: $$TARGET_SHELL (expected fish or zsh)"
+			exit 1
+			;;
+	esac
+	echo "🐚 shell sélectionné: $$TARGET_SHELL"
+
+	if ! command -v "$$TARGET_SHELL" >/dev/null 2>&1; then
+		echo "❌ $$TARGET_SHELL non trouvé, installation..."
 		if [ "$(OS_TYPE)" = "arch" ]; then
-			sudo pacman -Sy --noconfirm zsh
+			sudo pacman -Sy --noconfirm "$$TARGET_SHELL"
+		elif [ "$(OS_TYPE)" = "macos" ]; then
+			if ! command -v brew >/dev/null 2>&1; then
+				echo "❌ Homebrew non trouvé, installation..."
+				/bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+			fi
+			if [ -x /opt/homebrew/bin/brew ]; then
+				eval "$$(/opt/homebrew/bin/brew shellenv)"
+			elif [ -x /usr/local/bin/brew ]; then
+				eval "$$(/usr/local/bin/brew shellenv)"
+			fi
+			brew install "$$TARGET_SHELL"
 		else
 			sudo apt update
-			sudo apt install -y zsh
+			sudo apt install -y "$$TARGET_SHELL"
 		fi
-		chsh -s $$(which zsh)
+	else
+		echo "✅ $$TARGET_SHELL trouvé"
+	fi
+
+	DESIRED_SHELL_PATH="$$(command -v "$$TARGET_SHELL")"
+	if [ "$${SHELL:-}" != "$$DESIRED_SHELL_PATH" ]; then
+		chsh -s "$$DESIRED_SHELL_PATH"
 		echo "🙋‍♂️ logout login pour prendre en compte le nouveau shell"
 	else
-		echo "✅ zsh trouvé"
+		echo "✅ shell par défaut déjà configuré"
 	fi
 
 	if [ "$(OS_TYPE)" = "arch" ]; then
@@ -46,9 +79,15 @@ terminal:
 		if ! command -v brew >/dev/null 2>&1; then
 			echo "❌ Homebrew non trouvé, installation..."
 			/bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-			exec $$SHELL
 		else
 			echo "✅ Homebrew trouvé"
+		fi
+		if [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
+			eval "$$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+		elif [ -x /opt/homebrew/bin/brew ]; then
+			eval "$$(/opt/homebrew/bin/brew shellenv)"
+		elif [ -x /usr/local/bin/brew ]; then
+			eval "$$(/usr/local/bin/brew shellenv)"
 		fi
 		echo "🔄 Mise à jour de Homebrew..."
 		if command -v brew >/dev/null 2>&1; then
@@ -67,44 +106,48 @@ terminal:
 		echo "✅ nvim trouvé"
 	fi
 
-	if ! command -v p10k >/dev/null 2>&1; then
-		echo "❌ power level 10k non trouvé, installation..."
-		if [ "$(OS_TYPE)" = "arch" ]; then
-			paru -S --noconfirm zsh-theme-powerlevel10k-git
+	if [ "$$TARGET_SHELL" = "zsh" ]; then
+		if ! command -v p10k >/dev/null 2>&1; then
+			echo "❌ power level 10k non trouvé, installation..."
+			if [ "$(OS_TYPE)" = "arch" ]; then
+				paru -S --noconfirm zsh-theme-powerlevel10k-git
+			else
+				brew install powerlevel10k
+			fi
 		else
-			brew install powerlevel10k
+			echo "✅ powerlevel10k trouvé"
+		fi
+
+		# if ! command -v starship >/dev/null 2>&1; then
+		# 	echo "❌ starship non trouvé, installation..."
+		# 	curl -sS https://starship.rs/install.sh | sh -s -- -y
+		# else
+		# 	echo "✅ starship trouvé"
+		# fi
+
+		if ! command -v zsh-history-substring-search >/dev/null 2>&1; then
+			echo "❌ zsh-history-substring-search non trouvé, installation..."
+			if [ "$(OS_TYPE)" = "arch" ]; then
+				paru -S --noconfirm zsh-history-substring-search
+			else
+				brew install zsh-history-substring-search
+			fi
+		else
+			echo "✅ zsh-history-substring-search trouvé"
+		fi
+
+		if ! command -v zsh-autosuggestions >/dev/null 2>&1; then
+			echo "❌ zsh-autosuggestions non trouvé, installation..."
+			if [ "$(OS_TYPE)" = "arch" ]; then
+				paru -S --noconfirm zsh-autosuggestions
+			else
+				brew install zsh-autosuggestions
+			fi
+		else
+			echo "✅ zsh-autosuggestions trouvé"
 		fi
 	else
-		echo "✅ powerlevel10k trouvé"
-	fi
-
-	# if ! command -v starship >/dev/null 2>&1; then
-	# 	echo "❌ starship non trouvé, installation..."
-	# 	curl -sS https://starship.rs/install.sh | sh -s -- -y
-	# else
-	# 	echo "✅ starship trouvé"
-	# fi
-
-	if ! command -v zsh-history-substring-search >/dev/null 2>&1; then
-		echo "❌ zsh-history-substring-search non trouvé, installation..."
-		if [ "$(OS_TYPE)" = "arch" ]; then
-			paru -S --noconfirm zsh-history-substring-search
-		else
-			brew install zsh-history-substring-search
-		fi
-	else
-		echo "✅ zsh-history-substring-search trouvé"
-	fi
-
-	if ! command -v zsh-autosuggestions >/dev/null 2>&1; then
-		echo "❌ zsh-autosuggestions non trouvé, installation..."
-		if [ "$(OS_TYPE)" = "arch" ]; then
-			paru -S --noconfirm zsh-autosuggestions
-		else
-			brew install zsh-autosuggestions
-		fi
-	else
-		echo "✅ zsh-autosuggestions trouvé"
+		echo "ℹ️  dépendances zsh spécifiques ignorées (DOTFILES_SHELL=$$TARGET_SHELL)"
 	fi
 
 	if ! -x $$HOME/.fzf/install >/dev/null 2>&1; then 
@@ -189,8 +232,7 @@ terminal:
 	fi
 
 	if [[ ":$$PATH:" != *":$$HOME/.local/bin:"* ]]; then
-		echo "❌ ~/.local/bin n'est pas dans le PATH, ajout..."
-		echo 'export PATH="$$HOME/.local/bin:$$PATH"' >> $$HOME/.zshrc
+		echo "ℹ️  ajout temporaire de ~/.local/bin au PATH pour cette exécution"
 		export PATH="$$HOME/.local/bin:$$PATH"
 	else
 		echo "✅ ~/.local/bin est dans le PATH"
@@ -202,17 +244,39 @@ terminal:
 
 config-terminal:
 	@echo "ℹ️ Installation des fichiers de configuration"
-	@mv $$HOME/.zshrc $$HOME/.zshrc.bak || true
-	@cp shell/zshrc $$HOME/.zshrc
+	@TARGET_SHELL="$(DEFAULT_LOGIN_SHELL)"; \
+	if [ -f "$(SHELL_SELECTION_FILE)" ]; then \
+		source "$(SHELL_SELECTION_FILE)"; \
+		TARGET_SHELL="$${DOTFILES_SHELL:-$(DEFAULT_LOGIN_SHELL)}"; \
+	fi; \
+	case "$$TARGET_SHELL" in fish|zsh) ;; *) echo "❌ Unsupported DOTFILES_SHELL: $$TARGET_SHELL (expected fish or zsh)"; exit 1 ;; esac; \
+	if [ "$$TARGET_SHELL" = "zsh" ] && [ -f $$HOME/.zshrc ]; then \
+		mv $$HOME/.zshrc $$HOME/.zshrc.bak; \
+	fi; \
 	@mkdir -p $$HOME/.config || true
+	@if [ "$$TARGET_SHELL" = "fish" ] && [ -f $$HOME/.config/fish/config.fish ]; then \
+		mkdir -p $$HOME/.config/fish; \
+		mv $$HOME/.config/fish/config.fish $$HOME/.config/fish/config.fish.bak; \
+	fi
 	@cp -r config/* $$HOME/.config
+	@if [ "$$TARGET_SHELL" = "zsh" ]; then \
+		cp shell/zshrc $$HOME/.zshrc; \
+	fi
 	@cp -r dotfiles/.* $$HOME/
-	@exec $$SHELL
-	@echo "✅ Installation des fichiers de configuration terminée"
+	@echo "✅ Installation des fichiers de configuration terminée ($$TARGET_SHELL)"
 
 devops:
 	@echo "ℹ️ Installation des outils DevOps"
 	@source config/devops || true
+	if [ "$(OS_TYPE)" != "arch" ]; then
+		if [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
+			eval "$$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+		elif [ -x /opt/homebrew/bin/brew ]; then
+			eval "$$(/opt/homebrew/bin/brew shellenv)"
+		elif [ -x /usr/local/bin/brew ]; then
+			eval "$$(/usr/local/bin/brew shellenv)"
+		fi
+	fi
 	if [ "$${KUBECTL:-true}" = "true" ]; then
 		if ! command -v kubectl >/dev/null 2>&1; then
 			echo "❌ kubectl non trouvé, installation..."
@@ -307,6 +371,19 @@ devops:
 dev:
 	@echo "ℹ️ Installation des outils de développement"
 	@source config/dev || true
+	NVM_SH="$$HOME/.nvm/nvm.sh"
+	if [ "$(OS_TYPE)" != "arch" ]; then
+		if [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
+			eval "$$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+			NVM_SH="/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh"
+		elif [ -x /opt/homebrew/bin/brew ]; then
+			eval "$$(/opt/homebrew/bin/brew shellenv)"
+			NVM_SH="/opt/homebrew/opt/nvm/nvm.sh"
+		elif [ -x /usr/local/bin/brew ]; then
+			eval "$$(/usr/local/bin/brew shellenv)"
+			NVM_SH="/usr/local/opt/nvm/nvm.sh"
+		fi
+	fi
 	if [ "$${PYENV:-true}" = "true" ]; then
 		if ! command -v pyenv >/dev/null 2>&1; then
 			echo "❌ pyenv non trouvé, installation..."
@@ -330,10 +407,14 @@ dev:
 			else
 				brew install nvm
 			fi
-			exec $$SHELL
-			nvm install --lts
 		else
 			echo "✅ nvm trouvé"
+		fi
+		if [ "$(OS_TYPE)" != "arch" ] && [ -s "$$NVM_SH" ]; then
+			export NVM_DIR="$$HOME/.nvm"
+			mkdir -p "$$NVM_DIR"
+			. "$$NVM_SH"
+			nvm install --lts
 		fi
 	else
 		echo "⏭️  nvm installation skipped (NVM=false)"
@@ -371,6 +452,9 @@ dev:
 			if [ "$(OS_TYPE)" = "arch" ]; then
 				paru -S --noconfirm nodejs
 			else
+				export NVM_DIR="$$HOME/.nvm"
+				mkdir -p "$$NVM_DIR"
+				. "$$NVM_SH"
 				nvm install --lts
 			fi
 		else
@@ -386,6 +470,9 @@ dev:
 			if [ "$(OS_TYPE)" = "arch" ]; then
 				paru -S --noconfirm npm
 			else
+				export NVM_DIR="$$HOME/.nvm"
+				mkdir -p "$$NVM_DIR"
+				. "$$NVM_SH"
 				nvm install --lts
 			fi
 		else
@@ -421,10 +508,8 @@ dev:
 
 help:
 	@echo "Commands available :"
-	@echo "  make term            - install terminal"
-	@echo "  make config-terminal - install les fichiers de configuration et shellrc"
+	@echo "  make term            - install terminal for the shell selected in config/shell"
+	@echo "  make config-terminal - install les fichiers de configuration et le shell rc sélectionné"
 	@echo "  make dev             - Install development tools"
 	@echo "  make devops          - Install devops tools"
 	@echo "  make help            - Display this help message"
-
-
