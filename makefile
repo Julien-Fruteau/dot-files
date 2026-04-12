@@ -150,6 +150,14 @@ terminal:
 		echo "ℹ️  dépendances zsh spécifiques ignorées (DOTFILES_SHELL=$$TARGET_SHELL)"
 	fi
 
+	if [ "$$TARGET_SHELL" = "fish" ]; then
+		echo "ℹ️  vérification de fisher/tide pour fish..."
+		fish -c 'if not functions -q fisher; curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher; else echo "✅ fisher déjà installé"; end'
+		fish -c 'if fisher list | string match -q "*IlanCosman/tide*"; echo "✅ tide déjà installé"; else fisher install IlanCosman/tide@v6; end'
+	else
+		echo "ℹ️  dépendances fish spécifiques ignorées (DOTFILES_SHELL=$$TARGET_SHELL)"
+	fi
+
 	if ! -x $$HOME/.fzf/install >/dev/null 2>&1; then 
 		echo "❌ fzf install non trouvé, installation..."
 		git clone --depth 1 https://github.com/junegunn/fzf.git $$HOME/.fzf
