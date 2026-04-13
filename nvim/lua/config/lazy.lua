@@ -22,7 +22,7 @@ require("lazy").setup({
 			opts = {
         -- colorscheme = "monokai-pro-octagon",
 				-- colorscheme = "rose-pine",
-				colorscheme = "catppuccin",
+				colorscheme = "catppuccin-macchiato",
         -- colorscheme = "tokyonight",
 			},
 		}, -- import any extras modules here
