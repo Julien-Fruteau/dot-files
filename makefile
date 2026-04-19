@@ -261,7 +261,7 @@ config-terminal:
 	if [ "$$TARGET_SHELL" = "zsh" ] && [ -f $$HOME/.zshrc ]; then \
 		mv $$HOME/.zshrc $$HOME/.zshrc.bak; \
 	fi; \
-	@mkdir -p $$HOME/.config || true
+	mkdir -p $$HOME/.config || true
 	@if [ "$$TARGET_SHELL" = "fish" ] && [ -f $$HOME/.config/fish/config.fish ]; then \
 		mkdir -p $$HOME/.config/fish; \
 		mv $$HOME/.config/fish/config.fish $$HOME/.config/fish/config.fish.bak; \
@@ -323,7 +323,7 @@ devops:
 			else
 				brew install helm
 			fi
-			helm plugin install https://github.com/databus23/helm-diff || true
+			helm plugin install https://github.com/databus23/helm-diff --verify=false || true
 		else
 			echo "✅ helm trouvé"
 		fi
