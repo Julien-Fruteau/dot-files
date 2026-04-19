@@ -54,7 +54,7 @@ terminal:
 	fi
 
 	DESIRED_SHELL_PATH="$$(command -v "$$TARGET_SHELL")"
-	if [ "$${SHELL:-}" != "$$DESIRED_SHELL_PATH" ]; then
+	if [ "$$(basename "$${SHELL:-}")" != "$$TARGET_SHELL" ]; then
 		chsh -s "$$DESIRED_SHELL_PATH"
 		echo "🙋‍♂️ logout login pour prendre en compte le nouveau shell"
 	else
@@ -158,7 +158,7 @@ terminal:
 		echo "ℹ️  dépendances fish spécifiques ignorées (DOTFILES_SHELL=$$TARGET_SHELL)"
 	fi
 
-	if ! -x $$HOME/.fzf/install >/dev/null 2>&1; then 
+	if [ ! -x "$$HOME/.fzf/install" ]; then
 		echo "❌ fzf install non trouvé, installation..."
 		git clone --depth 1 https://github.com/junegunn/fzf.git $$HOME/.fzf
 		$$HOME/.fzf/install
@@ -188,6 +188,17 @@ terminal:
 		echo "✅ lazygit trouvé"
 	fi
 
+	if ! command -v lazydocker >/dev/null 2>&1; then
+		echo "❌ lazydocker non trouvé, installation..."
+		if [ "$(OS_TYPE)" = "arch" ]; then
+			paru -S --noconfirm lazydocker
+		else
+			brew install jesseduffield/lazydocker/lazydocker
+		fi
+	else
+		echo "✅ lazydocker trouvé"
+	fi
+
 	# if ! command -v fzf >/dev/null 2>&1; then
 	# 	echo "❌ fzf non trouvé, installation..."
 	# 	brew install fzf
@@ -195,7 +206,7 @@ terminal:
 	# 	echo "✅ fzf trouvé"
 	# fi
 
-	if ! command -v ripgrep >/dev/null 2>&1; then
+	if ! command -v rg >/dev/null 2>&1; then
 		echo "❌ ripgrep non trouvé, installation..."
 		if [ "$(OS_TYPE)" = "arch" ]; then
 			paru -S --noconfirm ripgrep
@@ -246,6 +257,18 @@ terminal:
 		echo "✅ ~/.local/bin est dans le PATH"
 	fi
 
+	if ! command -v keyd >/dev/null 2>&1; then
+		echo "❌ keyd non trouvé, installation..."
+		if [ "$(OS_TYPE)" = "arch" ]; then
+			paru -S --noconfirm keyd
+		else
+			echo "⚠️  keyd installation manuelle requise sur ce système"
+		fi
+	else
+		echo "✅ keyd trouvé"
+	fi
+	sudo systemctl enable --now keyd || true
+
 	echo "installation de nerd fonts..."
 	getnf -i Meslo,JetBrainsMono,CascadiaMono,Hack,Hasklig
 	echo "✅ nerd fonts installées"
@@ -271,6 +294,10 @@ config-terminal:
 		cp shell/zshrc $$HOME/.zshrc; \
 	fi
 	@cp -r dotfiles/.* $$HOME/
+	@sudo mkdir -p /etc/keyd
+	@sudo cp etc/keyd/default.conf /etc/keyd/default.conf
+	@sudo systemctl restart keyd
+	@echo "✅ keyd config installée"
 	@echo "✅ Installation des fichiers de configuration terminée ($$TARGET_SHELL)"
 
 devops:
@@ -376,6 +403,37 @@ devops:
 		echo "⏭️  minio installation skipped (MINIO=false)"
 	fi
 
+	if ! command -v docker >/dev/null 2>&1; then
+		echo "❌ docker non trouvé, installation..."
+		if [ "$(OS_TYPE)" = "arch" ]; then
+			paru -S --noconfirm docker
+		else
+			brew install --cask docker
+		fi
+	else
+		echo "✅ docker trouvé"
+	fi
+
+	if ! command -v docker-compose >/dev/null 2>&1; then
+		echo "❌ docker-compose non trouvé, installation..."
+		if [ "$(OS_TYPE)" = "arch" ]; then
+			paru -S --noconfirm docker-compose
+		else
+			brew install docker-compose
+		fi
+	else
+		echo "✅ docker-compose trouvé"
+	fi
+
+	sudo systemctl enable --now docker
+	if ! getent group docker | grep -q "\b$$USER\b"; then
+		echo "ℹ️  ajout de $$USER au groupe docker..."
+		sudo usermod -aG docker $$USER
+		newgrp docker
+	else
+		echo "✅ $$USER déjà dans le groupe docker"
+	fi
+
 dev:
 	@echo "ℹ️ Installation des outils de développement"
 	@source config/dev || true
@@ -426,6 +484,17 @@ dev:
 		fi
 	else
 		echo "⏭️  nvm installation skipped (NVM=false)"
+	fi
+
+	if ! command -v zip >/dev/null 2>&1; then
+		echo "❌ zip non trouvé, installation..."
+		if [ "$(OS_TYPE)" = "arch" ]; then
+			paru -S --noconfirm zip
+		else
+			brew install zip
+		fi
+	else
+		echo "✅ zip trouvé"
 	fi
 
 	if [ "$${SDKMAN:-true}" = "true" ]; then
