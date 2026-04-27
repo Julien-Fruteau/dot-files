@@ -4,6 +4,7 @@ set -gx KUBECONFIG "$HOME/.kube/config"
 set -gx KUBE_EDITOR "nvim"
 set -gx SDKMAN_DIR "$HOME/.sdkman"
 set -gx MESA_D3D12_DEFAULT_ADAPTER_NAME AMD
+set -gx NVM_DIR "$HOME/.nvm"
 
 function __dotfiles_source_env_file --argument-names env_file
     if not test -f $env_file
@@ -289,4 +290,6 @@ end
 if test -f "$HOME/.cargo/env.fish" 
 	source "$HOME/.cargo/env.fish"
 end	
+
+direnv hook fish | source
 
