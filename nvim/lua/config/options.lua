@@ -89,13 +89,6 @@ opt.completeopt = "menuone,noselect"
 opt.guicursor =
 	"n-v-c-sm:block-blinkon500-blinkoff200-blinkwait300,i-ci-ve:ver25-blinkon500-blinkoff200-blinkwait300,r-cr-o:hor20-blinkon500-blinkoff200-blinkwait300"
 
--- LSP Server to use for Python.
--- Set to "basedpyright" to use basedpyright instead of pyright.
--- vim.g.lazyvim_python_lsp = "basedpyright"
--- Set to "ruff_lsp" to use the old LSP implementation version.
--- vim.g.lazyvim_python_ruff = "ruff"
 
 g.root_spec = { "cwd" }
--- g.python3_host_prog = vim.fn.expand("/home/julien/.local/share/virtualenvs/neovim/bin/python")
-
 g.autosave_enabled = false

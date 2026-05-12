@@ -43,12 +43,6 @@ keymap.set("n", "<A-v>", "<C-v>", { desc = "Visual block mode" })
 -- paste do not overwrite the register
 -- keymap.set("n", "p", "P", { desc = "Paste before selection by defaults to avoid overwriting register" })
 keymap.set("n", "U", "<C-R>", { desc = "Redo" })
--- keymap.set("n", "<leader>ls", "<CMD>Lazy show<CR>", { desc = "Lazy Show" })
--- keymap.set("n", "<leader>lS", "<CMD>Lazy sync<CR>", { desc = "Lazy Sync" })
-
--- window management
--- keymap.set("n", "sv", "<C-w>v", { desc = "Split window vertically" }) -- split window vertically
--- keymap.set("n", "ss", "<C-w>s", { desc = "Split window horizontally" }) -- split window horizontally
 
 local function get_total_buffers()
 	local buffers = vim.api.nvim_list_bufs()
@@ -113,7 +107,6 @@ keymap.set("n", "<leader>wh", function()
 end, { desc = "Move buffer to left split" })
 
 keymap.set("n", "<leader>wH", function()
-	local buf = vim.api.nvim_get_current_buf()
 	local current_win = vim.fn.winnr()
 	local right_win = vim.fn.winnr("h")
 	local buf = vim.api.nvim_get_current_buf()
@@ -142,20 +135,11 @@ keymap.set("n", "<Leader>O", "O<Esc>^Da", { desc = "Continue above" })
 keymap.set("n", "<leader>we", "<C-w>=", { desc = "Make splits equal size" }) -- make split windows equal width & height
 keymap.set("n", "<leader>wx", "<CMD>close<CR>", { desc = "Close current split" }) -- close current split window
 
-keymap.set("n", "<leader>to", "<CMD>tabnew<CR>", { desc = "Open new tab" }) -- open new tab
-keymap.set("n", "<leader>tx", "<CMD>tabclose<CR>", { desc = "Close current tab" }) -- close current tab
-keymap.set("n", "<leader>tn", "<CMD>tabn<CR>", { desc = "Go to next tab" }) --  go to next tab
-keymap.set("n", "<leader>tp", "<CMD>tabp<CR>", { desc = "Go to previous tab" }) --  go to previous tab
-keymap.set("n", "<leader>tf", "<CMD>tabnew %<CR>", { desc = "Open current buffer in new tab" }) --  move current buffer to new tab
-
 -- buffer management
 keymap.set("n", "<M-w>", ":b#<CR>", { desc = "Focus to previous active buffer" }) --  Focus to previous active buffer
 
 keymap.set("n", "<leader>fs", "<CMD>w<CR>", { desc = "File save" }) -- file save, NB: by default lazyvim put it to C-s
 
--- neo-tree
--- keymap.set("n", "<leader>e", ":Neotree focus<cr>", { desc = "Explorer focus on File Explorer" })
--- keymap.set("n", "<leader>E", ":Neotree toggle<cr>", { desc = "Explorer toggle File Explorer" })
 -- snack
 keymap.set("n", "<leader>e", function()
 	local explorer_win = nil
@@ -213,35 +197,6 @@ end
 -- diagnostic
 keymap.set("n", "<leader>cb", "<CMD>Telescope diagnostics<CR>", { desc = "Show buffers diagnostics (Telescope)" })
 
--- magma (python jupyter)
--- Required Python packages:
--- pynvim (for the Remote Plugin API)
--- jupyter_client (for interacting with Jupyter)
--- ueberzug (for displaying images. Not available on MacOS, but see #15 for alternatives)
--- Pillow (also for displaying images, should be installed with ueberzug)
--- cairosvg (for displaying SVG images)
--- pnglatex (for displaying TeX formulas)
--- plotly and kaleido (for displaying Plotly figures)
--- pyperclip if you want to use magma_copy_output
+-- keymap.set("n", "<leader>ch", ":LivePreview start<cr>", { desc = "Preview start" })
+-- keymap.set("n", "<leader>cH", ":LivePreview close<cr>", { desc = "Preview stop" })
 
--- keymap.set("n", "<leader>mo", ":MagmaEvaluateOperator<CR>", { desc = "Magma (jupy) eval operator" })
--- keymap.set("n", "<leader>mr", ":MagmaEvaluateLine<CR>", { desc = "Magma (jupy) eval line" })
--- keymap.set("n", "<leader>mu", ":<C-u>MagmaEvaluateVisual<CR>", { desc = "Magma (jupy) eval visual" })
--- keymap.set("n", "<leader>mc", ":MagmaReevaluateCell<CR>", { desc = "Magma (jupy) reeval cell" })
--- keymap.set("n", "<leader>md", ":MagmaDelete<CR>", { desc = "Magma (jupy) delete" })
--- keymap.set("n", "<leader>mo", ":MagmaShowOutput<CR>", { desc = "Magma (jupy) show output" })
-
-keymap.set("n", "<leader>ch", ":LivePreview start<cr>", { desc = "Preview start" })
-keymap.set("n", "<leader>cH", ":LivePreview close<cr>", { desc = "Preview stop" })
-
--- keymap.set("n", "<Leader>t_", ":lua open_floating_terminal()<CR>", { noremap = true, silent = true })
--- Clear the terminal with Ctrl+L in terminal mode
--- vim.keymap.set('t', '<C-l>', '<Cmd>clear<CR>', { remap = true, silent = true })
-
--- molten jupyter kernel
-keymap.set("n", "<leader>mi", ":MoltenInit<CR>", { silent = true, desc = "Initialize the plugin" })
-keymap.set("n", "<leader>me", ":MoltenEvaluateOperator<CR>", { silent = true, desc = "run operator selection" })
-keymap.set("n", "<leader>ml", ":MoltenEvaluateLine<CR>", { silent = true, desc = "evaluate line" })
-keymap.set("n", "<leader>mc", ":MoltenReevaluateCell<CR>", { silent = true, desc = "re-evaluate cell" })
-keymap.set("v", "<leader>mv", ":<C-u>MoltenEvaluateVisual<CR>gv", { silent = true, desc = "evaluate visual selection" })
-keymap.set("n", "<leader>md", ":MoltenDeinit<CR>", { silent = true, desc = "deinit" })

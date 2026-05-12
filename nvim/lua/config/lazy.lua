@@ -20,15 +20,9 @@ require("lazy").setup({
 			"LazyVim/LazyVim",
 			import = "lazyvim.plugins",
 			opts = {
-        -- colorscheme = "monokai-pro-octagon",
-				-- colorscheme = "rose-pine",
 				colorscheme = "catppuccin-macchiato",
-        -- colorscheme = "tokyonight",
 			},
 		}, -- import any extras modules here
-		-- { import = "lazyvim.plugins.extras.util.mini-hipatterns" },
-		-- NB: some plugins are handled by LazyExtras
-		-- import/override with your plugins
 		{
 			import = "plugins",
 		},
@@ -53,13 +47,9 @@ require("lazy").setup({
 			-- disable some rtp plugins
 			disabled_plugins = {
 				"gzip",
-        -- "matchit",
-				-- "matchparen",
-				-- "netrwPlugin",
 				"tarPlugin",
 				"tohtml",
 				"tutor",
-				-- "zipPlugin",
         "nvim-notify",
 			},
 		},
