@@ -3,8 +3,25 @@
 ## prerequisites
 
 - SHELL: fish by default (`config/shell`), zsh supported for backward compatibility
-- command: make, unzip
+- command: make (or task as alternative, see below), unzip
 - If installing `dev tools`, and particularly `pyenv`, please refer to the official doc to install the build packages : [link](https://github.com/pyenv/pyenv/wiki#suggested-build-environment)
+
+### install task (alternative to make)
+
+[Task](https://taskfile.dev) is available as an alternative task runner via `Taskfile.yml`.
+
+```bash
+# Arch Linux
+paru -S go-task-bin
+
+# macOS
+brew install go-task
+
+# any OS (installs to ~/.local/bin)
+sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b ~/.local/bin
+```
+
+Replace `make <target>` with `task <target>` in the commands below.
 
 ## usage
 

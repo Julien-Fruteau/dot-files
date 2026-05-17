@@ -250,17 +250,21 @@ terminal:
 		echo "✅ ~/.local/bin est dans le PATH"
 	fi
 
-	if ! command -v keyd >/dev/null 2>&1; then
-		echo "❌ keyd non trouvé, installation..."
-		if [ "$(OS_TYPE)" = "arch" ]; then
-			paru -S --noconfirm keyd
+	if [ -d /run/systemd/system ]; then
+		if ! command -v keyd >/dev/null 2>&1; then
+			echo "❌ keyd non trouvé, installation..."
+			if [ "$(OS_TYPE)" = "arch" ]; then
+				paru -S --noconfirm keyd
+			else
+				echo "⚠️  keyd installation manuelle requise sur ce système"
+			fi
 		else
-			echo "⚠️  keyd installation manuelle requise sur ce système"
+			echo "✅ keyd trouvé"
 		fi
+		sudo systemctl enable --now keyd || true
 	else
-		echo "✅ keyd trouvé"
+		echo "⏭️  keyd skipped (systemd not available)"
 	fi
-	sudo systemctl enable --now keyd || true
 
 	echo "installation de nerd fonts..."
 	getnf -i Meslo,JetBrainsMono,CascadiaMono,Hack,Hasklig
@@ -287,10 +291,14 @@ config-terminal:
 		cp shell/zshrc $$HOME/.zshrc; \
 	fi
 	@cp -r dotfiles/.* $$HOME/
-	@sudo mkdir -p /etc/keyd
-	@sudo cp etc/keyd/default.conf /etc/keyd/default.conf
-	@sudo systemctl restart keyd
-	@echo "✅ keyd config installée"
+	@if [ -d /run/systemd/system ]; then \
+		sudo mkdir -p /etc/keyd; \
+		sudo cp etc/keyd/default.conf /etc/keyd/default.conf; \
+		sudo systemctl restart keyd; \
+		echo "✅ keyd config installée"; \
+	else \
+		echo "⏭️  keyd config skipped (systemd not available)"; \
+	fi
 	@echo "✅ Installation des fichiers de configuration terminée ($$TARGET_SHELL)"
 
 devops:
