@@ -107,7 +107,7 @@ terminal:
 	fi
 
 	if [ "$$TARGET_SHELL" = "zsh" ]; then
-		if ! command -v p10k >/dev/null 2>&1; then
+		if ! [ -f "$$HOME/.p10k.zsh" ]; then
 			echo "❌ power level 10k non trouvé, installation..."
 			if [ "$(OS_TYPE)" = "arch" ]; then
 				paru -S --noconfirm zsh-theme-powerlevel10k-git
@@ -117,13 +117,6 @@ terminal:
 		else
 			echo "✅ powerlevel10k trouvé"
 		fi
-
-		# if ! command -v starship >/dev/null 2>&1; then
-		# 	echo "❌ starship non trouvé, installation..."
-		# 	curl -sS https://starship.rs/install.sh | sh -s -- -y
-		# else
-		# 	echo "✅ starship trouvé"
-		# fi
 
 		if ! command -v zsh-history-substring-search >/dev/null 2>&1; then
 			echo "❌ zsh-history-substring-search non trouvé, installation..."
