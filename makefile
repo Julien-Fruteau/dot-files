@@ -272,28 +272,34 @@ terminal:
 
 config-terminal:
 	@echo "ℹ️ Installation des fichiers de configuration"
-	@TARGET_SHELL="$(DEFAULT_LOGIN_SHELL)"; \
-	if [ -f "$(SHELL_SELECTION_FILE)" ]; then \
-		source "$(SHELL_SELECTION_FILE)"; \
-		TARGET_SHELL="$${DOTFILES_SHELL:-$(DEFAULT_LOGIN_SHELL)}"; \
-	fi; \
-	case "$$TARGET_SHELL" in fish|zsh) ;; *) echo "❌ Unsupported DOTFILES_SHELL: $$TARGET_SHELL (expected fish or zsh)"; exit 1 ;; esac; \
-	mv $$HOME/.zshrc $$HOME/.zshrc.bak;
-	mkdir -p $$HOME/.config || true
-	mkdir -p $$HOME/.config/fish;
-	mv $$HOME/.config/fish/config.fish $$HOME/.config/fish/config.fish.bak;
-	cp -r config/* $$HOME/.config/
-	cp shell/zshrc $$HOME/.zshrc;
-	cp -r dotfiles/.* $$HOME/;
-	@if [ -d /run/systemd/system ]; then \
-		sudo mkdir -p /etc/keyd; \
-		sudo cp etc/keyd/default.conf /etc/keyd/default.conf; \
-		sudo systemctl restart keyd; \
-		echo "✅ keyd config installée"; \
-	else \
-		echo "⏭️  keyd config skipped (systemd not available)"; \
+	TARGET_SHELL="$(DEFAULT_LOGIN_SHELL)"
+	if [ -f "$(SHELL_SELECTION_FILE)" ]; then
+		source "$(SHELL_SELECTION_FILE)"
+		TARGET_SHELL="$${DOTFILES_SHELL:-$(DEFAULT_LOGIN_SHELL)}"
 	fi
-	@echo "✅ Installation des fichiers de configuration terminée"
+	case "$$TARGET_SHELL" in
+		fish|zsh) ;;
+		*)
+			echo "❌ Unsupported DOTFILES_SHELL: $$TARGET_SHELL (expected fish or zsh)"
+			exit 1
+			;;
+	esac
+	mv $$HOME/.zshrc $$HOME/.zshrc.bak
+	mkdir -p $$HOME/.config || true
+	mkdir -p $$HOME/.config/fish
+	mv $$HOME/.config/fish/config.fish $$HOME/.config/fish/config.fish.bak
+	cp -r config/* $$HOME/.config/
+	cp shell/zshrc $$HOME/.zshrc
+	cp -r dotfiles/.[^.]* $$HOME/
+	if [ -d /run/systemd/system ]; then
+		sudo mkdir -p /etc/keyd
+		sudo cp etc/keyd/default.conf /etc/keyd/default.conf
+		sudo systemctl restart keyd
+		echo "✅ keyd config installée"
+	else
+		echo "⏭️  keyd config skipped (systemd not available)"
+	fi
+	echo "✅ Installation des fichiers de configuration terminée"
 
 devops:
 	@echo "ℹ️ Installation des outils DevOps"
