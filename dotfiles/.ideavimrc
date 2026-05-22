@@ -19,3 +19,4 @@ nmap gy :action GotoTypeDeclaration<CR>
 nmap U <C-r>
 nmap <leader>cd :action ShowErrorDescription<CR>
 nmap <A-x> :action ShowHoverInfo<CR>
+set clipboard^=ideaput
