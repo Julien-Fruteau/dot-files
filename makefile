@@ -284,10 +284,10 @@ config-terminal:
 			exit 1
 			;;
 	esac
-	mv $$HOME/.zshrc $$HOME/.zshrc.bak
+	mv $$HOME/.zshrc $$HOME/.zshrc.bak || true
 	mkdir -p $$HOME/.config || true
 	mkdir -p $$HOME/.config/fish
-	mv $$HOME/.config/fish/config.fish $$HOME/.config/fish/config.fish.bak
+	mv $$HOME/.config/fish/config.fish $$HOME/.config/fish/config.fish.bak || true
 	cp -r config/* $$HOME/.config/
 	cp shell/zshrc $$HOME/.zshrc
 	cp -r dotfiles/.[^.]* $$HOME/
