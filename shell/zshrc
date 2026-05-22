@@ -176,7 +176,7 @@ export KUBECONFIG=$HOME/.kube/config
 export KUBE_EDITOR="nvim"
 export PYENV_ROOT="$HOME/.pyenv"
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+eval "$(fzf --zsh)"
 
 # Conditional loading of development tool configurations based on env vars
 if [[ "${PYENV:-true}" == "true" && $commands[pyenv] ]]; then
