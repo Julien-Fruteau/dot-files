@@ -442,6 +442,8 @@ binds {
     Super+Alt+L hotkey-overlay-title="Lock the Screen: Noctalia" { spawn-sh "qs -c noctalia-shell ipc call lockScreen lock"; }
     // Super+Control+L hotkey-overlay-title="Lock the Screen & Suspend" { spawn-sh "qs -c noctalia-shell ipc call sessionMenu lockAndSuspend"; }
 
+    Ctrl+2 hotkey-overlay-title="Draw on screen" { spawn-sh "wayscriber --daemon-toggle"; }
+
     Mod+Delete { spawn-sh "qs -c noctalia-shell ipc call sessionMenu toggle"; }
     Mod+SemiColon { spawn-sh "qs -c noctalia-shell ipc call launcher emoji"; }
     Mod+B hotkey-overlay-title="Run a Browser: Firefox" { spawn "firefox";}

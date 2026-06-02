@@ -273,6 +273,18 @@ tasks:
           echo "⏭️  keyd skipped (systemd not available)"
         fi
 
+        if ! command -v wayscriber >/dev/null 2>&1; then
+          echo "❌ wayscriber non trouvé, installation..."
+          if [ "{{.OS_TYPE}}" = "arch" ]; then
+            paru -S --noconfirm wayscriber
+          else
+            echo "⚠️  wayscriber installation manuelle requise sur ce système"
+            echo "ℹ️  voir https://github.com/devmobasa/wayscriber"
+          fi
+        else
+          echo "✅ wayscriber trouvé"
+        fi
+
         echo "installation de nerd fonts..."
         getnf -i Meslo,JetBrainsMono,CascadiaMono,Hack,Hasklig
         echo "✅ nerd fonts installées"
