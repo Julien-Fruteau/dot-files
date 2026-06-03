@@ -107,6 +107,42 @@ function nvims() {
   NVIM_APPNAME=$config nvim $@
 }
 
+function ksec() {
+  local secret=""
+  local context=""
+  local namespace=""
+  local field=""
+
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+      -c|--context)   context=$2;   shift 2 ;;
+      -n|--namespace) namespace=$2; shift 2 ;;
+      -f|--field)     field=$2;     shift 2 ;;
+      *)              secret=$1;    shift   ;;
+    esac
+  done
+
+  if [[ -z $context ]]; then 
+    context=$(kubectl config current-context)
+  fi
+
+  if [[ -z $namespace ]]; then 
+    namespace=$(kubectl config view -o jsonpath="{.contexts[?(@.name==\"$context\")].context.namespace}")
+  fi
+
+  if [[ -z $secret ]]; then
+    echo "Usage: ksec [-c context] [-n namespace] <secret-name> [-f field]"
+    return 1
+  fi
+
+  local cmd="kubectl --context=$context -n $namespace get secret $secret -o json"
+
+  if [[ -n $field ]]; then
+    $cmd | jq -r ".data[\"$field\"]" | base64 -d | tee >(wl-copy --trim-newline)
+  else
+    $cmd | jq -Mr '.data | map_values(@base64d)' | tee >(wl-copy --trim-newline)
+  fi
+}
 
 bindkey "^ " autosuggest-accept
 # bindkey "^[L" clear-screen
