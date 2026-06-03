@@ -270,6 +270,9 @@ terminal:
 		echo "❌ wayscriber non trouvé, installation..."
 		if [ "$(OS_TYPE)" = "arch" ]; then
 			paru -S --noconfirm wayscriber
+				if [ -d /run/systemd/system ]; then
+					systemctl --user enable --now wayscriber.service
+				fi
 		else
 			echo "⚠️  wayscriber installation manuelle requise sur ce système"
 			echo "ℹ️  voir https://github.com/devmobasa/wayscriber"

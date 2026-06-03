@@ -82,6 +82,7 @@ alias zsh_history_fix='f() { mv ~/.histfile ~/.histfile.bad ; strings ~/.histfil
 alias dateUpdateWsl='sudo ntpdate time.windows.com'
 alias yq='yq -C'
 alias jq='jq -C'
+alias task='go-task'
 
 function yless() {
     yq . -C | less -R

@@ -134,6 +134,7 @@ alias ld 'lazydocker'
 alias yq 'yq -C'
 alias jq 'jq -C'
 alias uidgen 'cat /proc/sys/kernel/random/uuid'
+alias task 'go-task'
 
 function kx
     if test (count $argv) -gt 0
