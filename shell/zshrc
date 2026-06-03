@@ -132,10 +132,20 @@ function ksec() {
 
   if [[ -z $secret ]]; then
     echo "Usage: ksec [-c context] [-n namespace] <secret-name> [-f field]"
+    echo ""
+    echo "Fecthing available secrets: ..."
+    _ksec_list $context $namespace | tee >(less)
     return 1
   fi
 
   local cmd="kubectl --context=$context -n $namespace get secret $secret -o json"
+  if ! output=$(eval $cmd 2>&1); then
+    echo "Error: secret '$secret' not found in context '$context' / namespace '$namespace'"
+    echo ""
+    echo "Fecthing available secrets: ..."
+    kubectl --context=$context -n $namespace get secrets --no-headers -o custom-columns="NAME:.metadata.name" | tee >(less)
+    return 1
+  fi
 
   if [[ -n $field ]]; then
     $cmd | jq -r ".data[\"$field\"]" | base64 -d | tee >(wl-copy --trim-newline)
