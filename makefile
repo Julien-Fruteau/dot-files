@@ -281,6 +281,18 @@ terminal:
 		echo "✅ wayscriber trouvé"
 	fi
 
+	if ! command -v wt >/dev/null 2>&1; then
+		echo "❌ worktrunk non trouvé, installation..."
+		if [ "$(OS_TYPE)" = "arch" ]; then
+			paru -S --noconfirm worktrunk
+		else
+			brew install worktrunk
+		fi
+	else
+		echo "✅ worktrunk trouvé"
+	fi
+
+
 	echo "installation de nerd fonts..."
 	getnf -i Meslo,JetBrainsMono,CascadiaMono,Hack,Hasklig
 	echo "✅ nerd fonts installées"
