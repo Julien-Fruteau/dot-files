@@ -7,7 +7,7 @@ vars:
       elif [ "$(uname)" = "Darwin" ]; then echo "macos"
       else echo "linux"
       fi
-  DEFAULT_LOGIN_SHELL: fish
+  DEFAULT_LOGIN_SHELL: zsh
   SHELL_SELECTION_FILE: config/shell
 
 tasks:
