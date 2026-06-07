@@ -1,9 +1,0 @@
-# Development tools installation control
-PYENV=true
-NVM=true
-SDKMAN=true
-GO=true
-NODE=true
-NPM=true
-RUST=true
-CARGO=true

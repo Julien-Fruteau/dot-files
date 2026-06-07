@@ -1,0 +1,93 @@
+# package installed with distro installer (pacman, dnf, apt)
+system:
+  - cli: zsh
+    pkg: zsh
+  - cli: fish
+    pkg: fish
+  - cli: curl
+    pkg: curl
+  - cli: git
+    pkg: git
+  - cli: zip
+    pkg: zip
+  - cli: unzip
+    pkg: unzip
+  - cli: kitty
+    pkg: kitty
+  - cli: mise
+    pkg: mise
+
+# installed with AUR/custom installer (paru, brew)
+user:
+  - cli: nvim
+    pkg: neovim
+  - cli: fzf
+    pkg: fzf
+  - cli: docker
+    pkg: docker
+  - cli: docker-compose
+    pkg: docker-compose
+  - cli: lazydocker
+    pkg: lazydocker
+  - cli: lazygit
+    pkg: lazygit
+  - cli: lazyjournal
+    pkg: lazyjournal
+  - cli: lazyssh
+    pkg: lazyssh
+  - cli: rg
+    pkg: ripgrep
+  - cli: fd
+    pkg: fd
+  - cli: direnv
+    pkg: direnv
+  - cli: wt
+    pkg: worktrunk
+  # specific to OS
+  # ARCH using Paru
+  - cli: getnf
+    pkg: getnf
+
+files:
+  arch:
+    - pkg: zsh-theme-powerlevel10k-git
+      file: "$HOME/.p10k.zsh"
+    - pkg: zsh-history-substring-search
+      file: /usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
+    - pkg: zsh-autosuggestions
+      file: /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+  other:
+    - pkg: powerlevel10k
+      file: "$HOME/.p10k.zsh"
+    - pkg: zsh-history-substring-search
+      file: $(brew --prefix)/share/zsh-history-substring-search/zsh-history-substring-search.zsh
+    - pkg: zsh-autosuggestions
+      file: $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+
+# ⚠️ not used
+systemd:
+  common:
+    - cli: keyd
+      pkg: keyd
+  arch:
+    - cli: wayscriber
+      pkg: wayscriber
+
+# devops:
+#   - cli: kubectl
+#     pkg: kubectl
+#   - cli: k9s 
+#     pkg: k9s
+#   - cli: helm 
+#     pkg: helm
+#   - cli: helm-diff
+#     pkg: helm-diff
+#   - cli: stern
+#     pkg: stern
+#   - cli: helmwave
+#     pkg: helmwave
+#   - cli: minio
+#     pkg: minio
+
+# dev directly in taskfile
+# dev:...

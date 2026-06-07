@@ -1,307 +1,229 @@
-version: '3'
+version: "3"
+silent: true
 
 vars:
+  LOGIN_SHELL: zsh
+  USE_SYSTEMD:
+    sh: |
+      if [ "$(ps -p 1 -o comm=)" == "systemd" ]; then
+        echo "true"
+      else
+        echo "false"
+      fi
   OS_TYPE:
     sh: |
-      if [ -f /etc/arch-release ]; then echo "arch"
-      elif [ "$(uname)" = "Darwin" ]; then echo "macos"
-      else echo "linux"
-      fi
-  DEFAULT_LOGIN_SHELL: zsh
-  SHELL_SELECTION_FILE: config/shell
+      . /etc/os-release
+      case "$ID" in
+        arch|cachyos)  echo "arch" ;;
+        ubuntu|debian) echo "debian" ;;
+        fedora)        echo "fedora" ;;
+        *)             echo "Unsupported OS" && exit 1 ;;
+      esac
+  DISTRO_PACKAGE_MANAGER:
+    sh: |
+      case "{{.OS_TYPE}}" in
+        arch)   echo "sudo pacman -Sy --noconfirm" ;;
+        fedora) echo "sudo dnf install -y" ;;
+        debian) echo "sudo apt install -y" ;;
+      esac
+  CUSTOM_PACKAGE_MANAGER:
+    sh: |
+      case "{{.OS_TYPE}}" in
+        arch) echo "paru -S --noconfirm" ;;
+        *)    echo "brew install" ;;
+      esac
+  CONFIG_RAW:
+    sh: cat task/config.yaml
+  CONFIG:
+    ref: "fromYaml .CONFIG_RAW"
+# dotenv:
+#   - .env
 
 tasks:
   default:
-    silent: true
     cmds:
       - task --list
 
-  term:
-    desc: Full terminal environment (shell install + config deployment)
+  build:
     cmds:
-      - task: terminal
-      - task: config-terminal
+      # - |
+      #   PKG="{{coalesce .ITEM .ITEM.cli .ITEM.pkg}}"
+      #   CLI="{{coalesce .ITEM .ITEM.cli}}"
+      #   echo "$PKG => $CLI"
+      - echo "{{.PKG}} => {{.FILE}}"
 
-  terminal:
-    desc: Install shell and core terminal dependencies
+  # debugs:
+  #   vars:
+  #     PKGS:
+  #       ref: .CONFIG.user
+  #   cmds:
+  #     - for:
+  #         var: PKGS
+  #       task: build
+  #       vars:
+  #         CLI: "{{ .ITEM.cli }}"
+  #         PKG: "{{ .ITEM.pkg }}"
+  #         INSTALL: "{{ .DISTRO_PACKAGE_MANAGER }}"
+
+  # debug:
+  #   cmds:
+  #     - echo '{{toJson .CONFIG_TERM.arch}}'
+  #
+  # debug-packages:
+  #   cmds:
+  #     - echo '{{printf "%#v" .CONFIG_TERM.packages}}'
+
+  package-manager:
+    desc: install Paru or Brew based on distro
+    cmd: |
+      set -eu
+      if  command -v paru >/dev/null 2>&1 || command -v brew >/dev/null 2>&1 ; then
+        exit 0
+      fi
+      echo "❌ custom package manager non trouvé, installation..."
+      if [ "{{.OS_TYPE}}" = "arch" ]; then 
+        sudo pacman -Sy --needed --noconfirm base-devel git
+        cd /tmp
+        git clone https://aur.archlinux.org/paru.git
+        cd paru
+        makepkg -si --noconfirm
+        echo "✅ paru installé"
+      else
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        echo "✅ brew installé"
+      fi
+
+  install-pkg-bycli-test:
+    cmd: |
+      if ! command -v {{.CLI}} >/dev/null 2>&1; then
+        echo "❌ {{.PKG}} non trouvé, installation..."
+        {{.INSTALLER}}
+      else
+        echo "✅ {{.PKG}} trouvé"
+      fi
+
+  install-pkg-byfile-test:
+    cmd: |
+      if ! [ -f "{{.FILE}}" ]; then
+        echo "❌ {{.PKG}} non trouvé, installation..."
+        {{.INSTALLER}}
+      else
+        echo "✅ {{.PKG}} trouvé"
+      fi
+
+  install-term:
+    vars:
+      PKGS_SYS:
+        ref: .CONFIG.system
+      PKGS_USER:
+        ref: .CONFIG.user
+      PKGS_FILE_ARCH:
+        ref: .CONFIG.files.arch
+      PKGS_FILE_OTHER:
+        ref: .CONFIG.files.other
     cmds:
+      - echo "ℹ️ Installation des prérequis du terminal"
+      - for:
+          var: PKGS_SYS
+        task: install-pkg-bycli-test
+        vars:
+          CLI: "{{.ITEM.cli}}"
+          PKG: "{{.ITEM.pkg}}"
+          INSTALLER: "{{.DISTRO_PACKAGE_MANAGER}} {{.PKG}}"
+
       - |
-        set -eu
-        TARGET_SHELL="{{.DEFAULT_LOGIN_SHELL}}"
-        if [ -f "{{.SHELL_SELECTION_FILE}}" ]; then
-          . "{{.SHELL_SELECTION_FILE}}"
-          TARGET_SHELL="${DOTFILES_SHELL:-{{.DEFAULT_LOGIN_SHELL}}}"
-        fi
-        case "$TARGET_SHELL" in
-          fish|zsh) ;;
-          *)
-            echo "❌ Unsupported DOTFILES_SHELL: $TARGET_SHELL (expected fish or zsh)"
-            exit 1
-            ;;
-        esac
-        echo "🐚 shell sélectionné: $TARGET_SHELL"
-
-        if ! command -v "$TARGET_SHELL" >/dev/null 2>&1; then
-          echo "❌ $TARGET_SHELL non trouvé, installation..."
-          if [ "{{.OS_TYPE}}" = "arch" ]; then
-            sudo pacman -Sy --noconfirm "$TARGET_SHELL"
-          elif [ "{{.OS_TYPE}}" = "macos" ]; then
-            if ! command -v brew >/dev/null 2>&1; then
-              echo "❌ Homebrew non trouvé, installation..."
-              /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-            fi
-            if [ -x /opt/homebrew/bin/brew ]; then
-              eval "$(/opt/homebrew/bin/brew shellenv)"
-            elif [ -x /usr/local/bin/brew ]; then
-              eval "$(/usr/local/bin/brew shellenv)"
-            fi
-            brew install "$TARGET_SHELL"
-          else
-            sudo apt update
-            sudo apt install -y "$TARGET_SHELL"
-          fi
-        else
-          echo "✅ $TARGET_SHELL trouvé"
-        fi
-
-        DESIRED_SHELL_PATH="$(command -v "$TARGET_SHELL")"
-        if [ "$(basename "${SHELL:-}")" != "$TARGET_SHELL" ]; then
+        DESIRED_SHELL_PATH="$(command -v "{{.LOGIN_SHELL}}")"
+        if [ "$(basename "${SHELL:-}")" != "{{.LOGIN_SHELL}}" ]; then
           chsh -s "$DESIRED_SHELL_PATH"
           echo "🙋‍♂️ logout login pour prendre en compte le nouveau shell"
         else
-          echo "✅ shell par défaut déjà configuré"
+          echo "✅ {{.LOGIN_SHELL}} shell déjà configuré"
         fi
 
-        if [ "{{.OS_TYPE}}" = "arch" ]; then
-          if ! command -v paru >/dev/null 2>&1; then
-            echo "❌ paru non trouvé, installation..."
-            sudo pacman -Sy --needed --noconfirm base-devel git
-            cd /tmp
-            git clone https://aur.archlinux.org/paru.git
-            cd paru
-            makepkg -si --noconfirm
-            cd -
-          else
-            echo "✅ paru trouvé"
-          fi
-          echo "🔄 Mise à jour du système..."
-          paru -Syu --noconfirm || true
-        else
-          if ! command -v brew >/dev/null 2>&1; then
-            echo "❌ Homebrew non trouvé, installation..."
-            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-          else
-            echo "✅ Homebrew trouvé"
-          fi
-          if [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
-            eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-          elif [ -x /opt/homebrew/bin/brew ]; then
-            eval "$(/opt/homebrew/bin/brew shellenv)"
-          elif [ -x /usr/local/bin/brew ]; then
-            eval "$(/usr/local/bin/brew shellenv)"
-          fi
-          echo "🔄 Mise à jour de Homebrew..."
-          if command -v brew >/dev/null 2>&1; then
-            brew update || true
-          fi
-        fi
+      - for:
+          var: PKGS_USER
+        task: install-pkg-bycli-test
+        vars:
+          CLI: "{{.ITEM.cli}}"
+          PKG: "{{.ITEM.pkg}}"
+          INSTALLER: "{{.CUSTOM_PACKAGE_MANAGER}} {{.PKG}}"
 
-        if ! command -v nvim >/dev/null 2>&1; then
-          echo "❌ nvim non trouvé, installation..."
-          if [ "{{.OS_TYPE}}" = "arch" ]; then
-            paru -S --noconfirm neovim
-          else
-            brew install nvim
-          fi
-        else
-          echo "✅ nvim trouvé"
-        fi
+      - if: '[ {{.OS_TYPE}} == "arch" ]'
+        for:
+          var: PKGS_FILE_ARCH
+        task: install-pkg-byfile-test
+        vars:
+          FILE: "{{.ITEM.file}}"
+          PKG: "{{.ITEM.pkg}}"
+          INSTALL: "{{.CUSTOM_PACKAGE_MANAGER}} {{.PKG}}"
 
-        if [ "$TARGET_SHELL" = "zsh" ]; then
-          if ! [ -f "$HOME/.p10k.zsh" ]; then
-            echo "❌ power level 10k non trouvé, installation..."
-            if [ "{{.OS_TYPE}}" = "arch" ]; then
-              paru -S --noconfirm zsh-theme-powerlevel10k-git
-            else
-              brew install powerlevel10k
-            fi
-          else
-            echo "✅ powerlevel10k trouvé"
-          fi
+      - if: '[ {{.OS_TYPE}} != "arch" ]'
+        for:
+          var: PKGS_FILE_OTHER
+        task: install-pkg-byfile-test
+        vars:
+          FILE: "{{.ITEM.file}}"
+          PKG: "{{.ITEM.pkg}}"
+          INSTALL: "{{.CUSTOM_PACKAGE_MANAGER}} {{.PKG}}"
 
-          if ! command -v zsh-history-substring-search >/dev/null 2>&1; then
-            echo "❌ zsh-history-substring-search non trouvé, installation..."
-            if [ "{{.OS_TYPE}}" = "arch" ]; then
-              paru -S --noconfirm zsh-history-substring-search
-            else
-              brew install zsh-history-substring-search
-            fi
-          else
-            echo "✅ zsh-history-substring-search trouvé"
-          fi
+      - if: '[ {{.OS_TYPE}} != "arch" ]'
+        task: install-pkg-bycli-test
+        vars:
+          CLI: getnf
+          PKG: getnf
+          INSTALLER: "curl -fsSL https://raw.githubusercontent.com/getnf/getnf/main/install.sh | bash"
 
-          if ! command -v zsh-autosuggestions >/dev/null 2>&1; then
-            echo "❌ zsh-autosuggestions non trouvé, installation..."
-            if [ "{{.OS_TYPE}}" = "arch" ]; then
-              paru -S --noconfirm zsh-autosuggestions
-            else
-              brew install zsh-autosuggestions
-            fi
-          else
-            echo "✅ zsh-autosuggestions trouvé"
-          fi
-        else
-          echo "ℹ️  dépendances zsh spécifiques ignorées (DOTFILES_SHELL=$TARGET_SHELL)"
-        fi
-
-        if [ "$TARGET_SHELL" = "fish" ]; then
-          echo "ℹ️  vérification de fisher/tide pour fish..."
-          fish -c 'if not functions -q fisher; curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher; else echo "✅ fisher déjà installé"; end'
-          fish -c 'if fisher list | string match -q "*IlanCosman/tide*"; echo "✅ tide déjà installé"; else fisher install IlanCosman/tide@v6; end'
-        else
-          echo "ℹ️  dépendances fish spécifiques ignorées (DOTFILES_SHELL=$TARGET_SHELL)"
-        fi
-
-        if [ ! -x "$HOME/.fzf/install" ]; then
-          echo "❌ fzf install non trouvé, installation..."
-          git clone --depth 1 https://github.com/junegunn/fzf.git "$HOME/.fzf"
-          "$HOME/.fzf/install"
-        else
-          echo "✅ fzf trouvé"
-        fi
-
-        if ! command -v git >/dev/null 2>&1; then
-          echo "❌ git non trouvé, installation..."
-          if [ "{{.OS_TYPE}}" = "arch" ]; then
-            paru -S --noconfirm git
-          else
-            brew install git
-          fi
-        else
-          echo "✅ git trouvé"
-        fi
-
-        if ! command -v lazygit >/dev/null 2>&1; then
-          echo "❌ lazygit non trouvé, installation..."
-          if [ "{{.OS_TYPE}}" = "arch" ]; then
-            paru -S --noconfirm lazygit
-          else
-            brew install lazygit
-          fi
-        else
-          echo "✅ lazygit trouvé"
-        fi
-
-        if ! command -v lazydocker >/dev/null 2>&1; then
-          echo "❌ lazydocker non trouvé, installation..."
-          if [ "{{.OS_TYPE}}" = "arch" ]; then
-            paru -S --noconfirm lazydocker
-          else
-            brew install jesseduffield/lazydocker/lazydocker
-          fi
-        else
-          echo "✅ lazydocker trouvé"
-        fi
-
-        if ! command -v rg >/dev/null 2>&1; then
-          echo "❌ ripgrep non trouvé, installation..."
-          if [ "{{.OS_TYPE}}" = "arch" ]; then
-            paru -S --noconfirm ripgrep
-          else
-            brew install ripgrep
-          fi
-        else
-          echo "✅ rg trouvé"
-        fi
-
-        if ! command -v fd >/dev/null 2>&1; then
-          echo "❌ fd non trouvé, installation..."
-          if [ "{{.OS_TYPE}}" = "arch" ]; then
-            paru -S --noconfirm fd
-          else
-            brew install fd
-          fi
-        else
-          echo "✅ fd trouvé"
-        fi
-
-        if ! command -v direnv >/dev/null 2>&1; then
-          echo "❌ direnv non trouvé, installation..."
-          if [ "{{.OS_TYPE}}" = "arch" ]; then
-            paru -S --noconfirm direnv
-          else
-            brew install direnv
-          fi
-        else
-          echo "✅ direnv trouvé"
-        fi
-
-        if ! command -v getnf >/dev/null 2>&1; then
-          echo "❌ getnf non trouvé, installation..."
-          if [ "{{.OS_TYPE}}" = "arch" ]; then
-            paru -S --noconfirm getnf
-          else
-            curl -fsSL https://raw.githubusercontent.com/getnf/getnf/main/install.sh | bash
-          fi
-        else
-          echo "✅ getnf trouvé"
-        fi
-
-        case ":$PATH:" in
-          *":$HOME/.local/bin:"*)
-            echo "✅ ~/.local/bin est dans le PATH"
-            ;;
-          *)
-            echo "ℹ️  ajout temporaire de ~/.local/bin au PATH pour cette exécution"
-            export PATH="$HOME/.local/bin:$PATH"
-            ;;
-        esac
-
-        if [ -d /run/systemd/system ]; then
-          if ! command -v keyd >/dev/null 2>&1; then
-            echo "❌ keyd non trouvé, installation..."
-            if [ "{{.OS_TYPE}}" = "arch" ]; then
-              paru -S --noconfirm keyd
-            else
-              echo "⚠️  keyd installation manuelle requise sur ce système"
-            fi
-          else
-            echo "✅ keyd trouvé"
-          fi
-          sudo systemctl enable --now keyd || true
-        else
-          echo "⏭️  keyd skipped (systemd not available)"
-        fi
-
-        if ! command -v wayscriber >/dev/null 2>&1; then
-          echo "❌ wayscriber non trouvé, installation..."
-          if [ "{{.OS_TYPE}}" = "arch" ]; then
-            paru -S --noconfirm wayscriber
-            if [ -d /run/systemd/system ]; then
-              systemctl --user enable --now wayscriber.service
-            fi
-          else
-            echo "⚠️  wayscriber installation manuelle requise sur ce système"
-            echo "ℹ️  voir https://github.com/devmobasa/wayscriber"
-          fi
-        else
-          echo "✅ wayscriber trouvé"
-        fi
-
-        if ! command -v wt >/dev/null 2>&1; then
-          echo "❌ worktrunk non trouvé, installation..."
-          if [ "{{.OS_TYPE}}" = "arch" ]; then
-            paru -S --noconfirm worktrunk
-          else
-            brew install worktrunk
-          fi
-        else
-          echo "✅ worktrunk trouvé"
-        fi
-
+      - |
+        fish -c 'if not functions -q fisher; curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher; else echo "✅ fisher déjà installé"; end'
+        fish -c 'if fisher list | string match -q "*IlanCosman/tide*"; echo "✅ tide déjà installé"; else fisher install IlanCosman/tide@v6; end'
+      - |
         echo "installation de nerd fonts..."
         getnf -i Meslo,JetBrainsMono,CascadiaMono,Hack,Hasklig
         echo "✅ nerd fonts installées"
+
+      - if: '[ {{.USE_SYSTEMD}} == "true" ]'
+        task: install-pkg-bycli-test
+        vars:
+          CLI: keyd
+          PKG: keyd
+          INSTALLER: "{{.DISTRO_PACKAGE_MANAGER}} {{.PKG}}"
+      - if: '[ {{.USE_SYSTEMD}} == "true" ]'
+        cmd: systemctl --user enable --now keyd || true
+
+      - if: '[ {{.USE_SYSTEMD}} == "true" && {{.OS_TYPE}} == "arch" ]'
+        task: install-pkg-bycli-test
+        vars:
+          CLI: wayscriber
+          PKG: wayscriber
+          INSTALLER: "{{.DISTRO_PACKAGE_MANAGER}} {{.PKG}}"
+      - if: '[ {{.USE_SYSTEMD}} == "true" && {{.OS_TYPE}} == "arch" ]'
+        cmd: systemctl --user enable --now wayscriber || true
+      - if: '[ {{.USE_SYSTEMD}} == "true" && {{.OS_TYPE}} != "arch" ]'
+        cmd: echo "🛠️ To install wayscriber in current system check `https://wayscriber.com/docs/getting-started/installation.html`"
+
+      - |
+        sudo systemctl enable --now docker || true
+        if ! getent group docker | grep -q "\b$USER\b"; then
+          echo "ℹ️  ajout de $USER au groupe docker..."
+          sudo usermod -aG docker "$USER" || true
+          newgrp docker || true
+          echo "⚠️ logout/login pour être dans le group docker"
+        else
+          echo "✅ $USER déjà dans le groupe docker"
+        fi
+      - echo "✅ Tous les prérequis du terminal sont installés"
+
+  term-all:
+    desc: 🔥 Full terminal environment (shell install + config deployment)
+    cmds:
+      - task: term
+      - task: config-terminal
+
+  term:
+    desc: 🖥️ Install shell and core terminal dependencies
+    cmds:
+      - task: package-manager
+      - task: install-term
 
   config-terminal:
     desc: Deploy config files to $HOME/.config
@@ -309,34 +231,15 @@ tasks:
       - |
         set -eu
         echo "ℹ️ Installation des fichiers de configuration"
-        TARGET_SHELL="{{.DEFAULT_LOGIN_SHELL}}"
-        if [ -f "{{.SHELL_SELECTION_FILE}}" ]; then
-          . "{{.SHELL_SELECTION_FILE}}"
-          TARGET_SHELL="${DOTFILES_SHELL:-{{.DEFAULT_LOGIN_SHELL}}}"
-        fi
-        case "$TARGET_SHELL" in
-          fish|zsh) ;;
-          *)
-            echo "❌ Unsupported DOTFILES_SHELL: $TARGET_SHELL (expected fish or zsh)"
-            exit 1
-            ;;
-        esac
 
-        if [ "$TARGET_SHELL" = "zsh" ] && [ -f "$HOME/.zshrc" ]; then
-          mv "$HOME/.zshrc" "$HOME/.zshrc.bak"
-        fi
+        mv "$HOME/.zshrc" "$HOME/.zshrc.$(date '+%Y%m%dT%HH%M').bak" || true
         mkdir -p "$HOME/.config"
 
-        if [ "$TARGET_SHELL" = "fish" ] && [ -f "$HOME/.config/fish/config.fish" ]; then
-          mkdir -p "$HOME/.config/fish"
-          mv "$HOME/.config/fish/config.fish" "$HOME/.config/fish/config.fish.bak"
-        fi
+        mkdir -p "$HOME/.config/fish"
+        mv "$HOME/.config/fish/config.fish" "$HOME/.config/fish/config.fish.$(date '+%Y%m%dT%HH%M').bak" || true
 
         cp -r config/* "$HOME/.config"
-
-        if [ "$TARGET_SHELL" = "zsh" ]; then
-          cp shell/zshrc "$HOME/.zshrc"
-        fi
+        cp shell/zshrc "$HOME/.zshrc"
 
         cp -r dotfiles/.* "$HOME/"
         if [ -d /run/systemd/system ]; then
@@ -347,303 +250,57 @@ tasks:
         else
           echo "⏭️  keyd config skipped (systemd not available)"
         fi
-        echo "✅ Installation des fichiers de configuration terminée ($TARGET_SHELL)"
+
+        echo "✅ Installation des fichiers de configuration terminée"
 
   devops:
     desc: Install DevOps tools (kubectl, helm, k9s, etc.)
-    cmds:
-      - |
-        set -eu
-        echo "ℹ️ Installation des outils DevOps"
-        . config/devops || true
-        if [ "{{.OS_TYPE}}" != "arch" ]; then
-          if [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
-            eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-          elif [ -x /opt/homebrew/bin/brew ]; then
-            eval "$(/opt/homebrew/bin/brew shellenv)"
-          elif [ -x /usr/local/bin/brew ]; then
-            eval "$(/usr/local/bin/brew shellenv)"
-          fi
-        fi
+    vars:
+      PKGS_DEVOPS:
+        - kubectl
+        - k9s
+        - helm
+        - helm-diff
+        - stern
+        - helmwave
+        - minio
+      cmds:
+        - echo "ℹ️ Installation des outils devops"
+        - for:
+            var: PKGS_MISE
+          task: install-pkg-bycli-test
+          vars:
+            CLI: "{{.ITEM}}"
+            PKG: "{{.ITEM}}"
+            INSTALLER: "{{.CUSTOM_PACKAGE_MANAGER}} {{.PKG}}"
 
-        if [ "${KUBECTL:-true}" = "true" ]; then
-          if ! command -v kubectl >/dev/null 2>&1; then
-            echo "❌ kubectl non trouvé, installation..."
-            if [ "{{.OS_TYPE}}" = "arch" ]; then
-              paru -S --noconfirm kubectl-bin
-            else
-              brew install kubectl
-            fi
-          else
-            echo "✅ kubectl trouvé"
-          fi
-        else
-          echo "⏭️  kubectl installation skipped (KUBECTL=false)"
-        fi
-
-        if [ "${K9S:-true}" = "true" ]; then
-          if ! command -v k9s >/dev/null 2>&1; then
-            echo "❌ k9s non trouvé, installation..."
-            if [ "{{.OS_TYPE}}" = "arch" ]; then
-              sudo pacman -Sy --needed --noconfirm k9s
-            else
-              brew install k9s
-            fi
-          else
-            echo "✅ k9s trouvé"
-          fi
-        else
-          echo "⏭️  k9s installation skipped (K9S=false)"
-        fi
-
-        if [ "${HELM:-true}" = "true" ]; then
-          if ! command -v helm >/dev/null 2>&1; then
-            echo "❌ helm non trouvé, installation..."
-            if [ "{{.OS_TYPE}}" = "arch" ]; then
-              paru -S --noconfirm helm
-            else
-              brew install helm
-            fi
-            helm plugin install https://github.com/databus23/helm-diff --verify=false || true
-          else
-            echo "✅ helm trouvé"
-          fi
-        else
-          echo "⏭️  helm installation skipped (HELM=false)"
-        fi
-
-        if [ "${STERN:-true}" = "true" ]; then
-          if ! command -v stern >/dev/null 2>&1; then
-            echo "❌ stern non trouvé, installation..."
-            if [ "{{.OS_TYPE}}" = "arch" ]; then
-              sudo pacman -Sy --needed --noconfirm stern
-            else
-              brew install stern
-            fi
-          else
-            echo "✅ stern trouvé"
-          fi
-        else
-          echo "⏭️  stern installation skipped (STERN=false)"
-        fi
-
-        if [ "${HELMWAVE:-true}" = "true" ]; then
-          if ! command -v helmwave >/dev/null 2>&1; then
-            echo "❌ helmwave non trouvé, installation..."
-            if [ "{{.OS_TYPE}}" = "arch" ]; then
-              echo "todo manually"
-            else
-              brew install helmwave/tap/helmwave
-            fi
-          else
-            echo "✅ helmwave trouvé"
-          fi
-        else
-          echo "⏭️  helmwave installation skipped (HELMWAVE=false)"
-        fi
-
-        if [ "${MINIO:-true}" = "true" ]; then
-          if ! command -v minio >/dev/null 2>&1; then
-            echo "❌ minio non trouvé, installation..."
-            if [ "{{.OS_TYPE}}" = "arch" ]; then
-              paru -S --noconfirm minio
-            else
-              brew install minio
-            fi
-          else
-            echo "✅ minio trouvé"
-          fi
-        else
-          echo "⏭️  minio installation skipped (MINIO=false)"
-        fi
-
-        if ! command -v docker >/dev/null 2>&1; then
-          echo "❌ docker non trouvé, installation..."
-          if [ "{{.OS_TYPE}}" = "arch" ]; then
-            paru -S --noconfirm docker
-          else
-            brew install --cask docker
-          fi
-        else
-          echo "✅ docker trouvé"
-        fi
-
-        if ! command -v docker-compose >/dev/null 2>&1; then
-          echo "❌ docker-compose non trouvé, installation..."
-          if [ "{{.OS_TYPE}}" = "arch" ]; then
-            paru -S --noconfirm docker-compose
-          else
-            brew install docker-compose
-          fi
-        else
-          echo "✅ docker-compose trouvé"
-        fi
-
-        sudo systemctl enable --now docker
-        if ! getent group docker | grep -q "\b$USER\b"; then
-          echo "ℹ️  ajout de $USER au groupe docker..."
-          sudo usermod -aG docker "$USER"
-          newgrp docker
-        else
-          echo "✅ $USER déjà dans le groupe docker"
-        fi
+        - helm plugin install https://github.com/databus23/helm-diff
+        - echo "✅ Tous les prérequis devops sont installés"
 
   dev:
     desc: Install development tools (pyenv, nvm, go, rust, etc.)
-    cmds:
-      - |
-        set -eu
-        echo "ℹ️ Installation des outils de développement"
-        . config/dev || true
-        NVM_SH="$HOME/.nvm/nvm.sh"
-        if [ "{{.OS_TYPE}}" != "arch" ]; then
-          if [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
-            eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-            NVM_SH="/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh"
-          elif [ -x /opt/homebrew/bin/brew ]; then
-            eval "$(/opt/homebrew/bin/brew shellenv)"
-            NVM_SH="/opt/homebrew/opt/nvm/nvm.sh"
-          elif [ -x /usr/local/bin/brew ]; then
-            eval "$(/usr/local/bin/brew shellenv)"
-            NVM_SH="/usr/local/opt/nvm/nvm.sh"
-          fi
-        fi
-
-        if [ "${PYENV:-true}" = "true" ]; then
-          if ! command -v pyenv >/dev/null 2>&1; then
-            echo "❌ pyenv non trouvé, installation..."
-            if [ "{{.OS_TYPE}}" = "arch" ]; then
-              paru -S --noconfirm pyenv
-            else
-              brew install pyenv
-            fi
-          else
-            echo "✅ pyenv trouvé"
-          fi
-        else
-          echo "⏭️  pyenv installation skipped (PYENV=false)"
-        fi
-
-        if [ "${NVM:-true}" = "true" ]; then
-          if ! command -v nvm >/dev/null 2>&1; then
-            echo "❌ nvm non trouvé, installation..."
-            if [ "{{.OS_TYPE}}" = "arch" ]; then
-              paru -S --noconfirm nvm
-            else
-              brew install nvm
-            fi
-          else
-            echo "✅ nvm trouvé"
-          fi
-          if [ "{{.OS_TYPE}}" != "arch" ] && [ -s "$NVM_SH" ]; then
-            export NVM_DIR="$HOME/.nvm"
-            mkdir -p "$NVM_DIR"
-            . "$NVM_SH"
-            nvm install --lts
-          fi
-        else
-          echo "⏭️  nvm installation skipped (NVM=false)"
-        fi
-
-        if ! command -v zip >/dev/null 2>&1; then
-          echo "❌ zip non trouvé, installation..."
-          if [ "{{.OS_TYPE}}" = "arch" ]; then
-            paru -S --noconfirm zip
-          else
-            brew install zip
-          fi
-        else
-          echo "✅ zip trouvé"
-        fi
-
-        if [ "${SDKMAN:-true}" = "true" ]; then
-          if ! command -v sdk >/dev/null 2>&1; then
-            echo "❌ sdkman non trouvé, installation..."
-            curl -s "https://get.sdkman.io" | bash
-          else
-            echo "✅ sdkman trouvé"
-          fi
-        else
-          echo "⏭️  sdkman installation skipped (SDKMAN=false)"
-        fi
-
-        if [ "${GO:-true}" = "true" ]; then
-          if ! command -v go >/dev/null 2>&1; then
-            echo "❌ go non trouvé, installation..."
-            if [ "{{.OS_TYPE}}" = "arch" ]; then
-              paru -S --noconfirm go
-            else
-              brew install go
-            fi
-          else
-            echo "✅ go trouvé"
-          fi
-        else
-          echo "⏭️  go installation skipped (GO=false)"
-        fi
-
-        if [ "${NODE:-true}" = "true" ]; then
-          if ! command -v node >/dev/null 2>&1; then
-            echo "❌ node non trouvé, installation..."
-            if [ "{{.OS_TYPE}}" = "arch" ]; then
-              paru -S --noconfirm nodejs
-            else
-              export NVM_DIR="$HOME/.nvm"
-              mkdir -p "$NVM_DIR"
-              . "$NVM_SH"
-              nvm install --lts
-            fi
-          else
-            echo "✅ node trouvé"
-          fi
-        else
-          echo "⏭️  node installation skipped (NODE=false)"
-        fi
-
-        if [ "${NPM:-true}" = "true" ]; then
-          if ! command -v npm >/dev/null 2>&1; then
-            echo "❌ npm non trouvé, installation..."
-            if [ "{{.OS_TYPE}}" = "arch" ]; then
-              paru -S --noconfirm npm
-            else
-              export NVM_DIR="$HOME/.nvm"
-              mkdir -p "$NVM_DIR"
-              . "$NVM_SH"
-              nvm install --lts
-            fi
-          else
-            echo "✅ npm trouvé"
-          fi
-        else
-          echo "⏭️  npm installation skipped (NPM=false)"
-        fi
-
-        if [ "${RUST:-true}" = "true" ]; then
-          if ! command -v rustc >/dev/null 2>&1; then
-            echo "❌ rustc non trouvé, installation..."
-            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-          else
-            echo "✅ rustc trouvé"
-          fi
-        else
-          echo "⏭️  rustc installation skipped (RUST=false)"
-        fi
-
-        if [ "${CARGO:-true}" = "true" ]; then
-          if ! command -v cargo >/dev/null 2>&1; then
-            echo "❌ cargo non trouvé, installation..."
-            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-          else
-            echo "✅ cargo trouvé"
-          fi
-        else
-          echo "⏭️  cargo installation skipped (CARGO=false)"
-        fi
-
-        echo "✅ Tous les prérequis de développement sont installés"
+    vars:
+      PKGS_DEV:
+        - python
+        - node
+        - go
+      cmds:
+        - echo "ℹ️ Installation des outils de développement"
+        - for:
+            var: PKGS_MISE
+          task: install-pkg-bycli-test
+          vars:
+            CLI: "{{.ITEM}}"
+            PKG: "{{.ITEM}}"
+            INSTALLER: "mise use -g {{.PKG}}"
+        - task: install-pkg-bycli-test
+          vars:
+            CLI: rustup
+            PKG: rustup
+            INSTALLER: "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh && rustup toolchain install stable"
+        - echo "✅ Tous les prérequis de développement sont installés"
 
   help:
     desc: Show available commands
-    silent: true
     cmds:
       - task --list || go-task --list

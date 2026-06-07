@@ -6,6 +6,8 @@ set -gx SDKMAN_DIR "$HOME/.sdkman"
 set -gx MESA_D3D12_DEFAULT_ADAPTER_NAME AMD
 set -gx NVM_DIR "$HOME/.nvm"
 
+mise activate fish | source
+
 function __dotfiles_source_env_file --argument-names env_file
     if not test -f $env_file
         return
@@ -293,4 +295,5 @@ if test -f "$HOME/.cargo/env.fish"
 end	
 
 direnv hook fish | source
+
 

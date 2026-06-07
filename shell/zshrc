@@ -173,7 +173,7 @@ if grep -qi microsoft /proc/version 2>/dev/null; then
     alias pc='pwd|cl'
 fi
 # ======= END PERSO
-
+ 
 # added by pipx (https://github.com/pipxproject/pipx)
 # Detect if using Homebrew or native package manager
 if [ -d "/home/linuxbrew/.linuxbrew" ]; then
@@ -223,7 +223,7 @@ export KUBECONFIG=$HOME/.kube/config
 export KUBE_EDITOR="nvim"
 export PYENV_ROOT="$HOME/.pyenv"
 
-eval "$(fzf --zsh)"
+source <(fzf --zsh)
 
 # Conditional loading of development tool configurations based on env vars
 if [[ "${PYENV:-true}" == "true" && $commands[pyenv] ]]; then
@@ -275,4 +275,6 @@ export SDKMAN_DIR="$HOME/.sdkman"
 if command -v niri >/dev/null 2>&1; then source <(niri completions zsh); fi
 
 if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)"; fi
+
+eval "$(mise activate zsh)"
 

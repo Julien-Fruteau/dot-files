@@ -1,50 +1,57 @@
 # dot-files
 
-## prerequisites
+## roadmap
 
-- SHELL: fish by default (`config/shell`), zsh supported for backward compatibility
-- command: make (or task as alternative, see below), unzip
-- If installing `dev tools`, and particularly `pyenv`, please refer to the official doc to install the build packages : [link](https://github.com/pyenv/pyenv/wiki#suggested-build-environment)
+- [🔨] migration to taskfile
+- [🛠️] migration dev and devops to mise
+- [💭] github actions for test by arch : archlinux, ubuntu, fedora
 
-### install task (alternative to make)
+## distros
 
-[Task](https://taskfile.dev) is available as an alternative task runner via `Taskfile.yml`.
+dotfiles for following distro :
+
+- archlinux
+- fedora
+- debian based (ubuntu, etc...)
+
+## shell and terminal
+
+- supports zsh and fish
+- terminal: kitty
+
+### install task
+
+[Task](https://taskfile.dev) is used as the task runner via `Taskfile.yml`. It's a modern alternative to `makefile`.
 
 ```bash
 # Arch Linux
-paru -S go-task-bin
+pacman -S go-task
 
-# macOS
-brew install go-task
+# fedora
+dnf install go-task
 
-# any OS (installs to ~/.local/bin)
-sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b ~/.local/bin
+# ubuntu, debian
+pat install task
 ```
-
-Replace `make <target>` with `task <target>` in the commands below.
 
 ## usage
 
-Below usage is advisable to keep a clean $HOME/.config folder, by having this repo checked-out in a dedicated sub-folder
-Purpose of this conf is to (push/)pull nvim updates easily
+Checked-out the repo in a dedicated home sub-folder preferably.
 
 ```bash
 git clone https://github.com/Julien-Fruteau/dot-files.git
 cd dot-files
 
-# optional: switch back to zsh by editing config/shell
-# DOTFILES_SHELL=zsh
-
 # terminal configuration
-# nb: make term install brew if not already done, takes time, be patient
-make term
+which go-task && alias task='go-task'
+task term
+
+# optional
+# 🤙: configure the config/shell, config/dev and config/devops files
+# according to the tool you want to use before running these commands
+task dev
+task devops
 
 # link nvim configuration
 ln -s "$(pwd)/nvim" ~/.config/nvim
-
-# optional 
-# 🤙: configure the config/shell, config/dev and config/devops files
-# according to the tool you want to use before running these commands
-make dev
-make devops
 ```
