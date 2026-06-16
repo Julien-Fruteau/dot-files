@@ -1,4 +1,10 @@
 # package installed with distro installer (pacman, dnf, apt)
+# TODO: split few having package and cli with different name
+
+# `cli` (with pkg = cli) or `cli,pkg` with coalesce when just cli
+test:
+  - zsh
+  - wt,worktrunk
 system:
   - cli: zsh
     pkg: zsh
@@ -19,8 +25,6 @@ system:
 
 # installed with AUR/custom installer (paru, brew)
 user:
-  - cli: nvim
-    pkg: neovim
   - cli: fzf
     pkg: fzf
   - cli: docker
@@ -35,16 +39,23 @@ user:
     pkg: lazyjournal
   - cli: lazyssh
     pkg: lazyssh
-  - cli: rg
-    pkg: ripgrep
-  - cli: fd
-    pkg: fd
   - cli: direnv
     pkg: direnv
+  - cli: fd
+    pkg: fd
+  - cli: nvim
+    pkg: neovim
+  - cli: rg
+    pkg: ripgrep
   - cli: wt
     pkg: worktrunk
-  # specific to OS
-  # ARCH using Paru
+
+# TODO: 
+# [ ] bring back sh installer with dedicated util func 
+    
+# specific to OS
+# ARCH using Paru
+user-arch:
   - cli: getnf
     pkg: getnf
 
@@ -73,21 +84,20 @@ systemd:
     - cli: wayscriber
       pkg: wayscriber
 
-# devops:
-#   - cli: kubectl
-#     pkg: kubectl
-#   - cli: k9s 
-#     pkg: k9s
-#   - cli: helm 
-#     pkg: helm
-#   - cli: helm-diff
-#     pkg: helm-diff
-#   - cli: stern
-#     pkg: stern
-#   - cli: helmwave
-#     pkg: helmwave
-#   - cli: minio
-#     pkg: minio
+user-devops:
+  - kubectl
+  - k9s
+  - helm
+  - helm-diff
+  - stern
+  - helmwave
+  - minio
 
-# dev directly in taskfile
-# dev:...
+dev-mise:
+  - python
+  - node
+  - go
+
+dev-sh:
+  - cli: rustup
+    sh: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh && rustup toolchain install stable

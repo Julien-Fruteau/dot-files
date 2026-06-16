@@ -44,34 +44,26 @@ tasks:
     cmds:
       - task --list
 
+
+
+  do:
+    cmd: echo "CLI={{.CLI}} PKG={{.PKG}}"
+
+  # TODO: WORKS
   build:
+    vars:
+      CONF:
+        ref: .CONFIG.test
     cmds:
-      # - |
-      #   PKG="{{coalesce .ITEM .ITEM.cli .ITEM.pkg}}"
-      #   CLI="{{coalesce .ITEM .ITEM.cli}}"
-      #   echo "$PKG => $CLI"
-      - echo "{{.PKG}} => {{.FILE}}"
-
-  # debugs:
-  #   vars:
-  #     PKGS:
-  #       ref: .CONFIG.user
-  #   cmds:
-  #     - for:
-  #         var: PKGS
-  #       task: build
-  #       vars:
-  #         CLI: "{{ .ITEM.cli }}"
-  #         PKG: "{{ .ITEM.pkg }}"
-  #         INSTALL: "{{ .DISTRO_PACKAGE_MANAGER }}"
-
-  # debug:
-  #   cmds:
-  #     - echo '{{toJson .CONFIG_TERM.arch}}'
-  #
-  # debug-packages:
-  #   cmds:
-  #     - echo '{{printf "%#v" .CONFIG_TERM.packages}}'
+      - for:
+          var: CONF
+        cmd: 'echo {{.ITEM}}'
+      - for:
+          var: CONF
+        task: do
+        vars:
+          CLI: '{{.ITEM | splitList "," | first}}'
+          PKG: '{{.ITEM | splitList "," | last}}'
 
   package-manager:
     desc: install Paru or Brew based on distro
@@ -117,6 +109,8 @@ tasks:
         ref: .CONFIG.system
       PKGS_USER:
         ref: .CONFIG.user
+      PKGS_USER_ARCH:
+        ref: .CONFIG.user-arch
       PKGS_FILE_ARCH:
         ref: .CONFIG.files.arch
       PKGS_FILE_OTHER:
@@ -147,6 +141,15 @@ tasks:
           CLI: "{{.ITEM.cli}}"
           PKG: "{{.ITEM.pkg}}"
           INSTALLER: "{{.CUSTOM_PACKAGE_MANAGER}} {{.PKG}}"
+
+      - if: '[ {{.OS_TYPE}} == "arch" ]'
+        for:
+          var: PKGS_USER_ARCH
+        task: install-pkg-bycli-test
+        vars:
+          FILE: "{{.ITEM.file}}"
+          PKG: "{{.ITEM.pkg}}"
+          INSTALL: "{{.CUSTOM_PACKAGE_MANAGER}} {{.PKG}}"
 
       - if: '[ {{.OS_TYPE}} == "arch" ]'
         for:
@@ -257,13 +260,7 @@ tasks:
     desc: Install DevOps tools (kubectl, helm, k9s, etc.)
     vars:
       PKGS_DEVOPS:
-        - kubectl
-        - k9s
-        - helm
-        - helm-diff
-        - stern
-        - helmwave
-        - minio
+        ref: .CONFIG.user-devops
       cmds:
         - echo "ℹ️ Installation des outils devops"
         - for:
@@ -272,7 +269,7 @@ tasks:
           vars:
             CLI: "{{.ITEM}}"
             PKG: "{{.ITEM}}"
-            INSTALLER: "{{.CUSTOM_PACKAGE_MANAGER}} {{.PKG}}"
+            INSTALLER: "{{.CUSTOM_PACKAGE_MANAGER}} {{.ITEM}}"
 
         - helm plugin install https://github.com/databus23/helm-diff
         - echo "✅ Tous les prérequis devops sont installés"
