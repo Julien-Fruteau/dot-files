@@ -3,13 +3,6 @@ silent: true
 
 vars:
   LOGIN_SHELL: zsh
-  USE_SYSTEMD:
-    sh: |
-      if [ "$(ps -p 1 -o comm=)" == "systemd" ]; then
-        echo "true"
-      else
-        echo "false"
-      fi
   OS_TYPE:
     sh: |
       . /etc/os-release
@@ -32,44 +25,74 @@ vars:
         arch) echo "paru -S --noconfirm" ;;
         *)    echo "brew install" ;;
       esac
+  OS_CONFIG_SELECTOR:
+    sh: |
+      case "{{.OS_TYPE}}" in
+        arch) echo "arch" ;;
+        *)    echo "other" ;;
+      esac
+  USE_SYSTEMD:
+    sh: |
+      if [ "$(ps -p 1 -o comm=)" == "systemd" ]; then
+        echo "true"
+      else
+        echo "false"
+      fi
   CONFIG_RAW:
     sh: cat task/config.yaml
   CONFIG:
     ref: "fromYaml .CONFIG_RAW"
-# dotenv:
-#   - .env
+
+# ============================
 
 tasks:
+  help:
+    desc: Show available commands
+    cmds:
+      - task --list 2>/dev/null || go-task --list
+
   default:
     cmds:
-      - task --list
+      - task: help
 
+  # ==========================
 
+  install-package:
+    cmd: |
+      if ! command -v {{.CLI}} >/dev/null 2>&1; then
+        echo "❌ {{.PKG}} not found, installing..."
+        {{.INSTALLER}}
+      else
+        echo "✅ {{.PKG}} found"
+      fi
 
-  do:
-    cmd: echo "CLI={{.CLI}} PKG={{.PKG}}"
+  test-file-install-package:
+    cmd: |
+      if ! [ -f "{{.FILE}}" ]; then
+        echo "❌ {{.PKG}} not found, installing..."
+        {{.INSTALLER}}
+      else
+        echo "✅ {{.PKG}} found"
+      fi
 
-  # TODO: WORKS
-  build:
-    vars:
-      CONF:
-        ref: .CONFIG.test
-    cmds:
-      - for:
-          var: CONF
-        cmd: 'echo {{.ITEM}}'
-      - for:
-          var: CONF
-        task: do
-        vars:
-          CLI: '{{.ITEM | splitList "," | first}}'
-          PKG: '{{.ITEM | splitList "," | last}}'
+  # install-systemd-package:
+  #   cmds:
+  #     - task: install-package
+  #       vars:
+  #         CLI: "{{.CLI}}"
+  #         PKG: "{{.PKG}}"
+  #         INSTALLER: "{{.INSTALLER}}"
+  #     - cmd: sudo systemctl enable --now "{{.CLI}}" || true
 
-  package-manager:
+  # =====================
+
+  install-package-manager:
     desc: install Paru or Brew based on distro
     cmd: |
+      echo "ℹ️ Installing custom package manager"
       set -eu
       if  command -v paru >/dev/null 2>&1 || command -v brew >/dev/null 2>&1 ; then
+        echo "✅ Custom package manager already installed"
         exit 0
       fi
       echo "❌ custom package manager non trouvé, installation..."
@@ -84,151 +107,175 @@ tasks:
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         echo "✅ brew installé"
       fi
+      echo "✅ Custom package manager installed"
 
-  install-pkg-bycli-test:
-    cmd: |
-      if ! command -v {{.CLI}} >/dev/null 2>&1; then
-        echo "❌ {{.PKG}} non trouvé, installation..."
-        {{.INSTALLER}}
-      else
-        echo "✅ {{.PKG}} trouvé"
-      fi
-
-  install-pkg-byfile-test:
-    cmd: |
-      if ! [ -f "{{.FILE}}" ]; then
-        echo "❌ {{.PKG}} non trouvé, installation..."
-        {{.INSTALLER}}
-      else
-        echo "✅ {{.PKG}} trouvé"
-      fi
-
-  install-term:
+  install-system-packages:
     vars:
-      PKGS_SYS:
-        ref: .CONFIG.system
-      PKGS_USER:
-        ref: .CONFIG.user
-      PKGS_USER_ARCH:
-        ref: .CONFIG.user-arch
-      PKGS_FILE_ARCH:
-        ref: .CONFIG.files.arch
-      PKGS_FILE_OTHER:
-        ref: .CONFIG.files.other
+      COMMON:
+        ref: .CONFIG.system.common | splitLines | compact
+      OS:
+        ref: index .CONFIG.system .OS_CONFIG_SELECTOR | splitLines | compact
+      PACKAGES:
+        ref: concat .COMMON .OS
     cmds:
-      - echo "ℹ️ Installation des prérequis du terminal"
+      - echo "ℹ️ Installing system packages"
       - for:
-          var: PKGS_SYS
-        task: install-pkg-bycli-test
+          var: PACKAGES
+        task: install-package
         vars:
-          CLI: "{{.ITEM.cli}}"
-          PKG: "{{.ITEM.pkg}}"
-          INSTALLER: "{{.DISTRO_PACKAGE_MANAGER}} {{.PKG}}"
+          CLI: '{{.ITEM | splitList "," | first}}'
+          PKG: '{{.ITEM | splitList "," | last}}'
+          INSTALLER: '{{.DISTRO_PACKAGE_MANAGER}} {{.ITEM | splitList "," | last}}'
+      - echo "✅ System packages installed"
 
-      - |
-        DESIRED_SHELL_PATH="$(command -v "{{.LOGIN_SHELL}}")"
-        if [ "$(basename "${SHELL:-}")" != "{{.LOGIN_SHELL}}" ]; then
-          chsh -s "$DESIRED_SHELL_PATH"
-          echo "🙋‍♂️ logout login pour prendre en compte le nouveau shell"
-        else
-          echo "✅ {{.LOGIN_SHELL}} shell déjà configuré"
-        fi
-
+  install-custom-packages:
+    vars:
+      COMMON:
+        ref: .CONFIG.custom.common | splitLines | compact
+      OS:
+        ref: index .CONFIG.custom .OS_CONFIG_SELECTOR | splitLines | compact
+      PACKAGES:
+        ref: concat .COMMON .OS
+    cmds:
+      - echo "ℹ️ Installing custom packages"
       - for:
-          var: PKGS_USER
-        task: install-pkg-bycli-test
+          var: PACKAGES
+        task: install-package
         vars:
-          CLI: "{{.ITEM.cli}}"
-          PKG: "{{.ITEM.pkg}}"
-          INSTALLER: "{{.CUSTOM_PACKAGE_MANAGER}} {{.PKG}}"
+          CLI: '{{.ITEM | splitList "," | first}}'
+          PKG: '{{.ITEM | splitList "," | last}}'
+          DTC: hello
+          INSTALLER: '{{.CUSTOM_PACKAGE_MANAGER}} {{.ITEM | splitList "," | last}}'
+      - echo "✅ Custom packages installed"
 
-      - if: '[ {{.OS_TYPE}} == "arch" ]'
-        for:
-          var: PKGS_USER_ARCH
-        task: install-pkg-bycli-test
+  install-custom-packages-sh:
+    vars:
+      COMMON:
+        ref: .CONFIG.sh.common
+      OS:
+        ref: index .CONFIG.sh .OS_CONFIG_SELECTOR
+      PACKAGES:
+        ref: concat .COMMON .OS
+    cmds:
+      - echo "ℹ️ Installing custom packages via script"
+      - for:
+          var: PACKAGES
+        task: install-package
         vars:
+          CLI: "{{.ITEM.pkg}}"
+          PKG: "{{.ITEM.pkg}}"
+          INSTALLER: "{{.ITEM.sh}}"
+      - echo "✅ Custom packages via script installed"
+
+  install-custom-packages-test-file:
+    vars:
+      COMMON:
+        ref: .CONFIG.files.common
+      OS:
+        ref: index .CONFIG.files .OS_CONFIG_SELECTOR
+      PACKAGES:
+        ref: concat .COMMON .OS
+    cmds:
+      - echo "ℹ️ Installing custom packages by file test"
+      - for:
+          var: PACKAGES
+        task: test-file-install-package
+        vars:
+          PKG: "{{.ITEM.pkg}}"
           FILE: "{{.ITEM.file}}"
-          PKG: "{{.ITEM.pkg}}"
-          INSTALL: "{{.CUSTOM_PACKAGE_MANAGER}} {{.PKG}}"
+          INSTALLER: "{{.CUSTOM_PACKAGE_MANAGER}} {{.ITEM.pkg}}"
+      - echo "✅ Custom packages by file test intalled"
 
-      - if: '[ {{.OS_TYPE}} == "arch" ]'
-        for:
-          var: PKGS_FILE_ARCH
-        task: install-pkg-byfile-test
-        vars:
-          FILE: "{{.ITEM.file}}"
-          PKG: "{{.ITEM.pkg}}"
-          INSTALL: "{{.CUSTOM_PACKAGE_MANAGER}} {{.PKG}}"
-
-      - if: '[ {{.OS_TYPE}} != "arch" ]'
-        for:
-          var: PKGS_FILE_OTHER
-        task: install-pkg-byfile-test
-        vars:
-          FILE: "{{.ITEM.file}}"
-          PKG: "{{.ITEM.pkg}}"
-          INSTALL: "{{.CUSTOM_PACKAGE_MANAGER}} {{.PKG}}"
-
-      - if: '[ {{.OS_TYPE}} != "arch" ]'
-        task: install-pkg-bycli-test
-        vars:
-          CLI: getnf
-          PKG: getnf
-          INSTALLER: "curl -fsSL https://raw.githubusercontent.com/getnf/getnf/main/install.sh | bash"
-
-      - |
-        fish -c 'if not functions -q fisher; curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher; else echo "✅ fisher déjà installé"; end'
-        fish -c 'if fisher list | string match -q "*IlanCosman/tide*"; echo "✅ tide déjà installé"; else fisher install IlanCosman/tide@v6; end'
-      - |
-        echo "installation de nerd fonts..."
-        getnf -i Meslo,JetBrainsMono,CascadiaMono,Hack,Hasklig
-        echo "✅ nerd fonts installées"
-
-      - if: '[ {{.USE_SYSTEMD}} == "true" ]'
-        task: install-pkg-bycli-test
+  install-systemd-packages:
+    # NOTE: some packages requires dev packages, such as rustup
+    deps: [dev]
+    cmds:
+      - echo "ℹ️ Installing systemd packages"
+      - echo "ℹ️ Installing keyd"
+      - task: install-package
         vars:
           CLI: keyd
           PKG: keyd
-          INSTALLER: "{{.DISTRO_PACKAGE_MANAGER}} {{.PKG}}"
-      - if: '[ {{.USE_SYSTEMD}} == "true" ]'
-        cmd: systemctl --user enable --now keyd || true
-
-      - if: '[ {{.USE_SYSTEMD}} == "true" && {{.OS_TYPE}} == "arch" ]'
-        task: install-pkg-bycli-test
+          INSTALLER: "{{.DISTRO_PACKAGE_MANAGER}} keyd && sudo systemctl enable --now keyd"
+      - echo "ℹ️ Installing wayscriber"
+      - if: '[ "{{.OS_TYPE}} == arch ]'
+        task: install-package
         vars:
           CLI: wayscriber
           PKG: wayscriber
-          INSTALLER: "{{.DISTRO_PACKAGE_MANAGER}} {{.PKG}}"
-      - if: '[ {{.USE_SYSTEMD}} == "true" && {{.OS_TYPE}} == "arch" ]'
-        cmd: systemctl --user enable --now wayscriber || true
-      - if: '[ {{.USE_SYSTEMD}} == "true" && {{.OS_TYPE}} != "arch" ]'
+          INSTALLER: "{{.DISTRO_PACKAGE_MANAGER}} wayscriber && systemctl --user enable --now wayscriber"
+      - if: '[ "{{.OS_TYPE}} != arch ]'
         cmd: echo "🛠️ To install wayscriber in current system check `https://wayscriber.com/docs/getting-started/installation.html`"
+      - echo "✅ Systemd packages installed"
 
-      - |
-        sudo systemctl enable --now docker || true
-        if ! getent group docker | grep -q "\b$USER\b"; then
-          echo "ℹ️  ajout de $USER au groupe docker..."
-          sudo usermod -aG docker "$USER" || true
-          newgrp docker || true
-          echo "⚠️ logout/login pour être dans le group docker"
-        else
-          echo "✅ $USER déjà dans le groupe docker"
-        fi
-      - echo "✅ Tous les prérequis du terminal sont installés"
+  set-shell:
+    cmd: |
+      echo "ℹ️ Setting user shell"
+      DESIRED_SHELL_PATH="$(command -v "{{.LOGIN_SHELL}}")"
+      if [ "$(basename "${SHELL:-}")" != "{{.LOGIN_SHELL}}" ]; then
+        chsh -s "$DESIRED_SHELL_PATH"
+        echo "🙋‍♂️ logout/login to take into account the new shell"
+      else
+        echo "✅ {{.LOGIN_SHELL}} shell already set"
+      fi
+      echo "✅ User shell set"
 
-  term-all:
-    desc: 🔥 Full terminal environment (shell install + config deployment)
+  setup-fish-shell:
     cmds:
-      - task: term
-      - task: config-terminal
+      - echo "ℹ️ Setting fish shell conf"
+      - fish -c 'if not functions -q fisher; curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher; else echo "✅ fisher already installed"; end'
+      - fish -c 'if fisher list | string match -q "*IlanCosman/tide*"; echo "✅ tide already installed"; else fisher install IlanCosman/tide@v6; end'
+      - echo "✅ Fish shell conf set"
 
-  term:
-    desc: 🖥️ Install shell and core terminal dependencies
+  install-nerd-fonts:
+    cmd: |
+      echo "ℹ️ Installing nerd fonts..."
+      installed=$(getnf -l)
+      for font in Meslo JetBrainsMono CascadiaMono Hack Hasklig; do
+        echo "$installed" | grep -w $font >/dev/null && echo "✅ $font already intalled" && continue
+        getnf -i $font
+      done
+      echo "✅ Nerd fonts installed"
+
+  setup-user-for-docker:
+    cmd: |
+      echo "ℹ️ Setting user in docker group"
+      if ! systemctl status docker 2>/dev/null; then
+        echo "⚠️ docker service not found, skipping"
+        exit 0
+      fi
+      sudo systemctl enable --now docker || true
+      if ! getent group docker | grep -q "\b$USER\b"; then
+        sudo usermod -aG docker "$USER" || true
+        newgrp docker || true
+        echo "⚠️ logout/login to be permanently in docker group"
+      else
+        echo "✅ $USER already in docker group"
+      fi
+      echo "✅ User set in docker group"
+
+  # =====================
+
+  user-packages:
+    desc: "🖥️ Install shell and core terminal dependencies"
     cmds:
-      - task: package-manager
-      - task: install-term
+      - echo "ℹ️ Installing system and terminal requirements"
+      - task: install-package-manager
+      - task: install-system-packages
+      - task: install-custom-packages
+      - task: install-custom-packages-sh
+      - task: install-custom-packages-test-file
+      - if: '[ {{.USE_SYSTEMD}} == "true" ]'
+        task: install-systemd-packages
+      - task: set-shell
+      - task: setup-fish-shell
+      - task: install-nerd-fonts
+      - task: setup-user-for-docker
+      - echo "✅ System and terminal requirements installed"
 
-  config-terminal:
+  # =====================
+
+  user-config:
     desc: Deploy config files to $HOME/.config
     cmds:
       - |
@@ -256,48 +303,73 @@ tasks:
 
         echo "✅ Installation des fichiers de configuration terminée"
 
+  # =====================
+
+  user-all:
+    desc: "🔥 Full terminal environment (user packages + user config)"
+    cmds:
+      - task: user-packages
+      - task: user-config
+
+  # =====================
+
   devops:
     desc: Install DevOps tools (kubectl, helm, k9s, etc.)
     vars:
-      PKGS_DEVOPS:
-        ref: .CONFIG.user-devops
-      cmds:
-        - echo "ℹ️ Installation des outils devops"
-        - for:
-            var: PKGS_MISE
-          task: install-pkg-bycli-test
-          vars:
-            CLI: "{{.ITEM}}"
-            PKG: "{{.ITEM}}"
-            INSTALLER: "{{.CUSTOM_PACKAGE_MANAGER}} {{.ITEM}}"
+      PACKAGES:
+        ref: .CONFIG.devops | splitLines | compact
+    cmds:
+      - echo "ℹ️ Installing devops tools"
+      - for:
+          var: PACKAGES
+        task: install-package
+        vars:
+          CLI: '{{.ITEM | splitList "," | first}}'
+          PKG: '{{.ITEM | splitList "," | last}}'
+          INSTALLER: '{{.CUSTOM_PACKAGE_MANAGER}} {{.ITEM | splitList "," | last}}'
 
-        - helm plugin install https://github.com/databus23/helm-diff
-        - echo "✅ Tous les prérequis devops sont installés"
+      - |
+        if helm diff --help >/dev/null 2>&1; then
+          echo "✅ helm diff found"
+        else
+         helm plugin install --verify=false https://github.com/databus23/helm-diff
+          echo "✅ helm diff installed"
+        fi
+      - echo "✅ Devops tools installed"
+
+  # =====================
 
   dev:
-    desc: Install development tools (pyenv, nvm, go, rust, etc.)
+    desc: Install Development tools
     vars:
-      PKGS_DEV:
-        - python
-        - node
-        - go
-      cmds:
-        - echo "ℹ️ Installation des outils de développement"
-        - for:
-            var: PKGS_MISE
-          task: install-pkg-bycli-test
-          vars:
-            CLI: "{{.ITEM}}"
-            PKG: "{{.ITEM}}"
-            INSTALLER: "mise use -g {{.PKG}}"
-        - task: install-pkg-bycli-test
-          vars:
-            CLI: rustup
-            PKG: rustup
-            INSTALLER: "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh && rustup toolchain install stable"
-        - echo "✅ Tous les prérequis de développement sont installés"
-
-  help:
-    desc: Show available commands
+      COMMON_PACKAGES:
+        ref: .CONFIG.dev.common | splitLines | compact
+      SH_PACKAGES:
+        ref: .CONFIG.dev.sh
     cmds:
-      - task --list || go-task --list
+      - echo "ℹ️ Installing dev tools"
+      - for:
+          var: COMMON_PACKAGES
+        task: install-package
+        vars:
+          CLI: '{{.ITEM | splitList "," | first}}'
+          PKG: '{{.ITEM | splitList "," | last}}'
+          INSTALLER: 'mise use -g {{.ITEM | splitList "," | last}}'
+      - for:
+          var: SH_PACKAGES
+        task: install-package
+        vars:
+          CLI: "{{.ITEM.cli}}"
+          PKG: "{{.ITEM.cli}}"
+          INSTALLER: "{{.ITEM.sh}}"
+      - echo "✅ Dev tools installed"
+
+  # =====================
+
+  all:
+    desc: 🔱 Install all (user-all, devops, dev)
+    cmds:
+      - task: user-all
+      - task: devops
+      - task: dev
+

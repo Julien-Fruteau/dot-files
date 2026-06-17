@@ -1,65 +1,46 @@
-# package installed with distro installer (pacman, dnf, apt)
-# TODO: split few having package and cli with different name
+# syntax: |
+#  cli      // when cli and package have same names
+#  cli,pkg  // when they differ
 
-# `cli` (with pkg = cli) or `cli,pkg` with coalesce when just cli
-test:
-  - zsh
-  - wt,worktrunk
+# installed with distro package manager
 system:
-  - cli: zsh
-    pkg: zsh
-  - cli: fish
-    pkg: fish
-  - cli: curl
-    pkg: curl
-  - cli: git
-    pkg: git
-  - cli: zip
-    pkg: zip
-  - cli: unzip
-    pkg: unzip
-  - cli: kitty
-    pkg: kitty
-  - cli: mise
-    pkg: mise
+  common: |
+    zsh
+    fish
+    curl
+    git
+    zip
+    unzip
+    kitty
+    mise
+  arch: |
+  other: |
 
-# installed with AUR/custom installer (paru, brew)
-user:
-  - cli: fzf
-    pkg: fzf
-  - cli: docker
-    pkg: docker
-  - cli: docker-compose
-    pkg: docker-compose
-  - cli: lazydocker
-    pkg: lazydocker
-  - cli: lazygit
-    pkg: lazygit
-  - cli: lazyjournal
-    pkg: lazyjournal
-  - cli: lazyssh
-    pkg: lazyssh
-  - cli: direnv
-    pkg: direnv
-  - cli: fd
-    pkg: fd
-  - cli: nvim
-    pkg: neovim
-  - cli: rg
-    pkg: ripgrep
-  - cli: wt
-    pkg: worktrunk
+# installed with custom package manager (paru, brew)
+custom:
+  common: |
+    fzf
+    docker
+    docker-compose
+    lazydocker
+    lazygit
+    lazyjournal
+    lazyssh
+    direnv
+    fd
+    nvim,neovim
+    rg,ripgrep
+    wt,worktrunk
+  arch: |
+    getnf
 
-# TODO: 
-# [ ] bring back sh installer with dedicated util func 
-    
-# specific to OS
-# ARCH using Paru
-user-arch:
-  - cli: getnf
-    pkg: getnf
+# installed with distro package manager for os with systemd
+# Directly in Taskfile
+# systemd:
 
+# installed with custom package manager if file does not exist
 files:
+  common: []
   arch:
     - pkg: zsh-theme-powerlevel10k-git
       file: "$HOME/.p10k.zsh"
@@ -68,36 +49,38 @@ files:
     - pkg: zsh-autosuggestions
       file: /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
   other:
-    - pkg: powerlevel10k
+    - pkg: zsh-theme-powerlevel10k-git
       file: "$HOME/.p10k.zsh"
     - pkg: zsh-history-substring-search
-      file: $(brew --prefix)/share/zsh-history-substring-search/zsh-history-substring-search.zsh
+      file: $(brew --prefix)/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
     - pkg: zsh-autosuggestions
-      file: $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+      file: $(brew --prefix)/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 
-# ⚠️ not used
-systemd:
-  common:
-    - cli: keyd
-      pkg: keyd
-  arch:
-    - cli: wayscriber
-      pkg: wayscriber
+sh:
+  common: []
+  arch: []
+  other:
+    - pkg: getnf
+      sh: curl -fsSL https://raw.githubusercontent.com/getnf/getnf/main/install.sh | bash
+    - pkg: wayscriber
+      sh: echo "🛠️ To install wayscriber in current system check `https://wayscriber.com/docs/getting-started/installation.html`"
 
-user-devops:
-  - kubectl
-  - k9s
-  - helm
-  - helm-diff
-  - stern
-  - helmwave
-  - minio
+# installed with custom package manager
+devops: |
+  kubectl
+  k9s
+  helm
+  stern
+  minio
 
-dev-mise:
-  - python
-  - node
-  - go
+# helm-diff installed via helm, check Taskfile.
 
-dev-sh:
-  - cli: rustup
-    sh: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh && rustup toolchain install stable
+# installed with mise
+dev:
+  common: |
+    python
+    node
+    go
+  sh:
+    - cli: rustup
+      sh: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh && rustup toolchain install stable
