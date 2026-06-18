@@ -1,14 +1,8 @@
 # dot-files
 
-## roadmap
-
-- [🔨] migration to taskfile
-- [🛠️] migration dev and devops to mise
-- [💭] github actions for test by arch : archlinux, ubuntu, fedora
-
 ## distros
 
-dotfiles for following distro :
+dotfiles and packages (system, devops, dev) for following distro :
 
 - archlinux
 - fedora
@@ -25,13 +19,13 @@ dotfiles for following distro :
 
 ```bash
 # Arch Linux
-pacman -S go-task
+sudo pacman -S go-task
 
 # fedora
-dnf install go-task
+sudo dnf install go-task
 
 # ubuntu, debian
-pat install task
+sudo apt install task
 ```
 
 ## usage
@@ -42,14 +36,17 @@ Checked-out the repo in a dedicated home sub-folder preferably.
 git clone https://github.com/Julien-Fruteau/dot-files.git
 cd dot-files
 
-# terminal configuration
 which go-task && alias task='go-task'
-task term
+# review `task/config.yml` for the packages installed
 
-# optional
-# 🤙: configure the config/shell, config/dev and config/devops files
-# according to the tool you want to use before running these commands
+# all (user, devops, dev)
+task all
+
+# user packages and configuration
+task user-all
+# dev packages
 task dev
+# devops packages
 task devops
 
 # link nvim configuration
