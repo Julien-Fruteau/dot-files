@@ -21,12 +21,10 @@ dotfiles and packages (system, devops, dev) for following distro :
 # Arch Linux
 sudo pacman -S go-task
 
-# fedora
-sudo dnf install go-task
-
-# ubuntu, debian
-sudo apt install task
+# other distro
 ```
+
+Other distro, check : `https://taskfile.dev/docs/installation`
 
 ## usage
 

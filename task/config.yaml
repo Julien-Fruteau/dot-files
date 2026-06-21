@@ -12,8 +12,8 @@ system:
     zip
     unzip
     kitty
-    mise
   arch: |
+    mise
   other: |
 
 # installed with custom package manager (paru, brew)
@@ -33,6 +33,7 @@ custom:
     wt,worktrunk
   arch: |
     getnf
+  other: |
 
 # installed with distro package manager for os with systemd
 # Directly in Taskfile
@@ -49,7 +50,7 @@ files:
     - pkg: zsh-autosuggestions
       file: /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
   other:
-    - pkg: zsh-theme-powerlevel10k-git
+    - pkg: powerlevel10k
       file: "$HOME/.p10k.zsh"
     - pkg: zsh-history-substring-search
       file: $(brew --prefix)/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
@@ -60,6 +61,8 @@ sh:
   common: []
   arch: []
   other:
+    - pkg: mise
+      sh: curl https://mise.run | sh
     - pkg: getnf
       sh: curl -fsSL https://raw.githubusercontent.com/getnf/getnf/main/install.sh | bash
     - pkg: wayscriber
