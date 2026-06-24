@@ -1,14 +1,5 @@
 export LC_ALL=en_US.UTF-8       #! Super important
 
-# Source environment variables for conditional loading
-if [ -f ~/.config/devops ]; then
-    source ~/.config/devops
-fi
-
-if [ -f ~/.config/dev ]; then
-    source ~/.config/dev
-fi
-
 # The following lines were added by compinstall
 zstyle ':completion:*' insert-tab false
 zstyle ':completion:*' auto-description 'specify: %d'
@@ -37,6 +28,15 @@ bindkey -e
 
 autoload -U +X bashcompinit && bashcompinit
 
+# Use neovim for command editing (chord ctrl x + ctrl e)
+export EDITOR="nvim"
+export VISUAL="nvim"
+autoload -Uz edit-command-line
+zle -N edit-command-line
+bindkey -M emacs '^X^E' edit-command-line
+bindkey -M viins '^X^E' edit-command-line
+bindkey -M vicmd '^X^E' edit-command-line
+bindkey -M vicmd v edit-command-line
 
 # Personal addition
 if [ -x /usr/bin/dircolors ]; then
@@ -44,7 +44,7 @@ if [ -x /usr/bin/dircolors ]; then
     alias ls='ls --color=auto'
     alias dir='dir --color=auto'
     alias vdir='vdir --color=auto'
-    
+
     alias grep='grep --color=auto'
     # export GREP_COLORS='ms=01;31'
     alias fgrep='fgrep --color=auto'
@@ -66,7 +66,7 @@ alias g=git
 alias v=nvim
 alias lg=lazygit
 alias tf=terraform
-alias z=zoxide 
+alias z=zoxide
 alias vl="NVIM_APPNAME=LazyVim nvim"
 alias vk="NVIM_APPNAME=kickstart nvim"
 alias vc="NVIM_APPNAME=NvChad nvim"
@@ -122,11 +122,11 @@ function ksec() {
     esac
   done
 
-  if [[ -z $context ]]; then 
+  if [[ -z $context ]]; then
     context=$(kubectl config current-context)
   fi
 
-  if [[ -z $namespace ]]; then 
+  if [[ -z $namespace ]]; then
     namespace=$(kubectl config view -o jsonpath="{.contexts[?(@.name==\"$context\")].context.namespace}")
   fi
 
@@ -154,12 +154,6 @@ function ksec() {
   fi
 }
 
-bindkey "^ " autosuggest-accept
-# bindkey "^[L" clear-screen
-bindkey "^[[1;5C" forward-word
-bindkey "^[[1;5D" backward-word
-bindkey "^[[3~" delete-char
-
 # Add | as word boundary when deleting words backward 
 export WORDCHARS="${WORDCHARS}|"
 
@@ -173,7 +167,7 @@ if grep -qi microsoft /proc/version 2>/dev/null; then
     alias pc='pwd|cl'
 fi
 # ======= END PERSO
- 
+
 # added by pipx (https://github.com/pipxproject/pipx)
 # Detect if using Homebrew or native package manager
 if [ -d "/home/linuxbrew/.linuxbrew" ]; then
@@ -202,11 +196,9 @@ export PATH="$PATH:$HOME/minio-binaries/"
 [ -f "$ZSH_HISTORY_SUBSTRING_SEARCH" ] && source "$ZSH_HISTORY_SUBSTRING_SEARCH"
 [ -f "$ZSH_AUTOSUGGESTIONS" ] && source "$ZSH_AUTOSUGGESTIONS"
 
-[ -f "$POWERLEVEL10K" ] && source "$POWERLEVEL10K"
-
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
-
+[ -f "$POWERLEVEL10K" ] && source "$POWERLEVEL10K"
+[ -f ~/.p10k.zsh ] && source ~/.p10k.zsh
 
 # for windows terminal to keep_current_path on split (WSL only)
 if grep -qi microsoft /proc/version 2>/dev/null; then
@@ -215,7 +207,6 @@ if grep -qi microsoft /proc/version 2>/dev/null; then
     }
     precmd_functions+=(keep_current_path)
 fi
-
 
 export KUBECONFIG=$HOME/.kube/config
 export KUBE_EDITOR="nvim"
@@ -262,17 +253,17 @@ fi
 
 complete -o nospace -C $(which mc) mc
 
-
 # source ~/.git-flow-zsh-completion.sh
 eval "$(direnv hook zsh)"
-
-#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
-export SDKMAN_DIR="$HOME/.sdkman"
-[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
 
 if command -v niri >/dev/null 2>&1; then source <(niri completions zsh); fi
 
 if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)"; fi
 
 eval "$(mise activate zsh)"
+
+#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+export SDKMAN_DIR="$HOME/.sdkman"
+[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+
 
