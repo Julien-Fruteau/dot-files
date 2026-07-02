@@ -118,6 +118,10 @@ function nvims() {
   NVIM_APPNAME=$config nvim $@
 }
 
+function _ksec_list() {
+  kubectl --context "$1" -n "$2" get secrets
+}
+
 function ksec() {
   local secret=""
   local context=""
@@ -149,8 +153,8 @@ function ksec() {
     return 1
   fi
 
-  local cmd="kubectl --context=$context -n $namespace get secret $secret -o json"
-  if ! output=$(eval $cmd 2>&1); then
+  local -a cmd=(kubectl --context=$context -n $namespace get secret $secret -o json)
+  if ! output=$("${cmd[@]}" 2>&1); then
     echo "Error: secret '$secret' not found in context '$context' / namespace '$namespace'"
     echo ""
     echo "Fecthing available secrets: ..."
@@ -159,9 +163,9 @@ function ksec() {
   fi
 
   if [[ -n $field ]]; then
-    $cmd | jq -r ".data[\"$field\"]" | base64 -d | tee >(wl-copy --trim-newline)
+    "${cmd[@]}" | jq -r ".data[\"$field\"]" | base64 -d | tee >(wl-copy --trim-newline)
   else
-    $cmd | jq -Mr '.data | map_values(@base64d)' | tee >(wl-copy --trim-newline)
+    "${cmd[@]}" | jq -Mr '.data | map_values(@base64d)' | tee >(wl-copy --trim-newline)
   fi
 }
 
