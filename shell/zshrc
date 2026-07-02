@@ -22,8 +22,19 @@ autoload -Uz compinit; compinit
 HISTFILE=~/.histfile
 HISTSIZE=10000
 SAVEHIST=10000
-setopt autocd extendedglob nomatch notify shwordsplit
-unsetopt beep
+
+setopt EXTENDED_HISTORY       # save timestamp + duration for each command
+setopt INC_APPEND_HISTORY     # write each command to HISTFILE as soon as it's run (not just on exit)
+setopt SHARE_HISTORY          # import new commands from HISTFILE + share across sessions live
+setopt HIST_EXPIRE_DUPS_FIRST # when trimming, drop dupes before unique commands
+setopt HIST_IGNORE_DUPS       # don't record a command if it's the same as the previous one
+setopt HIST_IGNORE_ALL_DUPS   # remove older dupe when a new identical command is added
+setopt HIST_FIND_NO_DUPS      # don't show dupes when searching history
+setopt HIST_SAVE_NO_DUPS      # don't write dupes to the history file
+setopt HIST_VERIFY            # let you review a !-expanded command before running it
+# setopt autocd extendedglob nomatch notify shwordsplit
+setopt autocd extendedglob nomatch notify
+# unsetopt beep
 bindkey -e
 
 autoload -U +X bashcompinit && bashcompinit
