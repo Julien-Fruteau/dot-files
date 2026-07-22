@@ -69,12 +69,16 @@ sh:
       sh: echo "🛠️ To install wayscriber in current system check `https://wayscriber.com/docs/getting-started/installation.html`"
 
 # installed with custom package manager
-devops: |
-  kubectl
-  k9s
-  helm
-  stern
-  minio
+devops:
+  common: |
+    kubectl
+    k9s
+    helm
+    stern
+    minio
+  sh:
+    - cli: herdr
+      sh: curl -fsSL https://herdr.dev/install.sh | sh
 
 # helm-diff installed via helm, check Taskfile.
 

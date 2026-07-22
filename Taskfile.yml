@@ -317,7 +317,9 @@ tasks:
     desc: Install DevOps tools (kubectl, helm, k9s, etc.)
     vars:
       PACKAGES:
-        ref: .CONFIG.devops | splitLines | compact
+        ref: .CONFIG.devops.common | splitLines | compact
+      SH_PACKAGES:
+        ref: .CONFIG.devops.sh
     cmds:
       - echo "ℹ️ Installing devops tools"
       - for:
@@ -327,6 +329,13 @@ tasks:
           CLI: '{{.ITEM | splitList "," | first}}'
           PKG: '{{.ITEM | splitList "," | last}}'
           INSTALLER: '{{.CUSTOM_PACKAGE_MANAGER}} {{.ITEM | splitList "," | last}}'
+      - for:
+          var: SH_PACKAGES
+        task: install-package
+        vars:
+          CLI: "{{.ITEM.cli}}"
+          PKG: "{{.ITEM.cli}}"
+          INSTALLER: "{{.ITEM.sh}}"
 
       - |
         if helm diff --help >/dev/null 2>&1; then
@@ -372,4 +381,3 @@ tasks:
       - task: user-all
       - task: devops
       - task: dev
-
