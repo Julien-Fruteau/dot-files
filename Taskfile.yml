@@ -338,6 +338,14 @@ tasks:
           INSTALLER: "{{.ITEM.sh}}"
 
       - |
+        if command -v herdr >/dev/null 2>&1; then
+          echo "ℹ️ Adding herdr skill"
+          npx skills add ogulcancelik/herdr --skill herdr -g
+          echo "✅ herdr skill added"
+        else
+          echo "⏭️  herdr not found, skipping herdr skill"
+        fi
+      - |
         if helm diff --help >/dev/null 2>&1; then
           echo "✅ helm diff found"
         else
