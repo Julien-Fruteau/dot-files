@@ -1,65 +1,16 @@
 set -gx LC_ALL en_US.UTF-8
-set -gx PYENV_ROOT "$HOME/.pyenv"
 set -gx KUBECONFIG "$HOME/.kube/config"
 set -gx KUBE_EDITOR "nvim"
 set -gx SDKMAN_DIR "$HOME/.sdkman"
-set -gx MESA_D3D12_DEFAULT_ADAPTER_NAME AMD
-set -gx NVM_DIR "$HOME/.nvm"
 
-mise activate fish | source
-
-function __dotfiles_source_env_file --argument-names env_file
-    if not test -f $env_file
-        return
-    end
-
-    for line in (string split \n -- (cat $env_file))
-        set line (string trim -- $line)
-
-        if test -z "$line"
-            continue
-        end
-
-        if string match -qr '^#' -- $line
-            continue
-        end
-
-        set -l parts (string split -m 1 '=' -- $line)
-        if test (count $parts) -ne 2
-            continue
-        end
-
-        set -gx (string trim -- $parts[1]) (string trim -- $parts[2])
-    end
+# Development toolchains (python/node/go/rust) are managed by mise + rustup,
+# see task/config.yaml
+if command -q mise
+    mise activate fish | source
 end
 
 function __dotfiles_is_wsl
     grep -qi microsoft /proc/version 2>/dev/null
-end
-
-function __dotfiles_latest_nvm_bin
-    if test -n "$NVM_DIR"; and test -d "$NVM_DIR/versions/node"
-        find "$NVM_DIR/versions/node" -mindepth 2 -maxdepth 2 -type d -name bin 2>/dev/null | sort -V | tail -n 1
-        return
-    end
-
-    if set -q nvm_data; and test -d "$nvm_data"
-        find "$nvm_data" -mindepth 2 -maxdepth 2 -type d -name bin 2>/dev/null | sort -V | tail -n 1
-    end
-end
-
-function __dotfiles_detect_nvm_sh
-    for candidate in \
-        "$HOME/.nvm/nvm.sh" \
-        "$HOME/.local/share/nvm/nvm.sh" \
-        "/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh" \
-        "/opt/homebrew/opt/nvm/nvm.sh" \
-        "/usr/local/opt/nvm/nvm.sh"
-        if test -s "$candidate"
-            echo "$candidate"
-            return
-        end
-    end
 end
 
 function __dotfiles_dircolors_ls_colors
@@ -75,11 +26,7 @@ function __dotfiles_dircolors_ls_colors
     end
 end
 
-__dotfiles_source_env_file ~/.config/devops
-__dotfiles_source_env_file ~/.config/dev
-
 set -l brew_prefix ""
-set -gx DOTFILES_NVM_SH (__dotfiles_detect_nvm_sh)
 
 if test -d "/home/linuxbrew/.linuxbrew"
     set brew_prefix "/home/linuxbrew/.linuxbrew"
@@ -116,7 +63,9 @@ alias ll 'ls -alF'
 alias la 'ls -A'
 alias l 'ls -CF'
 alias lla 'ls -la'
-alias lt 'ls --tree'
+if command -q tree
+    alias lt 'tree'
+end
 alias c 'clear'
 alias k 'kubectl'
 alias h 'helm'
@@ -124,11 +73,6 @@ alias s 'stern'
 alias g 'git'
 alias v 'nvim'
 alias lg 'lazygit'
-alias tf 'terraform'
-alias z 'zoxide'
-alias vl 'env NVIM_APPNAME=LazyVim nvim'
-alias vk 'env NVIM_APPNAME=kickstart nvim'
-alias vc 'env NVIM_APPNAME=NvChad nvim'
 alias dif 'diff --color=always -y'
 alias less 'less -R'
 alias dkr 'docker'
@@ -136,7 +80,9 @@ alias ld 'lazydocker'
 alias yq 'yq -C'
 alias jq 'jq -C'
 alias uidgen 'cat /proc/sys/kernel/random/uuid'
-alias task 'go-task'
+if command -q go-task
+    alias task 'go-task'
+end
 
 function kx
     if test (count $argv) -gt 0
@@ -167,10 +113,6 @@ function sct
     echo
 end
 
-function dateUpdateWsl
-    sudo ntpdate time.windows.com
-end
-
 function yless
     yq . -C | less -R
 end
@@ -181,23 +123,10 @@ function jless
 end
 alias lessj 'jless'
 
-function nvims
-    set -l items default kickstart LazyVim NvChad
-    set -l config (printf "%s\n" $items | fzf --prompt=" Neovim Config  " --height=~50% --layout=reverse --border --exit-0)
-
-    if test -z "$config"
-        echo "Nothing selected"
-        return 0
-    end
-
-    if test "$config" = default
-        set config ""
-    end
-
-    env NVIM_APPNAME="$config" nvim $argv
-end
-
+# ========== WSL only (not native Linux)
 if __dotfiles_is_wsl
+    set -gx MESA_D3D12_DEFAULT_ADAPTER_NAME AMD
+
     alias cl 'clip.exe'
     alias clip 'clip.exe'
 
@@ -205,38 +134,19 @@ if __dotfiles_is_wsl
         pwd | clip.exe
     end
 
+    function dateUpdateWsl
+        sudo ntpdate time.windows.com
+    end
+
+    # for windows terminal to keep_current_path on split
     function __dotfiles_keep_current_path --on-event fish_prompt
         printf '\e]9;9;%s\e\\' (wslpath -w "$PWD")
     end
 end
+# ======= END WSL
 
-if test "$PYENV" = "true"; and command -q pyenv
-    fish_add_path --prepend "$PYENV_ROOT/bin"
-    pyenv init - | source
-end
-
-if test -n "$DOTFILES_NVM_SH"
-    set -gx NVM_DIR (string replace -- '/nvm.sh' '' "$DOTFILES_NVM_SH")
-else
-    set -e NVM_DIR
-end
-
-if test "$NVM" = "true"
-    set -l latest_nvm_bin (__dotfiles_latest_nvm_bin)
-    if test -n "$latest_nvm_bin"
-        fish_add_path --prepend "$latest_nvm_bin"
-    end
-
-    if test -s "$DOTFILES_NVM_SH"
-        function nvm
-            set -l escaped_args (string join ' ' -- (string escape -- $argv))
-            bash -lc "source \"$DOTFILES_NVM_SH\" && nvm $escaped_args"
-        end
-    end
-end
-
-if test "$RUST" = "true"
-    fish_add_path "$HOME/.cargo/bin"
+if test -f "$HOME/.cargo/env.fish"
+    source "$HOME/.cargo/env.fish"
 end
 
 if test -s "$SDKMAN_DIR/bin/sdkman-init.sh"
@@ -252,48 +162,49 @@ if test -s "$SDKMAN_DIR/bin/sdkman-init.sh"
     end
 end
 
-if test -f "$HOME/.fzf/shell/key-bindings.fish"
-    source "$HOME/.fzf/shell/key-bindings.fish"
+if command -q fzf
+    fzf --fish | source
 end
 
-if test -f "$HOME/.fzf/shell/completion.fish"
-    source "$HOME/.fzf/shell/completion.fish"
-end
-
-if test "$KUBECTL" = "true"; and command -q kubectl
+# devops tool completions
+if command -q kubectl
     kubectl completion fish | source
     complete -c k -w kubectl
 end
 
-if test "$HELM" = "true"; and command -q helm
+if command -q helm
     helm completion fish | source
-    helm diff completion fish | source
+    helm plugin list 2>/dev/null | grep -q '^diff'; and helm diff completion fish | source
     complete -c h -w helm
 end
 
-if test "$STERN" = "true"; and command -q stern
+if command -q stern
     stern --completion=fish | source
     complete -c s -w stern
 end
 
-if test "$HELMWAVE" = "true"; and command -q helmwave
-    helmwave completion fish | source
-end
-
-if test "$MINIO" = "true"; and command -q mc
+if command -q mc
     mc alias completion fish | source
 end
 
 if command -q direnv
     direnv hook fish | source
 end
-if test -f /usr/share/cachyos-fish-config/cachyos-config.fish
-	source /usr/share/cachyos-fish-config/cachyos-config.fish
-end
-if test -f "$HOME/.cargo/env.fish" 
-	source "$HOME/.cargo/env.fish"
-end	
 
-direnv hook fish | source
+if command -q niri
+    niri completions fish | source
+end
+
+if command -q wt
+    command wt config shell init fish | source
+end
+
+if command -q herdr
+    herdr completion fish | source
+end
+
+if test -f /usr/share/cachyos-fish-config/cachyos-config.fish
+    source /usr/share/cachyos-fish-config/cachyos-config.fish
+end
 
 

@@ -14,8 +14,6 @@ zstyle ':completion:*' menu select=1
 zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p%s
 zstyle :compinstall filename '${HOME}/.zshrc'
 
-fpath=(~/.zsh/completion $fpath)
-fpath+=~/.zfunc
 autoload -Uz compinit; compinit
 
 # Lines configured by zsh-newuser-install
@@ -66,7 +64,7 @@ alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
 alias lla='ls -la'
-alias lt='ls --tree'
+command -v tree >/dev/null && alias lt='tree'
 
 # personalized aliases
 alias c=clear
@@ -76,11 +74,6 @@ alias s=stern
 alias g=git
 alias v=nvim
 alias lg=lazygit
-alias tf=terraform
-alias z=zoxide
-alias vl="NVIM_APPNAME=LazyVim nvim"
-alias vk="NVIM_APPNAME=kickstart nvim"
-alias vc="NVIM_APPNAME=NvChad nvim"
 alias dif="diff --color=always -y"
 alias less="less -R"
 alias dkr=docker
@@ -93,7 +86,7 @@ alias zsh_history_fix='f() { mv ~/.histfile ~/.histfile.bad ; strings ~/.histfil
 alias dateUpdateWsl='sudo ntpdate time.windows.com'
 alias yq='yq -C'
 alias jq='jq -C'
-which go-task >/dev/null 2>/dev/null && alias task='go-task'
+command -v go-task >/dev/null && alias task='go-task'
 
 function yless() {
     yq . -C | less -R
@@ -104,19 +97,6 @@ function jless() {
 }
 alias lessj=jless
 alias uidgen='cat /proc/sys/kernel/random/uuid'
-
-function nvims() {
-  items=("default" "kickstart" "LazyVim" "NvChad")
-  # items=("default" "kickstart" "LazyVim" "NvChad" "AstroNvim")
-  config=$(printf "%s\n" "${items[@]}" | fzf --prompt=" Neovim Config  " --height=~50% --layout=reverse --border --exit-0)
-  if [[ -z $config ]]; then
-    echo "Nothing selected"
-    return 0
-  elif [[ $config == "default" ]]; then
-    config=""
-  fi
-  NVIM_APPNAME=$config nvim $@
-}
 
 function _ksec_list() {
   kubectl --context "$1" -n "$2" get secrets
@@ -172,18 +152,6 @@ function ksec() {
 # Add | as word boundary when deleting words backward 
 export WORDCHARS="${WORDCHARS}|"
 
-# ========== PERSO
-export MESA_D3D12_DEFAULT_ADAPTER_NAME=AMD
-
-# WSL-specific aliases (only on WSL, not native Linux)
-if grep -qi microsoft /proc/version 2>/dev/null; then
-    alias cl=clip.exe
-    alias clip=clip.exe
-    alias pc='pwd|cl'
-fi
-# ======= END PERSO
-
-# added by pipx (https://github.com/pipxproject/pipx)
 # Detect if using Homebrew or native package manager
 if [ -d "/home/linuxbrew/.linuxbrew" ]; then
     # Homebrew installation
@@ -192,14 +160,15 @@ if [ -d "/home/linuxbrew/.linuxbrew" ]; then
     ZSH_HISTORY_SUBSTRING_SEARCH="/home/linuxbrew/.linuxbrew/share/zsh-history-substring-search/zsh-history-substring-search.zsh"
     ZSH_AUTOSUGGESTIONS="/home/linuxbrew/.linuxbrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
     POWERLEVEL10K="/home/linuxbrew/.linuxbrew/share/powerlevel10k/powerlevel10k.zsh-theme"
-    NVM_SH="/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh"
 else
     # Arch Linux or other system package manager
     ZSH_HISTORY_SUBSTRING_SEARCH="/usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh"
     ZSH_AUTOSUGGESTIONS="/usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
     POWERLEVEL10K="/usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme"
-    NVM_SH="$HOME/.nvm/nvm.sh"
 fi
+
+# keep PATH free of duplicates when this file is re-sourced
+typeset -U path PATH
 
 export PATH="${HOME}/.local/bin:$PATH"
 export PATH="$PATH:$HOME/go/bin"
@@ -215,67 +184,62 @@ export PATH="$PATH:$HOME/minio-binaries/"
 [ -f "$POWERLEVEL10K" ] && source "$POWERLEVEL10K"
 [ -f ~/.p10k.zsh ] && source ~/.p10k.zsh
 
-# for windows terminal to keep_current_path on split (WSL only)
+# ========== WSL only (not native Linux)
 if grep -qi microsoft /proc/version 2>/dev/null; then
+    export MESA_D3D12_DEFAULT_ADAPTER_NAME=AMD
+
+    alias cl=clip.exe
+    alias clip=clip.exe
+    alias pc='pwd|cl'
+    alias dateUpdateWsl='sudo ntpdate time.windows.com'
+
+    # for windows terminal to keep_current_path on split
     keep_current_path() {
       printf "\e]9;9;%s\e\\" "$(wslpath -w "$PWD")"
     }
     precmd_functions+=(keep_current_path)
 fi
+# ======= END WSL
 
 export KUBECONFIG=$HOME/.kube/config
 export KUBE_EDITOR="nvim"
-export PYENV_ROOT="$HOME/.pyenv"
 
-source <(fzf --zsh)
+command -v fzf >/dev/null && source <(fzf --zsh)
 
-# Conditional loading of development tool configurations based on env vars
-if [[ "${PYENV:-true}" == "true" && $commands[pyenv] ]]; then
-    command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
-    eval "$(pyenv init -)"
+# Development toolchains (python/node/go/rust) are managed by mise + rustup,
+# see task/config.yaml
+if command -v mise >/dev/null 2>&1; then eval "$(mise activate zsh)"; fi
+
+[ -f "$HOME/.cargo/env" ] && source "$HOME/.cargo/env"
+
+# devops tool completions
+if command -v kubectl >/dev/null 2>&1; then
+    source <(kubectl completion zsh)
+    compdef k=kubectl
 fi
 
-if [[ "${NVM:-true}" == "true" ]]; then
-    export NVM_DIR="$HOME/.nvm"
-    [ -s "$NVM_SH" ] && \. "$NVM_SH"
-fi
-
-if [[ "${RUST:-true}" == "true" && -f ~/.cargo/env ]]; then
-    source ~/.cargo/env
-fi
-
-# Conditional loading of devops tool completions based on env vars
-if [[ "${KUBECTL:-true}" == "true" && $commands[kubectl] ]]; then
-    source <(k completion zsh)
-fi
-
-if [[ "${HELM:-true}" == "true" && $commands[helm] ]]; then
+if command -v helm >/dev/null 2>&1; then
     source <(helm completion zsh)
-    source <(helm diff completion zsh)
+    helm plugin list 2>/dev/null | grep -q '^diff' && source <(helm diff completion zsh)
+    compdef h=helm
 fi
 
-if [[ "${STERN:-true}" == "true" && $commands[stern] ]]; then
+if command -v stern >/dev/null 2>&1; then
     source <(stern --completion=zsh)
+    compdef s=stern
 fi
 
-if [[ "${HELMWAVE:-true}" == "true" && $commands[helmwave] ]]; then
-    source <(helmwave completion zsh)
+if command -v mc >/dev/null 2>&1; then
+    complete -o nospace -C "$(command -v mc)" mc
 fi
 
-if [[ "${MINIO:-true}" == "true" && $commands[mc] ]]; then
-    source <(mc alias completion zsh)
-fi
-
-complete -o nospace -C $(which mc) mc
-
-# source ~/.git-flow-zsh-completion.sh
-eval "$(direnv hook zsh)"
+if command -v direnv >/dev/null 2>&1; then eval "$(direnv hook zsh)"; fi
 
 if command -v niri >/dev/null 2>&1; then source <(niri completions zsh); fi
 
 if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)"; fi
 
-eval "$(mise activate zsh)"
+if command -v herdr >/dev/null 2>&1; then source <(herdr completion zsh); fi
 
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="$HOME/.sdkman"
