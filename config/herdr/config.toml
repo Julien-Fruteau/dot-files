@@ -1,3 +1,4 @@
+onboarding = false
 [keys]
 prefix = "ctrl+b"
 goto = "prefix+g"
@@ -17,3 +18,4 @@ previous_workspace = "ctrl+alt+p"
 
 [ui]
 agent_panel_sort = "spaces"
+pane_gaps = false
