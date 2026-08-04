@@ -65,7 +65,7 @@ cd dot-files
 which go-task && alias task='go-task'
 # review `task/config.yml` for the packages installed
 
-# all (user, devops, dev)
+# all (user, devops, dev, AI coding agents, agent skills)
 task all
 
 # user packages and configuration
@@ -74,6 +74,10 @@ task user-all
 task dev
 # devops packages
 task devops
+# AI coding agents (included in all)
+task ai
+# local llama.cpp environment (manual, Arch Linux only, not included in all)
+task ai-local
 # link agent skills (see "agent skills" above)
 task agent-skills
 

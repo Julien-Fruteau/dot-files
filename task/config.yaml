@@ -91,3 +91,16 @@ dev:
   sh:
     - cli: rustup
       sh: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh && rustup toolchain install stable
+
+# AI coding agents installed via their official shell installers
+ai:
+  sh:
+    - cli: codex
+      pkg: Codex
+      sh: sh -c 'curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh'
+    - cli: claude
+      pkg: Claude Code
+      sh: sh -c 'curl -fsSL https://claude.ai/install.sh | bash'
+    - cli: pi
+      pkg: Pi
+      sh: sh -c 'curl -fsSL https://pi.dev/install.sh | sh'
