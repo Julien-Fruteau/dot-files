@@ -1,6 +1,6 @@
 onboarding = false
 [keys]
-prefix = "ctrl+b"
+prefix = "ctrl+;"
 goto = "prefix+g"
 new_tab = "prefix+t"
 next_tab = "prefix+n"
@@ -19,3 +19,6 @@ previous_agent = "ctrl+alt+p"
 [ui]
 agent_panel_sort = "spaces"
 pane_gaps = false
+
+[ui.toast]
+delivery = "terminal"
