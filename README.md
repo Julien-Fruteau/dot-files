@@ -26,6 +26,34 @@ sudo pacman -S go-task
 
 Other distro, check : `https://taskfile.dev/docs/installation`
 
+## agent skills
+
+Skills written by hand live in `agents/skills/`. They are the ones that must
+survive a machine, so they are versioned here rather than inside the project
+that happened to need them first.
+
+Skills installed by a tool (BMad and friends) are **not** kept here — that tool
+owns them and reinstalls them on update. Only hand-written skills belong in this
+repo.
+
+`task agent-skills` links each one into every agent directory:
+
+```bash
+task agent-skills
+```
+
+- installs into `~/.agents/skills` (pi, codex, and other agent-agnostic
+  readers) and `~/.claude/skills` (Claude Code)
+- links instead of copying: agents de-duplicate skills by resolved realpath, so
+  one skill linked into several directories loads once instead of being reported
+  as a name collision — and edits go straight back to this repo
+- an existing real directory is saved as `<name>.<timestamp>.bak` before being
+  replaced by the link
+
+Keep skills out of a project's own `.agents/skills/` unless they are useless
+anywhere else. A project copy shadows the global one, silently, and drifts from
+it version by version.
+
 ## usage
 
 Checked-out the repo in a dedicated home sub-folder preferably.
@@ -46,6 +74,8 @@ task user-all
 task dev
 # devops packages
 task devops
+# link agent skills (see "agent skills" above)
+task agent-skills
 
 # link nvim configuration
 ln -s "$(pwd)/nvim" ~/.config/nvim

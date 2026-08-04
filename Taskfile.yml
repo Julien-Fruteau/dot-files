@@ -383,9 +383,42 @@ tasks:
 
   # =====================
 
+  agent-skills:
+    desc: "🤖 Link agent skills into ~/.agents/skills and ~/.claude/skills"
+    cmds:
+      - |
+        set -eu
+        echo "ℹ️ Linking agent skills"
+
+        # Symlinks, not copies: coding agents de-duplicate skills by resolved
+        # realpath, so the same skill linked into several agent directories is
+        # loaded once instead of reported as a name collision. Edits also go
+        # straight back to this repo.
+        SRC="{{.ROOT_DIR}}/agents/skills"
+        STAMP="$(date '+%Y%m%dT%HH%M')"
+
+        for target in "$HOME/.agents/skills" "$HOME/.claude/skills"; do
+          mkdir -p "$target"
+          for skill in "$SRC"/*/; do
+            name="$(basename "$skill")"
+            dest="$target/$name"
+            if [ -e "$dest" ] && [ ! -L "$dest" ]; then
+              mv "$dest" "$dest.$STAMP.bak"
+              echo "  📦 $name: existing copy saved as $name.$STAMP.bak"
+            fi
+            ln -sfn "$SRC/$name" "$dest"
+            echo "  🔗 $name -> $target"
+          done
+        done
+
+        echo "✅ Agent skills linked"
+
+  # =====================
+
   all:
-    desc: 🔱 Install all (user-all, devops, dev)
+    desc: 🔱 Install all (user-all, devops, dev, agent-skills)
     cmds:
       - task: user-all
       - task: devops
       - task: dev
+      - task: agent-skills

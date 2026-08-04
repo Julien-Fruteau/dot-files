@@ -1,0 +1,4 @@
+interface:
+  display_name: "BMad Dev Epic"
+  short_description: "Autonomously deliver every story in an epic"
+  default_prompt: "Use $bmad-dev-epic to implement every remaining story in epic 2."
