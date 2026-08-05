@@ -457,16 +457,9 @@ tasks:
       - sudo pacman -S --needed --noconfirm nvtop btop
       - |
         set -eu
-        mkdir -p \
-          "$HOME/AI/models/qwen" \
-          "$HOME/AI/models/gemma" \
-          "$HOME/AI/models/llama" \
-          "$HOME/AI/prompts" \
-          "$HOME/AI/scripts" \
-          "$HOME/AI/docker"
-        cp "{{.ROOT_DIR}}/ai/scripts/qwen.sh" "$HOME/AI/scripts/qwen.sh"
-        cp "{{.ROOT_DIR}}/ai/docker/compose.yaml" "$HOME/AI/docker/compose.yaml"
-        chmod +x "$HOME/AI/scripts/qwen.sh"
+        mkdir -p "$HOME/ai"
+        cp -r "{{.ROOT_DIR}}/ai/." "$HOME/ai/"
+        find "$HOME/ai" -type f -name '*.sh' -exec chmod +x {} +
       - echo "✅ Local AI tools and config installed"
 
   # =====================
