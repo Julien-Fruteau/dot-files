@@ -416,10 +416,12 @@ tasks:
   # =====================
 
   ai:
-    desc: "🤖 Install AI coding agents (Codex, Claude Code, Pi, and pi-llama)"
+    desc: "🤖 Install AI coding agents and their Herdr integrations"
     vars:
       SH_PACKAGES:
         ref: .CONFIG.ai.sh
+      HERDR_INTEGRATIONS:
+        ref: .CONFIG.ai.herdr_integrations
     cmds:
       - echo "ℹ️ Installing AI coding agents"
       - for:
@@ -436,6 +438,14 @@ tasks:
           echo "❌ pi-llama not found, installing..."
           pi install git:github.com/huggingface/pi-llama
         fi
+      - |
+        if ! command -v herdr >/dev/null 2>&1; then
+          echo "❌ Herdr not found; run 'task devops' before 'task ai'" >&2
+          exit 1
+        fi
+      - for:
+          var: HERDR_INTEGRATIONS
+        cmd: herdr integration install "{{.ITEM}}"
       - echo "✅ AI coding agents installed"
 
   ai-local:

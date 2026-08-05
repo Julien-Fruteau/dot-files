@@ -94,6 +94,10 @@ dev:
 
 # AI coding agents installed via their official shell installers
 ai:
+  herdr_integrations:
+    - claude
+    - codex
+    - pi
   sh:
     - cli: codex
       pkg: Codex
