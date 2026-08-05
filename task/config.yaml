@@ -94,6 +94,11 @@ dev:
 
 # AI coding agents installed via their official shell installers
 ai:
+  pi_packages:
+    - git:github.com/huggingface/pi-llama
+    - npm:pi-subagents
+    - npm:pi-cc-status
+    - npm:@pi-plugins/usage
   herdr_integrations:
     - claude
     - codex

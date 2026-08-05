@@ -420,6 +420,8 @@ tasks:
     vars:
       SH_PACKAGES:
         ref: .CONFIG.ai.sh
+      PI_PACKAGES:
+        ref: .CONFIG.ai.pi_packages
       HERDR_INTEGRATIONS:
         ref: .CONFIG.ai.herdr_integrations
     cmds:
@@ -431,13 +433,9 @@ tasks:
           CLI: "{{.ITEM.cli}}"
           PKG: "{{.ITEM.pkg}}"
           INSTALLER: "{{.ITEM.sh}}"
-      - |
-        if pi list 2>/dev/null | grep -Fq "github.com/huggingface/pi-llama"; then
-          echo "✅ pi-llama found"
-        else
-          echo "❌ pi-llama not found, installing..."
-          pi install git:github.com/huggingface/pi-llama
-        fi
+      - for:
+          var: PI_PACKAGES
+        cmd: pi install "{{.ITEM}}"
       - |
         if ! command -v herdr >/dev/null 2>&1; then
           echo "❌ Herdr not found; run 'task devops' before 'task ai'" >&2
