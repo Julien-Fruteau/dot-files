@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-MODEL=~/ai/models/qwen/Qwen2.5-Coder-3B-Instruct-Q4_K_M.gguf
+MODEL=~/ai-local/models/qwen/Qwen2.5-Coder-3B-Instruct-Q4_K_M.gguf
 
 if [ ! -f "$MODEL" ]; then
     echo "Model not found, downloading Qwen2.5-Coder-3B-Instruct..."

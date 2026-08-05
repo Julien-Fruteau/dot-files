@@ -457,9 +457,9 @@ tasks:
       - sudo pacman -S --needed --noconfirm nvtop btop
       - |
         set -eu
-        mkdir -p "$HOME/ai"
-        cp -r "{{.ROOT_DIR}}/ai/." "$HOME/ai/"
-        find "$HOME/ai" -type f -name '*.sh' -exec chmod +x {} +
+        mkdir -p "$HOME/ai-local"
+        cp -r "{{.ROOT_DIR}}/ai-local/." "$HOME/ai-local/"
+        find "$HOME/ai-local" -type f -name '*.sh' -exec chmod +x {} +
       - echo "✅ Local AI tools and config installed"
 
   # =====================
