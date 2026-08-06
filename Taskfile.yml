@@ -305,11 +305,34 @@ tasks:
 
   # =====================
 
+  githook:
+    desc: Configure default Git hooks for newly initialized repositories
+    cmds:
+      - |
+        set -eu
+        echo "ℹ️ Configuration des hooks Git par défaut"
+
+        TEMPLATE_DIR="$HOME/.config/git/template"
+        PRE_COMMIT="$TEMPLATE_DIR/hooks/pre-commit"
+
+        if [ ! -f "$PRE_COMMIT" ]; then
+          echo "❌ Hook introuvable : $PRE_COMMIT (exécutez d'abord 'task user-config')" >&2
+          exit 1
+        fi
+
+        chmod +x "$PRE_COMMIT"
+        git config --global init.templateDir "$TEMPLATE_DIR"
+
+        echo "✅ Hook pre-commit configuré pour les prochains git init et git clone"
+
+  # =====================
+
   user-all:
     desc: "🔥 Full terminal environment (user packages + user config)"
     cmds:
       - task: user-packages
       - task: user-config
+      - task: githook
 
   # =====================
 

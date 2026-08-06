@@ -81,6 +81,10 @@ task ai-local
 # link agent skills (see "agent skills" above)
 task agent-skills
 
+# configure the secret-detection pre-commit hook for future git init/git clone
+# (already included in task user-all)
+task user-config githook
+
 # link nvim configuration
 ln -s "$(pwd)/nvim" ~/.config/nvim
 ```

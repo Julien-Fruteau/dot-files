@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+# Refuse un commit contenant un secret évident.
+# Un dépôt de documentation finit toujours par recevoir un .env collé
+# « juste pour tester » — ce hook existe pour ce jour-là.
+#
+# Contournement ponctuel et assumé : git commit --no-verify
+
+set -uo pipefail
+
+staged="$(git diff --cached --name-only --diff-filter=ACM)"
+[ -z "$staged" ] && exit 0
+
+fail=0
+report() { printf '  ✗ %s\n     %s\n' "$1" "$2" >&2; fail=1; }
+
+# --- Fichiers interdits par leur nom ------------------------------------
+while IFS= read -r f; do
+  case "$(basename "$f")" in
+    .env|.env.*|*.pem|*.key|*.pfx|*.p12|id_rsa|id_ed25519|*.kubeconfig)
+      report "$f" "fichier de secret — à ne jamais versionner" ;;
+    nuget.config|*.npmrc|.npmrc)
+      report "$f" "peut contenir des identifiants de dépôt privé" ;;
+  esac
+done <<< "$staged"
+
+# --- Motifs dans le contenu ajouté --------------------------------------
+# Uniquement les lignes ajoutées, pour ne pas bloquer sur l'historique.
+added="$(git diff --cached --diff-filter=ACM -U0 | grep '^+' | grep -v '^+++' || true)"
+
+check() {
+  local pattern="$1" label="$2"
+  local hits
+  # -e est obligatoire : certains motifs commencent par '-' (clés PEM) et
+  # seraient sinon interprétés comme des options par grep.
+  hits="$(printf '%s' "$added" | grep -nEi -e "$pattern" | head -3 || true)"
+  [ -n "$hits" ] && report "$label" "$(printf '%s' "$hits" | head -1 | cut -c1-100)"
+}
+
+check '(ClearTextPassword|password|passwd|pwd)[[:space:]]*[=:>"][[:space:]]*[^[:space:]"<>{}$]{6,}' 'mot de passe en clair'
+check '(api[_-]?key|apikey|secret|token|bearer)[[:space:]]*[=:][[:space:]]*["'"'"']?[A-Za-z0-9_\-]{20,}' 'clé ou jeton'
+check '-----BEGIN [A-Z ]*PRIVATE KEY-----' 'clé privée'
+check '(AKIA|ASIA)[A-Z0-9]{16}' 'clé d'"'"'accès AWS'
+check 'gh[pousr]_[A-Za-z0-9]{36}' 'jeton GitHub'
+check 'glpat-[A-Za-z0-9_\-]{20}' 'jeton GitLab'
+# GUID uniquement s'il est qualifié par un mot-clé de credential sur la même
+# ligne. Un GUID nu est trop courant pour être un signal : identifiants de
+# session Claude Code, connexions de service Azure DevOps, migrations EF…
+# Le signaler systématiquement entraînerait au réflexe --no-verify, ce qui
+# vide le hook de son intérêt.
+check '(password|passwd|pwd|secret|token|credential|api[_-]?key)[^[:alnum:]]{0,20}[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}' 'GUID utilisé comme identifiant secret'
+
+if [ "$fail" -ne 0 ]; then
+  cat >&2 <<'EOF'
+
+Commit refusé : secret potentiel détecté.
+
+  · faux positif  →  git commit --no-verify
+  · vrai positif  →  retirez la valeur, puis recommittez
+
+EOF
+  exit 1
+fi
+
+exit 0
