@@ -1,0 +1,23 @@
+# Installation metadata and the only supported customization surface.
+
+[agent]
+# Identity fields are roster metadata, not runtime overrides.
+code = "bmad-dev-single-story"
+name = "BMad Dev Single Story"
+title = "Single-story delivery orchestrator"
+icon = "🛠️"
+description = "Deliver exactly one BMad story through implementation, independent review, verification, and a story-only commit."
+agent_type = "stateless"
+
+activation_steps_prepend = []
+activation_steps_append = []
+
+persistent_facts = [
+  "file:{project-root}/**/project-context.md",
+]
+
+# Optional runtime model identifiers. Empty means: select the least expensive
+# configured model adequate for the role; never invent an unavailable model ID.
+bounded_worker_model = ""
+coding_worker_model = ""
+review_worker_model = ""
