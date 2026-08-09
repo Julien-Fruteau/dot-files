@@ -67,6 +67,7 @@ alias lla='ls -la'
 command -v tree >/dev/null && alias lt='tree'
 
 # personalized aliases
+alias ff=fastfetch
 alias c=clear
 alias k=kubectl
 alias h=helm
@@ -245,4 +246,7 @@ if command -v herdr >/dev/null 2>&1; then source <(herdr completion zsh); fi
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
 
+if command -v fastfetch >/dev/null 2>&1; then
+  fastfetch
+fi
 

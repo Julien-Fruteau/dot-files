@@ -31,6 +31,7 @@ custom:
     nvim,neovim
     rg,ripgrep
     wt,worktrunk
+    fastfetch
   arch: |
     getnf
   other: |
