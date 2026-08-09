@@ -101,6 +101,7 @@ ai:
     - npm:pi-cc-status
     - npm:@pi-plugins/usage
     - npm:@gotgenes/pi-anthropic-auth
+    - npm:pi-clear
   herdr_integrations:
     - claude
     - codex
