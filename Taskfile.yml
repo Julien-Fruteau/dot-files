@@ -478,14 +478,33 @@ tasks:
       - echo "✅ AI coding agents installed"
 
   ai-local:
-    desc: "🫥 Manually install local AI tools and config (Arch only; not included in all)"
+    desc: "🫥 Manually install local AI tools and config (Arch/Fedora; not included in all)"
     preconditions:
-      - sh: '[ "{{.OS_TYPE}}" = "arch" ]'
-        msg: "ai-local is only supported on Arch Linux"
+      - sh: '[ "{{.OS_TYPE}}" = "arch" ] || [ "{{.OS_TYPE}}" = "fedora" ]'
+        msg: "ai-local is only supported on Arch Linux or Fedora"
     cmds:
       - echo "ℹ️ Installing local AI tools"
-      - sudo pacman -S --needed --noconfirm llama-cpp python-huggingface-hub jq
-      - sudo pacman -S --needed --noconfirm nvtop btop
+      - |
+        set -eu
+        case "{{.OS_TYPE}}" in
+          arch)
+            sudo pacman -S --needed --noconfirm llama-cpp python-huggingface-hub jq nvtop btop
+            ;;
+          fedora)
+            sudo dnf install -y jq nvtop btop python3-pip
+            pip install --user --upgrade huggingface-hub
+            if ! command -v llama-cli >/dev/null 2>&1; then
+              echo "ℹ️ llama-cli not found; installing llama.cpp via pip (llama-cpp-python is not enough for llama-cli, building from source is recommended)"
+              sudo dnf install -y cmake gcc-c++ git
+              tmpdir="$(mktemp -d)"
+              git clone --depth 1 https://github.com/ggml-org/llama.cpp "$tmpdir/llama.cpp"
+              cmake -S "$tmpdir/llama.cpp" -B "$tmpdir/llama.cpp/build" -DCMAKE_BUILD_TYPE=Release
+              cmake --build "$tmpdir/llama.cpp/build" --config Release -j"$(nproc)"
+              sudo install -m 755 "$tmpdir/llama.cpp/build/bin/llama-cli" /usr/local/bin/llama-cli
+              rm -rf "$tmpdir"
+            fi
+            ;;
+        esac
       - |
         set -eu
         mkdir -p "$HOME/ai-local"
