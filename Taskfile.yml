@@ -467,6 +467,14 @@ tasks:
       - for:
           var: HERDR_INTEGRATIONS
         cmd: herdr integration install "{{.ITEM}}"
+      - |
+        if command -v claude >/dev/null 2>&1; then
+          echo "ℹ️ Configuring Claude Code statusline (ccstatusline)"
+          npx -y ccstatusline@latest
+          echo "✅ ccstatusline configured"
+        else
+          echo "⏭️  claude not found, skipping ccstatusline"
+        fi
       - echo "✅ AI coding agents installed"
 
   ai-local:
