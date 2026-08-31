@@ -1,4 +1,0 @@
-interface:
-  display_name: "BMad Dev Single Story"
-  short_description: "Deliver one BMad story end to end"
-  default_prompt: "Use $bmad-dev-single-story to autonomously deliver the current BMad story."

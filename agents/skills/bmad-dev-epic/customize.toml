@@ -2,11 +2,11 @@
 
 [agent]
 # Identity fields are roster metadata, not runtime overrides.
-code = "bmad-dev-single-story"
-name = "BMad Dev Single Story"
-title = "Single-story delivery orchestrator"
+code = "bmad-dev-epic"
+name = "BMad Dev Epic"
+title = "Epic delivery orchestrator"
 icon = "🛠️"
-description = "Deliver exactly one BMad story through implementation, independent review, verification, and a story-only commit."
+description = "Deliver every story of a BMad spec folder through bmad-build, with a verification gate and one attributed commit per story."
 agent_type = "stateless"
 
 activation_steps_prepend = []
@@ -18,6 +18,5 @@ persistent_facts = [
 
 # Optional runtime model identifiers. Empty means: select the least expensive
 # configured model adequate for the role; never invent an unavailable model ID.
-bounded_worker_model = ""
 coding_worker_model = ""
 review_worker_model = ""

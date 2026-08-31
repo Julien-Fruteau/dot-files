@@ -1,4 +1,4 @@
 interface:
   display_name: "BMad Dev Epic"
-  short_description: "Autonomously deliver every story in an epic"
-  default_prompt: "Use $bmad-dev-epic to implement every remaining story in epic 2."
+  short_description: "Deliver every story of a BMad spec folder"
+  default_prompt: "Use $bmad-dev-epic to autonomously deliver the remaining stories of this BMad spec folder."

@@ -1,8 +1,14 @@
 #!/usr/bin/env python3
 # /// script
-# requires-python = ">=3.10"
+# requires-python = ">=3.11"
+# dependencies = ["pyyaml"]
 # ///
-"""Validate deterministic BMad story completion and emit a compact Git manifest."""
+"""Validate deterministic BMad story completion and emit a compact Git manifest.
+
+Adapted to the spec-folder route: the story's own frontmatter is the single
+status source (no sprint-status.yaml), and the architecture view is expected to
+link back to the spec folder's SPEC.md rather than a global architecture file.
+"""
 
 from __future__ import annotations
 
@@ -14,7 +20,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from story_state import parse_development_status, path_fingerprint
+from epic_state import load_stories, path_fingerprint
 
 
 def git(project_root: Path, *args: str) -> list[str]:
@@ -44,34 +50,31 @@ def implementation_task_lines(text: str) -> list[tuple[int, str]]:
     """Return implementation tasks, excluding nested AI review-follow-up sections."""
     lines = text.splitlines()
     start = next(
-        (index for index, line in enumerate(lines) if re.match(r"^##\s+Tasks(?:\s*/\s*Subtasks|\s+and\s+Subtasks)?\s*$", line, re.IGNORECASE)),
+        (
+            index
+            for index, line in enumerate(lines)
+            if re.match(r"^##\s+Tasks(?:\s*(?:&|/|and)\s*(?:Subtasks|Acceptance))?\s*$", line, re.IGNORECASE)
+        ),
         None,
     )
     if start is None:
         return []
-    result: list[tuple[int, str]] = []
-    skipping_review = False
-    for index in range(start + 1, len(lines)):
-        line = lines[index]
-        heading = re.match(r"^(#{2,6})\s+(.+?)\s*$", line)
-        if heading:
-            level, title = len(heading.group(1)), heading.group(2)
-            if level == 2:
-                break
-            if level <= 3:
-                skipping_review = bool(
-                    re.match(r"^(?:Review Follow-ups|Senior Developer Review)(?:\s*\(AI\))?", title, re.IGNORECASE)
-                )
-        if not skipping_review:
-            result.append((index + 1, line))
-    return result
+    collected: list[tuple[int, str]] = []
+    for offset, line in enumerate(lines[start + 1 :], start=start + 2):
+        if re.match(r"^##\s+", line):
+            break
+        if re.match(r"^###\s+.*(review|follow-?up)", line, re.IGNORECASE):
+            break
+        collected.append((offset, line))
+    return collected
 
 
 def validate(args: argparse.Namespace) -> dict[str, Any]:
     root = args.project_root.resolve()
     story_file = (args.story_file if args.story_file.is_absolute() else root / args.story_file).resolve()
-    sprint_file = (args.sprint_status if args.sprint_status.is_absolute() else root / args.sprint_status).resolve()
-    architecture_file = root / "docs" / "story-flows" / f"{args.story_key}.md"
+    spec_folder = (args.spec_folder if args.spec_folder.is_absolute() else root / args.spec_folder).resolve()
+    spec_file = spec_folder / "SPEC.md"
+    architecture_file = root / "docs" / "story-flows" / f"{story_file.stem}.md"
     failures: list[str] = []
 
     if not story_file.is_file():
@@ -79,18 +82,20 @@ def validate(args: argparse.Namespace) -> dict[str, Any]:
         story_text = ""
     else:
         story_text = story_file.read_text(encoding="utf-8")
-    if not sprint_file.is_file():
-        failures.append(f"missing sprint status: {sprint_file}")
-        sprint = {}
+
+    if not spec_file.is_file():
+        failures.append(f"missing spec kernel: {spec_file}")
     else:
-        sprint = parse_development_status(sprint_file)
+        try:
+            known = {entry["id"] for entry in load_stories(spec_folder)}
+            if args.story_id not in known:
+                failures.append(f"story id {args.story_id!r} is absent from stories.yaml")
+        except (OSError, ValueError) as exc:
+            failures.append(f"stories.yaml unusable: {exc}")
 
     actual_story_status = story_status(story_text)
-    sprint_story_status = sprint.get(args.story_key)
     if actual_story_status != args.expected_status:
         failures.append(f"story status is {actual_story_status!r}, expected {args.expected_status!r}")
-    if sprint_story_status != args.expected_status:
-        failures.append(f"sprint status is {sprint_story_status!r}, expected {args.expected_status!r}")
 
     unchecked = [
         {"line": number, "text": line.strip()}
@@ -100,18 +105,18 @@ def validate(args: argparse.Namespace) -> dict[str, Any]:
     if unchecked:
         failures.append(f"{len(unchecked)} unchecked story task(s)")
 
+    relative_architecture = architecture_file.relative_to(root).as_posix()
+    relative_spec = spec_file.relative_to(root).as_posix()
     architecture_checks = {
         "exists": architecture_file.is_file(),
         "has_mermaid": False,
-        "links_global_architecture": False,
-        "listed_in_story": False,
+        "links_spec": False,
+        "listed_in_story": relative_architecture in story_text,
     }
     if architecture_file.is_file():
         architecture_text = architecture_file.read_text(encoding="utf-8")
         architecture_checks["has_mermaid"] = bool(re.search(r"```mermaid\s", architecture_text, re.IGNORECASE))
-        architecture_checks["links_global_architecture"] = "_bmad-output/planning-artifacts/architecture.md" in architecture_text
-    relative_architecture = architecture_file.relative_to(root).as_posix()
-    architecture_checks["listed_in_story"] = relative_architecture in story_text
+        architecture_checks["links_spec"] = relative_spec in architecture_text or spec_folder.name in architecture_text
     for name, passed in architecture_checks.items():
         if not passed:
             failures.append(f"architecture check failed: {name}")
@@ -140,11 +145,7 @@ def validate(args: argparse.Namespace) -> dict[str, Any]:
     if mutated_preexisting:
         failures.append("preexisting dirty paths changed after activation")
 
-    required_paths = {
-        story_file.relative_to(root).as_posix(),
-        sprint_file.relative_to(root).as_posix(),
-        relative_architecture,
-    }
+    required_paths = {story_file.relative_to(root).as_posix(), relative_architecture}
     required_conflicts = sorted(required_paths.intersection(preexisting))
     if required_conflicts:
         failures.append("required story artifacts overlap preexisting dirty paths")
@@ -154,10 +155,11 @@ def validate(args: argparse.Namespace) -> dict[str, Any]:
 
     return {
         "valid": not failures,
-        "story_key": args.story_key,
+        "story_id": args.story_id,
+        "story_file": story_file.relative_to(root).as_posix(),
+        "spec_folder": spec_folder.relative_to(root).as_posix(),
         "expected_status": args.expected_status,
         "story_status": actual_story_status,
-        "sprint_status": sprint_story_status,
         "unchecked_tasks": unchecked,
         "architecture": {"path": relative_architecture, **architecture_checks},
         "git": {
@@ -189,9 +191,9 @@ def emit(payload: dict[str, Any], output: Path | None) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("project_root", type=Path, help="Git/BMad project root")
-    parser.add_argument("--story-key", required=True)
+    parser.add_argument("--story-id", required=True, help="story id as it appears in stories.yaml")
     parser.add_argument("--story-file", type=Path, required=True)
-    parser.add_argument("--sprint-status", type=Path, required=True)
+    parser.add_argument("--spec-folder", type=Path, required=True)
     parser.add_argument("--baseline", required=True, help="implementation baseline commit")
     parser.add_argument("--expected-status", default="done")
     parser.add_argument(
