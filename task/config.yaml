@@ -32,6 +32,7 @@ custom:
     rg,ripgrep
     wt,worktrunk
     fastfetch
+    gitleaks
   arch: |
     getnf
   other: |
