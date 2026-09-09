@@ -12,6 +12,7 @@ system:
     zip
     unzip
     kitty
+    pass
   arch: |
     mise
   other: |
