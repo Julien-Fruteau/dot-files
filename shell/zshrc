@@ -252,6 +252,6 @@ function gh_token() {
 }
 
 function glab_token() {
-  export GITLAB_TOKEN=$(pass glab/token)
+  export GITLAB_TOKEN=$(pass gitlab/token)
 }
 
