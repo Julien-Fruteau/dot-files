@@ -34,6 +34,8 @@ custom:
     wt,worktrunk
     fastfetch
     gitleaks
+    gh,github-cli
+    glab
   arch: |
     getnf
   other: |
