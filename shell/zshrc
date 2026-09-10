@@ -202,7 +202,7 @@ if grep -qi microsoft /proc/version 2>/dev/null; then
 fi
 # ======= END WSL
 
-export KUBECONFIG=$HOME/.kube/config
+export KUBECONFIG="$HOME/.kube/config:$HOME/.kube/enercal/config"
 export KUBE_EDITOR="nvim"
 
 command -v fzf >/dev/null && source <(fzf --zsh)
@@ -242,11 +242,16 @@ if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)
 
 if command -v herdr >/dev/null 2>&1; then source <(herdr completion zsh); fi
 
-#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
-export SDKMAN_DIR="$HOME/.sdkman"
-[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
-
 if command -v fastfetch >/dev/null 2>&1; then
   fastfetch
 fi
+
+function gh_token() {
+  export GITHUB_TOKEN=$(pass github/token)
+  export NPM_AUTH_TOKEN=$GITHUB_TOKEN
+}
+
+function glab_token() {
+  export GITLAB_TOKEN=$(pass glab/token)
+}
 
