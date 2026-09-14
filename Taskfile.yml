@@ -220,13 +220,6 @@ tasks:
       fi
       echo "✅ User shell set"
 
-  setup-fish-shell:
-    cmds:
-      - echo "ℹ️ Setting fish shell conf"
-      - fish -c 'if not functions -q fisher; curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher; else echo "✅ fisher already installed"; end'
-      - fish -c 'if fisher list | string match -q "*IlanCosman/tide*"; echo "✅ tide already installed"; else fisher install IlanCosman/tide@v6; end'
-      - echo "✅ Fish shell conf set"
-
   install-nerd-fonts:
     cmd: |
       echo "ℹ️ Installing nerd fonts..."
@@ -268,7 +261,6 @@ tasks:
       - if: '[ {{.USE_SYSTEMD}} == "true" ]'
         task: install-systemd-packages
       - task: set-shell
-      - task: setup-fish-shell
       - task: install-nerd-fonts
       - task: setup-user-for-docker
       - echo "✅ System and terminal requirements installed"
@@ -284,9 +276,6 @@ tasks:
 
         mv "$HOME/.zshrc" "$HOME/.zshrc.$(date '+%Y%m%dT%HH%M').bak" || true
         mkdir -p "$HOME/.config"
-
-        mkdir -p "$HOME/.config/fish"
-        mv "$HOME/.config/fish/config.fish" "$HOME/.config/fish/config.fish.$(date '+%Y%m%dT%HH%M').bak" || true
 
         cp -r config/* "$HOME/.config"
         cp shell/zshrc "$HOME/.zshrc"

@@ -10,7 +10,7 @@ dotfiles and packages (system, devops, dev) for following distro :
 
 ## shell and terminal
 
-- supports zsh and fish
+- supports zsh
 - terminal: kitty
 
 ### install task

@@ -6,15 +6,15 @@
 system:
   common: |
     zsh
-    fish
     curl
     git
     zip
     unzip
     kitty
     pass
-  arch: |
     mise
+    usage
+  arch: |
   other: |
 
 # installed with custom package manager (paru, brew)
@@ -27,7 +27,6 @@ custom:
     lazygit
     lazyjournal
     lazyssh
-    direnv
     fd
     nvim,neovim
     rg,ripgrep
