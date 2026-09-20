@@ -12,6 +12,7 @@ system:
     unzip
     kitty
     pass
+    gpgconf,gnupg
     mise
     usage
   arch: |

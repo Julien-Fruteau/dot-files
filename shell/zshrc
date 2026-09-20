@@ -253,3 +253,15 @@ function glab_token() {
   export GITLAB_TOKEN=$(pass gitlab/token)
 }
 
+# Enable SSH support in gpg-agent
+if command -v gpgconf >/dev/null 2>&1; then
+  export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
+fi
+
+function gh_ssh() {
+  ssh-add <(pass show ssh/github)
+}
+
+function glab_ssh() {
+  ssh-add <(pass show ssh/gitlab)
+}
