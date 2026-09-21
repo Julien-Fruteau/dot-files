@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+TYPE="${1:?Usage: kube-pass <pem|token> <pass-entry>}"
+ENTRY="${2:?Missing pass entry}"
+
+case "$TYPE" in
+    pem)
+        pass show "$ENTRY" |
+            jq -Rs '{
+                apiVersion: "client.authentication.k8s.io/v1",
+                kind: "ExecCredential",
+                status: {
+                    clientCertificateData: .,
+                    clientKeyData: .
+                }
+            }'
+        ;;
+
+    token)
+        pass show "$ENTRY" |
+            jq -Rs '{
+                apiVersion: "client.authentication.k8s.io/v1",
+                kind: "ExecCredential",
+                status: {
+                    token: rtrimstr("\n")
+                }
+            }'
+        ;;
+
+    *)
+        echo "Unsupported credential type: $TYPE" >&2
+        exit 1
+        ;;
+esac

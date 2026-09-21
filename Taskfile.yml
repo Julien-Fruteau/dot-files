@@ -314,6 +314,10 @@ tasks:
         cp shell/zshrc "$HOME/.zshrc"
 
         cp -r dotfiles/.* "$HOME/"
+
+        mkdir -p "$HOME/.local/bin"
+        install -m 700 "{{.ROOT_DIR}}/scripts/kube-pass" "$HOME/.local/bin/kube-pass"
+
         if [ -d /run/systemd/system ]; then
           sudo mkdir -p /etc/keyd
           sudo cp etc/keyd/default.conf /etc/keyd/default.conf
