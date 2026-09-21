@@ -259,9 +259,14 @@ if command -v gpgconf >/dev/null 2>&1; then
 fi
 
 function gh_ssh() {
-  ssh-add <(pass show ssh/github)
+  ssh-add <(pass ssh/github)
 }
 
 function glab_ssh() {
-  ssh-add <(pass show ssh/gitlab)
+  ssh-add <(pass ssh/gitlab)
 }
+
+function az_ssh() {
+  ssh-add <(pass ssh/ec)
+}
+
