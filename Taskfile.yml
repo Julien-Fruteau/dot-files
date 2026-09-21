@@ -279,21 +279,16 @@ tasks:
 
         GNUPG_DIR="$HOME/.gnupg"
         AGENT_CONFIG="$GNUPG_DIR/gpg-agent.conf"
-        config_changed=false
+        SOURCE_CONFIG="{{.ROOT_DIR}}/gnupg/gpg-agent.conf"
 
         mkdir -p "$GNUPG_DIR"
         chmod 700 "$GNUPG_DIR"
-        touch "$AGENT_CONFIG"
-        chmod 600 "$AGENT_CONFIG"
 
-        if ! grep -qxF "enable-ssh-support" "$AGENT_CONFIG"; then
-          printf '%s\n' "enable-ssh-support" >> "$AGENT_CONFIG"
-          config_changed=true
-        fi
-
-        if [ "$config_changed" = true ]; then
+        if ! cmp -s "$SOURCE_CONFIG" "$AGENT_CONFIG"; then
+          install -m 600 "$SOURCE_CONFIG" "$AGENT_CONFIG"
           gpgconf --kill gpg-agent
         fi
+        chmod 600 "$AGENT_CONFIG"
         gpgconf --launch gpg-agent
 
         echo "✅ GPG agent SSH support configured"

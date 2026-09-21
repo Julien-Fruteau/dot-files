@@ -258,6 +258,17 @@ if command -v gpgconf >/dev/null 2>&1; then
   export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
 fi
 
+function gpg_clear_cache() {
+  if ! command -v gpgconf >/dev/null 2>&1; then
+    echo "gpgconf not found; install GnuPG first" >&2
+    return 1
+  fi
+
+  gpgconf --kill gpg-agent &&
+    gpgconf --launch gpg-agent &&
+    echo "GPG agent cache cleared"
+}
+
 function gh_ssh() {
   ssh-add <(pass ssh/github)
 }
@@ -269,4 +280,3 @@ function glab_ssh() {
 function az_ssh() {
   ssh-add <(pass ssh/ec)
 }
-
