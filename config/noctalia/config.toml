@@ -1,0 +1,204 @@
+# Migrated from Noctalia Shell v4 settings.json.
+# v4-only settings are intentionally not copied here.
+
+[theme]
+mode = "dark"
+shell_mode = "follow"
+source = "builtin"
+builtin = "Nord"
+pure_black_dark = false
+
+[bar]
+order = ["default"]
+
+[bar.default]
+enabled = true
+position = "top"
+background_opacity = 0.93
+font_scale = 1.0
+margin_edge = 0
+margin_ends = 0
+margin_opposite_edge = 0
+radius = 12
+padding = 2
+widget_spacing = 6
+show_on_workspace_switch = true
+capsule = false
+reserve_space = true
+layer = "overlay"
+start = ["launcher", "clock", "sysmon", "active_window", "media"]
+center = ["workspaces"]
+end = ["tray", "notifications", "battery", "volume", "brightness", "control-center"]
+
+[widget.clock]
+type = "clock"
+format = "{:%H:%M %a, %b %d}"
+
+[widget.active_window]
+type = "active_window"
+max_length = 145
+title_scroll = "none"
+icon_size = 14
+
+[widget.media]
+type = "media"
+max_length = 145
+art_size = 16
+
+[widget.sysmon]
+type = "sysmon"
+stat = "cpu_usage"
+
+[widget.workspaces]
+type = "workspaces"
+
+[dock]
+enabled = true
+position = "bottom"
+auto_hide = true
+reserve_space = false
+layer = "overlay"
+margin_edge = 0
+margin_ends = 0
+background_opacity = 1.0
+active_monitor_only = true
+show_dots = false
+launcher_position = "none"
+pinned = []
+
+[shell]
+font_family = "Sans Serif"
+time_format = "{:%H:%M}"
+telemetry_enabled = false
+niri_overview_type_to_launch_enabled = false
+show_location = true
+
+[shell.launcher]
+categories = true
+show_icons = true
+sort_by_usage = true
+pinned = []
+provider_prefix = "/"
+auto_paste = "off"
+
+[shell.panel]
+launcher_placement = "floating"
+launcher_position = "center"
+control_center_placement = "attached"
+session_placement = "attached"
+transparency_mode = "solid"
+
+[shell.screenshot]
+save_to_file = true
+copy_to_clipboard = true
+annotate = false
+
+[shell.animation]
+enabled = true
+speed = 1.0
+
+[shell.shadow]
+direction = "down_right"
+
+[lockscreen]
+enabled = true
+lock_before_suspend = true
+fingerprint = true
+
+[lockscreen_widgets]
+enabled = false
+
+[control_center]
+show_session_button = true
+show_shortcut_labels = true
+
+[control_center.calendar]
+show_events_card = true
+show_week_numbers = false
+
+[[control_center.shortcuts]]
+type = "wifi"
+
+[[control_center.shortcuts]]
+type = "bluetooth"
+
+[[control_center.shortcuts]]
+type = "notification"
+
+[[control_center.shortcuts]]
+type = "power_profile"
+
+[[control_center.shortcuts]]
+type = "nightlight"
+
+[location]
+address = "Noumea"
+auto_locate = false
+
+[weather]
+enabled = true
+effects = true
+unit = "metric"
+
+[wallpaper]
+enabled = true
+directory = "/home/julien/SynologyDrive/Documents/Wallpaper/Minimalist"
+fill_mode = "crop"
+transition_duration = 1500
+transition_on_startup = false
+
+[wallpaper.automation]
+enabled = false
+interval_seconds = 300
+order = "random"
+recursive = false
+
+[brightness]
+enable_ddcutil = false
+minimum_brightness = 0.0
+sync_all_monitors = false
+
+[nightlight]
+enabled = true
+force = true
+temperature_day = 6500
+temperature_night = 5069
+
+[notification]
+enable_daemon = true
+background_opacity = 1.0
+position = "top_right"
+layer = "overlay"
+keep_dismissed_in_history = true
+
+[osd]
+enabled = true
+position = "top_right"
+
+[desktop_widgets]
+enabled = false
+
+[audio]
+enable_overdrive = false
+enable_sounds = false
+sound_volume = 0.5
+
+[idle.behavior.lock]
+enabled = false
+timeout = 660
+
+[idle.behavior.screen-off]
+enabled = false
+timeout = 600
+
+[idle.behavior.lock-and-suspend]
+enabled = false
+timeout = 1800
+
+[system.monitor]
+enabled = true
+cpu_usage_critical_threshold = 90.0
+ram_pct_critical_threshold = 90.0
+swap_pct_critical_threshold = 90.0
+disk_used_pct_critical_threshold = 90.0
+gpu_usage_critical_threshold = 90.0
