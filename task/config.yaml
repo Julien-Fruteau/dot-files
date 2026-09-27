@@ -26,8 +26,6 @@ custom:
     docker-compose
     lazydocker
     lazygit
-    lazyjournal
-    lazyssh
     fd
     nvim,neovim
     rg,ripgrep
@@ -48,7 +46,7 @@ custom:
 files:
   common: []
   arch:
-    - pkg: zsh-theme-powerlevel10k-git
+    - pkg: zsh-theme-powerlevel10k
       file: "$HOME/.p10k.zsh"
     - pkg: zsh-history-substring-search
       file: /usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
@@ -80,7 +78,6 @@ devops:
     k9s
     helm
     stern
-    minio
   sh:
     - cli: herdr
       sh: curl -fsSL https://herdr.dev/install.sh | sh

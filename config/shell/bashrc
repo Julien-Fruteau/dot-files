@@ -1,0 +1,190 @@
+# Bash configuration managed by dot-files.
+
+export LC_ALL="${LC_ALL:-en_US.UTF-8}"
+
+# Omarchy configures history in its default Bash shell configuration.
+shopt -s autocd checkwinsize
+
+# Keep Omarchy's EDITOR and SUDO_EDITOR settings.
+
+if [ -x /usr/bin/dircolors ]; then
+    if [ -r "$HOME/.dircolors" ]; then
+        eval "$(dircolors -b "$HOME/.dircolors")"
+    else
+        eval "$(dircolors -b)"
+    fi
+    # Keep Omarchy's ls/eza configuration.
+    # alias ls='ls --color=auto'
+    alias dir='dir --color=auto'
+    alias vdir='vdir --color=auto'
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+fi
+
+# Keep Omarchy's eza aliases.
+# alias ll='ls -alF'
+# alias la='ls -A'
+# alias l='ls -CF'
+# alias lla='ls -la'
+
+alias fsf=fastfetch
+alias k=kubectl
+alias s=stern
+alias g=git
+alias v=nvim
+alias lg=lazygit
+alias dif='diff --color=always -y'
+alias less='less -R'
+alias dkr=docker
+alias ld=lazydocker
+alias yq='yq -C'
+alias jq='jq -C'
+alias uidgen='cat /proc/sys/kernel/random/uuid'
+command -v go-task >/dev/null 2>&1 && alias task='go-task'
+
+kx() {
+    if [ -n "${1:-}" ]; then
+        kubectl config use-context "$1"
+    else
+        kubectl config current-context
+    fi
+}
+
+kn() {
+    if [ -n "${1:-}" ]; then
+        kubectl config set-context --current --namespace "$1"
+    else
+        kubectl config view --minify | grep namespace | cut -d' ' -f6
+    fi
+}
+
+kd() { kubectl config unset current-context; }
+sct() {
+    local length="${1:-13}"
+    head /dev/urandom | tr -dc A-Za-z0-9 | head -c "$length"
+    printf '\n'
+}
+
+yless() { yq . -C | less -R; }
+alias lessy=yless
+jless() { jq . -C | less -R; }
+alias lessj=jless
+
+_ksec_list() { kubectl --context "$1" -n "$2" get secrets; }
+ksec() {
+    local secret='' context='' namespace='' field='' output
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            -c|--context) context=$2; shift 2 ;;
+            -n|--namespace) namespace=$2; shift 2 ;;
+            -f|--field) field=$2; shift 2 ;;
+            *) secret=$1; shift ;;
+        esac
+    done
+
+    [[ -n "$context" ]] || context=$(kubectl config current-context)
+    [[ -n "$namespace" ]] || namespace=$(kubectl config view -o "jsonpath={.contexts[?(@.name==\"$context\")].context.namespace}")
+    if [[ -z "$secret" ]]; then
+        echo 'Usage: ksec [-c context] [-n namespace] <secret-name> [-f field>'
+        echo 'Available secrets:'
+        _ksec_list "$context" "$namespace" | less
+        return 1
+    fi
+
+    local -a cmd=(kubectl "--context=$context" -n "$namespace" get secret "$secret" -o json)
+    if ! output=$("${cmd[@]}" 2>&1); then
+        echo "Error: secret '$secret' not found in context '$context' / namespace '$namespace'"
+        kubectl "--context=$context" -n "$namespace" get secrets --no-headers -o custom-columns='NAME:.metadata.name' | less
+        return 1
+    fi
+    if [[ -n "$field" ]]; then
+        printf '%s' "$output" | jq -r ".data[\"$field\"]" | base64 -d | tee >(wl-copy --trim-newline)
+    else
+        printf '%s' "$output" | jq -Mr '.data | map_values(@base64d)' | tee >(wl-copy --trim-newline)
+    fi
+}
+
+# Keep PATH entries unique when this file is sourced repeatedly.
+path_prepend() {
+    case ":$PATH:" in *":$1:"*) ;; *) PATH="$1:$PATH" ;; esac
+}
+path_append() {
+    case ":$PATH:" in *":$1:"*) ;; *) PATH="$PATH:$1" ;; esac
+}
+export PATH
+path_prepend "$HOME/.local/bin"
+path_append "$HOME/go/bin"
+path_append /opt/ApacheDirectoryStudio
+path_prepend /usr/local/go/bin
+path_prepend "$HOME/.local/share/applications"
+path_prepend "${KREW_ROOT:-$HOME/.krew}/bin"
+path_append "$HOME/minio-binaries"
+if [ -d /home/linuxbrew/.linuxbrew ]; then
+    path_prepend /home/linuxbrew/.linuxbrew/opt/rustup/bin
+    path_prepend /home/linuxbrew/.linuxbrew/bin
+fi
+export PATH
+
+export KUBECONFIG="$HOME/.kube/config:$HOME/.kube/enercal/config"
+export KUBE_EDITOR=nvim
+
+if command -v fzf >/dev/null 2>&1; then
+    eval "$(fzf --bash 2>/dev/null || true)"
+fi
+
+if command -v mise >/dev/null 2>&1; then
+    eval "$(mise activate bash)"
+fi
+[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
+
+# DevOps completions.
+if [ -r /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+elif [ -r /etc/bash_completion ]; then
+    . /etc/bash_completion
+fi
+command -v kubectl >/dev/null 2>&1 && source <(kubectl completion bash)
+command -v helm >/dev/null 2>&1 && source <(helm completion bash)
+command -v stern >/dev/null 2>&1 && source <(stern --completion=bash)
+command -v mc >/dev/null 2>&1 && complete -o nospace -C "$(command -v mc)" mc
+command -v niri >/dev/null 2>&1 && source <(niri completions bash)
+command -v wt >/dev/null 2>&1 && eval "$(command wt config shell init bash)"
+command -v herdr >/dev/null 2>&1 && source <(herdr completion bash)
+
+if grep -qi microsoft /proc/version 2>/dev/null; then
+    export MESA_D3D12_DEFAULT_ADAPTER_NAME=AMD
+    alias cl=clip.exe
+    alias clip=clip.exe
+    alias pc='pwd | clip.exe'
+    alias dateUpdateWsl='sudo ntpdate time.windows.com'
+    keep_current_path() { printf '\e]9;9;%s\e\\' "$(wslpath -w "$PWD")"; }
+    PROMPT_COMMAND="keep_current_path${PROMPT_COMMAND:+; $PROMPT_COMMAND}"
+fi
+
+gh_token() {
+    export GITHUB_TOKEN="$(pass github/token)"
+    export NPM_AUTH_TOKEN="$GITHUB_TOKEN"
+}
+glab_token() { export GITLAB_TOKEN="$(pass gitlab/token)"; }
+
+if command -v gpgconf >/dev/null 2>&1; then
+    export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
+fi
+
+gpg_clear_cache() {
+    if ! command -v gpgconf >/dev/null 2>&1; then
+        echo "gpgconf not found; install GnuPG first" >&2
+        return 1
+    fi
+
+    gpgconf --kill gpg-agent &&
+        gpgconf --launch gpg-agent &&
+        echo "GPG agent cache cleared"
+}
+
+gh_ssh() { ssh-add <(pass ssh/github); }
+glab_ssh() { ssh-add <(pass ssh/gitlab); }
+az_ssh() { ssh-add <(pass ssh/ec); }
+
+command -v fastfetch >/dev/null 2>&1 && fastfetch

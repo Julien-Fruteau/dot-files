@@ -1,13 +1,16 @@
 version: "3"
 silent: true
 
+env:
+  LOGIN_SHELL: bash
+
 vars:
-  LOGIN_SHELL: zsh
   OS_TYPE:
     sh: |
       . /etc/os-release
       case "$ID" in
         arch|cachyos)  echo "arch" ;;
+        omarchy)       echo "omarchy" ;;
         ubuntu|debian) echo "debian" ;;
         fedora)        echo "fedora" ;;
         *)             echo "Unsupported OS" && exit 1 ;;
@@ -16,6 +19,7 @@ vars:
     sh: |
       case "{{.OS_TYPE}}" in
         arch)   echo "sudo pacman -Sy --noconfirm" ;;
+        omarchy)   echo "sudo pacman -Sy --noconfirm" ;;
         fedora) echo "sudo dnf install -y" ;;
         debian) echo "sudo apt install -y" ;;
       esac
@@ -23,12 +27,14 @@ vars:
     sh: |
       case "{{.OS_TYPE}}" in
         arch) echo "paru -S --noconfirm" ;;
+        omarchy) echo "omarchy pkg add" ;;
         *)    echo "brew install" ;;
       esac
   OS_CONFIG_SELECTOR:
     sh: |
       case "{{.OS_TYPE}}" in
         arch) echo "arch" ;;
+        omarchy) echo "arch" ;;
         *)    echo "other" ;;
       esac
   USE_SYSTEMD:
@@ -96,7 +102,9 @@ tasks:
         exit 0
       fi
       echo "❌ custom package manager non trouvé, installation..."
-      if [ "{{.OS_TYPE}}" = "arch" ]; then 
+      if [ "{{.OS_TYPE}}" = "omarchy" ]; then 
+        echo "omarchy is doing fine"
+      elif [ "{{.OS_TYPE}}" = "arch" ]; then 
         sudo pacman -Sy --needed --noconfirm base-devel git
         cd /tmp
         git clone https://aur.archlinux.org/paru.git
@@ -302,11 +310,21 @@ tasks:
         set -eu
         echo "ℹ️ Installation des fichiers de configuration"
 
-        mv "$HOME/.zshrc" "$HOME/.zshrc.$(date '+%Y%m%dT%HH%M').bak" || true
         mkdir -p "$HOME/.config"
 
         cp -r config/* "$HOME/.config"
-        cp shell/zshrc "$HOME/.zshrc"
+
+        for rc in .bashrc .zshrc; do
+          rc_file="$HOME/$rc"
+          touch "$rc_file"
+          case "$rc" in
+            .bashrc) source_line='[ -f "$HOME/.config/shell/bashrc" ] && source "$HOME/.config/shell/bashrc"' ;;
+            .zshrc) source_line='[ -f "$HOME/.config/shell/zshrc" ] && source "$HOME/.config/shell/zshrc"' ;;
+          esac
+          if ! grep -Fqx "$source_line" "$rc_file"; then
+            printf '\n%s\n' "$source_line" >> "$rc_file"
+          fi
+        done
 
         cp -r dotfiles/.* "$HOME/"
 
