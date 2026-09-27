@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+nas="$(pass show nas/ip)"
+user='julien'
+password="$(pass show nas/julien | head -n1)"
+base="$HOME/nas"
+
+if ! command -v mount.cifs >/dev/null; then
+    echo "Il faut installer cifs-utils : sudo pacman -S cifs-utils"
+    exit 1
+fi
+
+mkdir -p "$base"
+
+for share in archives drive homes library music photo projects surveillance video; do
+    target="$base/$share"
+    mkdir -p "$target"
+
+    if mountpoint -q "$target"; then
+        echo "Déjà monté : $share"
+        continue
+    fi
+
+    printf '%s' "$password" | sudo -S mount.cifs "//$nas/$share" "$target" \
+        -o "username=$user,uid=$(id -u),gid=$(id -g),iocharset=utf8,domain=WORKGROUP,password=$(printf '%s' "$password" | sed 's/[,\\]/\\&/g')"
+done
+
+echo "Partages montés dans $base"

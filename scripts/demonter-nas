@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -u
+
+base="$HOME/nas"
+shares=(archives drive homes library music photo projects surveillance video)
+
+if [[ $# -gt 1 ]]; then
+    echo "Usage : demonter-nas [partage]" >&2
+    exit 2
+fi
+
+if [[ $# -eq 1 ]]; then
+    case "$1" in
+        archives|drive|homes|library|music|photo|projects|surveillance|video) ;;
+        *) echo "Partage inconnu : $1" >&2; exit 2 ;;
+    esac
+    shares=("$1")
+fi
+
+status=0
+for share in "${shares[@]}"; do
+    target="$base/$share"
+    if ! mountpoint -q "$target"; then
+        echo "Pas monté : $share"
+        continue
+    fi
+    if sudo umount "$target"; then
+        echo "Démonté : $share"
+    else
+        echo "Échec du démontage : $share" >&2
+        status=1
+    fi
+done
+exit "$status"
