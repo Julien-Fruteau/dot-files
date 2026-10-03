@@ -24,9 +24,9 @@ fi
 
 # Keep Omarchy's eza aliases.
 # alias ll='ls -alF'
-# alias la='ls -A'
-# alias l='ls -CF'
-# alias lla='ls -la'
+alias la='ls -A'
+alias l='ls -CF'
+alias lla='ls -la'
 
 alias fsf=fastfetch
 alias k=kubectl

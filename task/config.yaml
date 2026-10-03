@@ -36,7 +36,6 @@ custom:
     glab
     tuicr
   arch: |
-    getnf
   other: |
 
 # installed with distro package manager for os with systemd
@@ -63,6 +62,8 @@ files:
 
 sh:
   common:
+  - pkg: getnf
+    sh: curl -fsSL https://raw.githubusercontent.com/getnf/getnf/main/install.sh | bash
   - pkg: spf 
     sh: bash -c "$(curl -sLo- https://superfile.dev/install.sh)"
   arch: []
