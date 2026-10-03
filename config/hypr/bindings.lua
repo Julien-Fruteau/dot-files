@@ -40,14 +40,21 @@ hl.unbind("SUPER + L")
 -- hl.unbind("SUPER + code:21")
 -- hl.unbind("SUPER + CTRL + code:20")
 -- hl.unbind("SUPER + CTRL + code:21")
+-- Leave Ctrl+Alt+H/L available to Kitty.
+hl.unbind("CTRL + ALT + H")
+hl.unbind("CTRL + ALT + L")
+hl.unbind("CTRL + ALT + J")
+hl.unbind("CTRL + ALT + K")
+
+hl.unbind("SHIFT + ALT + J")
+hl.unbind("SHIFT + ALT + K")
+hl.unbind("SUPER + ALT + L")
 hl.unbind("SUPER + CTRL + H")
 hl.unbind("SUPER + CTRL + L")
-
-o.bind("SUPER + ALT + L", "Toggle workspace layout", "omarchy-hyprland-workspace-layout-toggle")
+o.bind("SUPER + ALT + SHIFT + L", "Toggle workspace layout", "omarchy-hyprland-workspace-layout-toggle")
+o.bind("SUPER + ALT + L", "Lock system", "omarchy-system-lock")
 o.bind("SUPER + CTRL + MINUS", "Expand window left", hl.dsp.window.resize({ x = -100, y = 0, relative = true }))
 o.bind("SUPER + CTRL + EQUAL", "Shrink window left", hl.dsp.window.resize({ x = 100, y = 0, relative = true }))
-o.bind("CTRL + ALT + H", "Hardware menu", "omarchy-menu toggle hardware")
-o.bind("CTRL + ALT + L", "Lock system", "omarchy-system-lock")
 
 o.bind("SUPER + H", "Focus window left", hl.dsp.focus({ direction = "l" }))
 o.bind("SUPER + L", "Focus window right", hl.dsp.focus({ direction = "r" }))
@@ -55,3 +62,12 @@ o.bind("SUPER + BRACKETLEFT", "Move window into group on left", hl.dsp.window.mo
 o.bind("SUPER + BRACKETRIGHT", "Move window into group on right", hl.dsp.window.move({ into_group = "r" }))
 o.bind("SUPER + CTRL + H", "Move window left", hl.dsp.window.swap({ direction = "l" }))
 o.bind("SUPER + CTRL + L", "Move window right", hl.dsp.window.swap({ direction = "r" }))
+
+-- Swap full screen and full width shortcuts.
+-- Cycle window focus while maximized or fullscreen.
+hl.config({ binds = { movefocus_cycles_fullscreen = true } })
+
+hl.unbind("SUPER + F")
+hl.unbind("SUPER + ALT + F")
+o.bind("SUPER + F", "Full width", hl.dsp.window.fullscreen({ mode = "maximized" }))
+o.bind("SUPER + ALT + F", "Full screen", hl.dsp.window.fullscreen({ mode = "fullscreen" }))
