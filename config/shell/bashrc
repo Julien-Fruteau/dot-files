@@ -187,4 +187,7 @@ gh_ssh() { ssh-add <(pass ssh/github); }
 glab_ssh() { ssh-add <(pass ssh/gitlab); }
 az_ssh() { ssh-add <(pass ssh/ec); }
 
+omarchy_unset_chromium_settings() {
+  sudo mv /etc/chromium/policies/managed /etc/chromium/policies/managed.omarchy-backup
+}
 command -v fastfetch >/dev/null 2>&1 && fastfetch

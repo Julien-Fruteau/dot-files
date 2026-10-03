@@ -280,3 +280,8 @@ function glab_ssh() {
 function az_ssh() {
   ssh-add <(pass ssh/ec)
 }
+
+function omarchy_unset_chromium_settings() {
+  sudo mv /etc/chromium/policies/managed /etc/chromium/policies/managed.omarchy-backup
+}
+
