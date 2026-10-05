@@ -24,7 +24,11 @@
 -- hl.unbind("SUPER + SHIFT + B")
 
 -- Logitech MX Keys examples:
-o.bind("SUPER + SHIFT + S", nil, "omarchy-capture-screenshot")
+hl.unbind("SUPER + SHIFT + S")
+o.bind("SUPER + SHIFT + S", "Screenshot", "omarchy-capture-screenshot")
+-- Move Google Maps from S to M (replaces the default Music shortcut).
+hl.unbind("SUPER + SHIFT + M")
+o.bind("SUPER + SHIFT + M", "Google Maps", { webapp = "https://maps.google.com/", focus = true })
 -- o.bind("SUPER + H", nil, "voxtype record toggle")
 o.bind("SUPER + PERIOD", nil, "omarchy-shell shell toggle omarchy.emojis")
 o.bind("SUPER + E", "Open File Explorer", "nautilus")
