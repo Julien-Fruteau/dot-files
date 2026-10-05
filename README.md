@@ -88,3 +88,11 @@ task user-config githook
 # link nvim configuration
 ln -s "$(pwd)/nvim" ~/.config/nvim
 ```
+
+`user-packages` installs `docker-credential-pass` (via
+`docker-credential-helper` on Homebrew). `user-config` creates
+`~/.docker/config.json` if missing, or patches its `credsStore` to `pass`
+while preserving other settings. This step can also run independently with
+`task setup-docker-config`. An invalid existing JSON file is left untouched.
+Initialize `pass` with your GPG key (`pass init <GPG-key-ID>`) before using
+`docker login`.

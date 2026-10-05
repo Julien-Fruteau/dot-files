@@ -36,7 +36,9 @@ custom:
     glab
     tuicr
   arch: |
+    docker-credential-pass
   other: |
+    docker-credential-pass,docker-credential-helper
 
 # installed with distro package manager for os with systemd
 # Directly in Taskfile

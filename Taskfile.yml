@@ -304,7 +304,7 @@ tasks:
   # =====================
 
   user-config:
-    desc: Deploy config files to $HOME/.config
+    desc: Deploy user configuration files
     cmds:
       - |
         set -eu
@@ -348,6 +348,15 @@ tasks:
 
         echo "✅ Installation des fichiers de configuration terminée"
       - task: setup-gpg-agent
+      - task: setup-docker-config
+
+  setup-docker-config:
+    desc: Merge Docker credential settings into $HOME/.docker/config.json
+    preconditions:
+      - sh: command -v python3 >/dev/null 2>&1
+        msg: "python3 not found; install Python first"
+    cmds:
+      - python3 "{{.ROOT_DIR}}/task/setup-docker-config.py"
 
   # =====================
 
