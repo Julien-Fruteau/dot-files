@@ -206,14 +206,23 @@ tasks:
           PKG: keyd
           INSTALLER: "{{.DISTRO_PACKAGE_MANAGER}} keyd && sudo systemctl enable --now keyd"
       - echo "ℹ️ Installing wayscriber"
-      - if: '[ "{{.OS_TYPE}} == arch ]'
-        task: install-package
-        vars:
-          CLI: wayscriber
-          PKG: wayscriber
-          INSTALLER: "{{.DISTRO_PACKAGE_MANAGER}} wayscriber && systemctl --user enable --now wayscriber"
-      - if: '[ "{{.OS_TYPE}} != arch ]'
-        cmd: echo "🛠️ To install wayscriber in current system check `https://wayscriber.com/docs/getting-started/installation.html`"
+      - |
+        set -eu
+        case "{{.OS_TYPE}}" in
+          omarchy)
+            omarchy pkg aur add wayscriber
+            systemctl --user enable --now wayscriber.service
+            ;;
+          arch)
+            if ! command -v wayscriber >/dev/null 2>&1; then
+              {{.CUSTOM_PACKAGE_MANAGER}} wayscriber
+            fi
+            systemctl --user enable --now wayscriber.service
+            ;;
+          *)
+            echo "🛠️ To install wayscriber in current system check https://wayscriber.com/docs/getting-started/installation.html"
+            ;;
+        esac
       - echo "✅ Systemd packages installed"
 
   set-shell:
