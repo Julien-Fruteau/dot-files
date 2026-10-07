@@ -1,0 +1,132 @@
+#!/usr/bin/env bash
+# Install the professional Omarchy boot/shutdown splash with its native unlock dialog.
+# Usage: omarchy-plymouth-professional [--restore]
+set -euo pipefail
+
+if (( EUID != 0 )); then
+  exec sudo bash "$0" "$@"
+fi
+
+rebuild() {
+  if command -v limine-mkinitcpio >/dev/null; then
+    limine-mkinitcpio
+  else
+    mkinitcpio -P
+  fi
+}
+
+backup=/etc/plymouth/plymouthd.conf.before-professional
+if [[ ${1:-} == --restore ]]; then
+  [[ -f $backup ]] || { echo 'Sauvegarde introuvable.' >&2; exit 1; }
+  cp -a "$backup" /etc/plymouth/plymouthd.conf
+  rebuild
+  echo 'Ancien thème restauré.'
+  exit 0
+fi
+[[ $# == 0 ]] || { echo 'Usage : omarchy-plymouth-professional [--restore]' >&2; exit 1; }
+
+source_dir=/usr/share/omarchy/default/plymouth
+target_dir=/usr/share/plymouth/themes/professional
+[[ -f $source_dir/omarchy.plymouth && -f /usr/lib/plymouth/script.so ]]
+command -v magick >/dev/null
+[[ ! -L $target_dir ]]
+if [[ ! -f $backup ]]; then
+  if [[ $(plymouth-set-default-theme) == professional ]]; then
+    echo 'Sauvegarde originale absente : refus de sauvegarder le thème professional comme original.' >&2
+    exit 1
+  fi
+  cp -a /etc/plymouth/plymouthd.conf "$backup"
+fi
+install -d -m 0755 "$target_dir"
+# Preserve Omarchy's integrated disk-unlock dialog and progress bar.
+for asset in bullet.png entry.png lock.png progress_bar.png progress_box.png; do
+  install -m 0644 "$source_dir/$asset" "$target_dir/$asset"
+done
+for asset in bullet.png entry.png lock.png progress_bar.png; do
+  magick "$target_dir/$asset" -channel RGB +level-colors '#9ba3af','#9ba3af' "$target_dir/$asset"
+done
+base64 --decode > "$target_dir/logo.png" <<'OMARCHY_WORDMARK_PNG'
+iVBORw0KGgoAAAANSUhEUgAAATgAAAA3CAMAAACvgKY5AAAAIGNIUk0AAHomAACAhAAA+gAAAIDo
+AAB1MAAA6mAAADqYAAAXcJy6UTwAAALcUExURQAAAJujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5uj
+r5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5uj
+r5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5uj
+r5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5uj
+r5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5uj
+r5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5uj
+r5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5uj
+r5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5uj
+r5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5uj
+r5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5uj
+r5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5uj
+r5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5uj
+r5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5ujr5uj
+r5ujr5ujr5ujr5ujr5ujr5ujr1Eh+xMAAADzdFJOUwAMWp3O6vn15L+MPQF8gX6EE/r4EWD+44g7
+ClabzOn04cOJRwLsKAip8htbVxXdA+Lea2nNEobfcAQY8KsP57hU7cYiSUPIx3pMLWpIlPZ/0b7v
+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
+OMARCHY_WORDMARK_PNG
+chmod 0644 "$target_dir/logo.png"
+sed \
+  -e 's/^Name=.*/Name=Professional/' \
+  -e 's/^Description=.*/Description=Subtle Omarchy wordmark with the integrated Omarchy unlock dialog./' \
+  -e 's|^ImageDir=.*|ImageDir=/usr/share/plymouth/themes/professional|' \
+  -e 's|^ScriptFile=.*|ScriptFile=/usr/share/plymouth/themes/professional/professional.script|' \
+  -e 's/^ConsoleLogBackgroundColor=.*/ConsoleLogBackgroundColor=0x101216/' \
+  "$source_dir/omarchy.plymouth" > "$target_dir/professional.plymouth"
+sed \
+  -e 's/^Window.SetBackgroundTopColor.*/Window.SetBackgroundTopColor(0.063, 0.071, 0.086);/' \
+  -e 's/^Window.SetBackgroundBottomColor.*/Window.SetBackgroundBottomColor(0.063, 0.071, 0.086);/' \
+  -e 's|^logo.sprite.SetY(.*|logo.sprite.SetY(Window.GetHeight() / 2 - 75 - logo.image.GetHeight() / 2);|' \
+  "$source_dir/omarchy.script" > "$target_dir/professional.script"
+chmod 0644 "$target_dir/professional.plymouth"
+chmod 0644 "$target_dir/professional.script"
+plymouth-set-default-theme professional
+if ! rebuild; then
+  cp -a "$backup" /etc/plymouth/plymouthd.conf
+  echo 'Reconstruction échouée : configuration précédente rétablie. Relancer la reconstruction avant de redémarrer.' >&2
+  exit 1
+fi
+[[ $(plymouth-set-default-theme) == professional ]]
+echo 'Splash professionnel activé pour le prochain démarrage et arrêt.'
