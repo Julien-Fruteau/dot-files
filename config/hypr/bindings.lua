@@ -97,3 +97,7 @@ hl.unbind("SUPER + F")
 hl.unbind("SUPER + ALT + F")
 o.bind("SUPER + F", "Full width", hl.dsp.window.fullscreen({ mode = "maximized" }))
 o.bind("SUPER + ALT + F", "Full screen", hl.dsp.window.fullscreen({ mode = "fullscreen" }))
+
+-- Move notification history to Super+N.
+hl.unbind("SUPER + SHIFT + ALT + comma")
+o.bind("SUPER + N", "Open notification history", "omarchy-shell notifications showHistory")
