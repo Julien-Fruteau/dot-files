@@ -316,10 +316,10 @@ layout {
 // This line starts waybar, a commonly used bar for Wayland compositors.
 // spawn-at-startup "waybar"
 
-spawn-at-startup "qs" "-c" "noctalia-shell"
+spawn-at-startup "noctalia-shell"
 
 // To run a shell command (with variables, pipes, etc.), use spawn-sh-at-startup:
-// spawn-sh-at-startup "qs -c ~/source/qs/MyAwesomeShell"
+// spawn-sh-at-startup "~/source/qs/MyAwesomeShell"
 
 hotkey-overlay {
     // Uncomment this line to disable the "Important Hotkeys" pop-up at startup.
@@ -436,18 +436,18 @@ binds {
     Mod+E hotkey-overlay-title="Open File Explorer: Nautilus" { spawn "nautilus"; }
     // Mod+D hotkey-overlay-title="Run an Application: fuzzel" { spawn "fuzzel"; }
     Mod+D hotkey-overlay-title="Run an Application: Rofi" { spawn-sh "rofi -show drun"; }
-    Mod+Space hotkey-overlay-title="Run Noctalia: Launcher" { spawn-sh "qs -c noctalia-shell ipc call launcher toggle"; }
-    Mod+Comma hotkey-overlay-title="Run Noctalia: Settings" { spawn-sh "qs -c noctalia-shell ipc call settings toggle"; }
-    Mod+S hotkey-overlay-title="Run Noctalia: File Search" { spawn-sh "qs -c noctalia-shell ipc call plugin:file-search toggle"; }
-    Super+Alt+L hotkey-overlay-title="Lock the Screen: Noctalia" { spawn-sh "qs -c noctalia-shell ipc call lockScreen lock"; }
-    // Super+Control+L hotkey-overlay-title="Lock the Screen & Suspend" { spawn-sh "qs -c noctalia-shell ipc call sessionMenu lockAndSuspend"; }
+    Mod+Space hotkey-overlay-title="Run Noctalia: Launcher" { spawn-sh "noctalia-shell ipc call launcher toggle"; }
+    Mod+Comma hotkey-overlay-title="Run Noctalia: Settings" { spawn-sh "noctalia-shell ipc call settings toggle"; }
+    Mod+S hotkey-overlay-title="Run Noctalia: File Search" { spawn-sh "noctalia-shell ipc call plugin:file-search toggle"; }
+    Super+Alt+L hotkey-overlay-title="Lock the Screen: Noctalia" { spawn-sh "noctalia-shell ipc call lockScreen lock"; }
+    // Super+Control+L hotkey-overlay-title="Lock the Screen & Suspend" { spawn-sh "noctalia-shell ipc call sessionMenu lockAndSuspend"; }
 
     Ctrl+2 hotkey-overlay-title="Draw on screen" { spawn-sh "wayscriber --daemon-toggle"; }
 
-    Mod+Delete { spawn-sh "qs -c noctalia-shell ipc call sessionMenu toggle"; }
-    Mod+SemiColon { spawn-sh "qs -c noctalia-shell ipc call launcher emoji"; }
+    Mod+Delete { spawn-sh "noctalia-shell ipc call sessionMenu toggle"; }
+    Mod+SemiColon { spawn-sh "noctalia-shell ipc call launcher emoji"; }
     Mod+B hotkey-overlay-title="Run a Browser: Firefox" { spawn "firefox";}
-    // Mod+S { spawn-sh "qs -c noctalia-shell ipc call controlCenter toggle"; }
+    // Mod+S { spawn-sh "noctalia-shell ipc call controlCenter toggle"; }
 
     // Use spawn-sh to run a shell command. Do this if you need pipes, multiple commands, etc.
     // Note: the entire command goes as a single argument. It's passed verbatim to `sh -c`.
