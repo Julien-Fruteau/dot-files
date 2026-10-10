@@ -186,13 +186,17 @@ function ksec() {
 export WORDCHARS="${WORDCHARS}|"
 
 # Detect if using Homebrew or native package manager
-if [ -d "/home/linuxbrew/.linuxbrew" ]; then
-    # Homebrew installation
-    export PATH="/home/linuxbrew/.linuxbrew/opt/rustup/bin:$PATH"
-    export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
-    ZSH_HISTORY_SUBSTRING_SEARCH="/home/linuxbrew/.linuxbrew/share/zsh-history-substring-search/zsh-history-substring-search.zsh"
-    ZSH_AUTOSUGGESTIONS="/home/linuxbrew/.linuxbrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
-    POWERLEVEL10K="/home/linuxbrew/.linuxbrew/share/powerlevel10k/powerlevel10k.zsh-theme"
+if command -v brew >/dev/null 2>&1 || [[ -x /home/linuxbrew/.linuxbrew/bin/brew ]]; then
+    # Match the prefix used by Task's plugin installation checks.
+    if command -v brew >/dev/null 2>&1; then
+        ZSH_BREW_PREFIX="$(brew --prefix)"
+    else
+        ZSH_BREW_PREFIX="$(/home/linuxbrew/.linuxbrew/bin/brew --prefix)"
+    fi
+    export PATH="$ZSH_BREW_PREFIX/opt/rustup/bin:$ZSH_BREW_PREFIX/bin:$PATH"
+    ZSH_HISTORY_SUBSTRING_SEARCH="$ZSH_BREW_PREFIX/share/zsh-history-substring-search/zsh-history-substring-search.zsh"
+    ZSH_AUTOSUGGESTIONS="$ZSH_BREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+    POWERLEVEL10K="$ZSH_BREW_PREFIX/share/powerlevel10k/powerlevel10k.zsh-theme"
 else
     # Arch Linux or other system package manager
     ZSH_HISTORY_SUBSTRING_SEARCH="/usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh"

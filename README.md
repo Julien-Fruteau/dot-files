@@ -63,7 +63,7 @@ git clone https://github.com/Julien-Fruteau/dot-files.git
 cd dot-files
 
 which go-task && alias task='go-task'
-# review `task/config.yml` for the packages installed
+# review `task/config.yaml` for the packages installed
 
 # all (user, devops, dev, AI coding agents, agent skills)
 task all
@@ -76,7 +76,7 @@ task dev
 task devops
 # AI coding agents (included in all)
 task ai
-# local llama.cpp environment (manual, Arch Linux only, not included in all)
+# local llama.cpp environment (manual, Arch/Omarchy/Fedora, not included in all)
 task ai-local
 # link agent skills (see "agent skills" above)
 task agent-skills
@@ -96,3 +96,28 @@ while preserving other settings. This step can also run independently with
 `task setup-docker-config`. An invalid existing JSON file is left untouched.
 Initialize `pass` with your GPG key (`pass init <GPG-key-ID>`) before using
 `docker login`.
+
+## Optional system integrations
+
+The terminal setup installs jq, rsync, inotify-tools, bat, eza, zoxide and
+Mike Farah's yq. Fedora uses its own package selection; mise is installed with
+its official installer and usage through mise, before development tasks run.
+GitHub CLI uses `github-cli` on Arch and `gh` on Homebrew. Hunk is included in
+`task dev`, and OpenCode in `task ai`.
+
+```bash
+# Wayland clipboard, including the shell secret-copy functions
+task wayland
+# CIFS support for monter-nas/demonter-nas
+task nas
+# Deploy configurations and the file-search helper after installation
+task user-config
+```
+
+Wayscriber installation enables its user service even when the binary already
+exists. On Fedora, a missing installation adds the signed upstream RPM repository
+from `task/wayscriber.repo`; Arch/Omarchy use the AUR. Fedora keyd installation
+enables the `alternateved/keyd` COPR linked by the upstream keyd project.
+
+Upstream installation references: [Wayscriber](https://github.com/devmobasa/wayscriber#installation),
+[mise](https://mise.jdx.dev/installing-mise.html).

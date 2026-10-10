@@ -7,7 +7,7 @@ password="$(pass show nas/julien | head -n1)"
 base="$HOME/nas"
 
 if ! command -v mount.cifs >/dev/null; then
-    echo "Il faut installer cifs-utils : sudo pacman -S cifs-utils"
+    echo "Il faut installer cifs-utils : lance task nas depuis le dépôt dot-files"
     exit 1
 fi
 

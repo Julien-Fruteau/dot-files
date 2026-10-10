@@ -3,8 +3,11 @@ silent: true
 
 env:
   LOGIN_SHELL: bash
+  PATH: "{{.TOOL_PATH}}"
 
 vars:
+  TOOL_PATH:
+    sh: printf '%s' "$HOME/.local/bin:$HOME/.local/share/mise/shims:$HOME/.cargo/bin:$HOME/.opencode/bin:/home/linuxbrew/.linuxbrew/bin:$PATH"
   OS_TYPE:
     sh: |
       . /etc/os-release
@@ -35,6 +38,7 @@ vars:
       case "{{.OS_TYPE}}" in
         arch) echo "arch" ;;
         omarchy) echo "arch" ;;
+        fedora) echo "fedora" ;;
         *)    echo "other" ;;
       esac
   USE_SYSTEMD:
@@ -199,18 +203,33 @@ tasks:
     deps: [dev]
     cmds:
       - echo "ℹ️ Installing systemd packages"
-      - echo "ℹ️ Installing keyd"
-      - task: install-package
-        vars:
-          CLI: keyd
-          PKG: keyd
-          INSTALLER: "{{.DISTRO_PACKAGE_MANAGER}} keyd && sudo systemctl enable --now keyd"
-      - echo "ℹ️ Installing wayscriber"
+      - task: install-keyd
+      - task: install-wayscriber
+      - echo "✅ Systemd packages installed"
+
+  install-keyd:
+    desc: Install keyd and enable its system service
+    cmds:
+      - |
+        set -eu
+        if ! command -v keyd >/dev/null 2>&1; then
+          if [ "{{.OS_TYPE}}" = "fedora" ]; then
+            sudo dnf copr enable -y alternateved/keyd
+          fi
+          {{.DISTRO_PACKAGE_MANAGER}} keyd
+        fi
+        sudo systemctl enable --now keyd
+
+  install-wayscriber:
+    desc: Install Wayscriber and enable its user service (Arch/Omarchy/Fedora)
+    cmds:
       - |
         set -eu
         case "{{.OS_TYPE}}" in
           omarchy)
-            omarchy pkg aur add wayscriber
+            if ! command -v wayscriber >/dev/null 2>&1; then
+              omarchy pkg aur add wayscriber
+            fi
             systemctl --user enable --now wayscriber.service
             ;;
           arch)
@@ -219,11 +238,18 @@ tasks:
             fi
             systemctl --user enable --now wayscriber.service
             ;;
+          fedora)
+            if ! command -v wayscriber >/dev/null 2>&1; then
+              sudo install -m 644 "{{.ROOT_DIR}}/task/wayscriber.repo" /etc/yum.repos.d/wayscriber.repo
+              sudo dnf install -y wayscriber
+            fi
+            systemctl --user daemon-reload
+            systemctl --user enable --now wayscriber.service
+            ;;
           *)
             echo "🛠️ To install wayscriber in current system check https://wayscriber.com/docs/getting-started/installation.html"
             ;;
         esac
-      - echo "✅ Systemd packages installed"
 
   set-shell:
     cmd: |
@@ -264,6 +290,36 @@ tasks:
       fi
       echo "✅ User set in docker group"
 
+  install-integration-packages:
+    internal: true
+    vars:
+      COMMON:
+        ref: index .CONFIG .INTEGRATION "common" | splitLines | compact
+      OS:
+        ref: index .CONFIG .INTEGRATION .OS_CONFIG_SELECTOR | default "" | splitLines | compact
+      PACKAGES:
+        ref: concat .COMMON .OS
+    cmds:
+      - for:
+          var: PACKAGES
+        task: install-package
+        vars:
+          CLI: '{{.ITEM | splitList "," | first}}'
+          PKG: '{{.ITEM | splitList "," | last}}'
+          INSTALLER: '{{.DISTRO_PACKAGE_MANAGER}} {{.ITEM | splitList "," | last}}'
+
+  wayland:
+    desc: Install Wayland clipboard tools
+    cmds:
+      - task: install-integration-packages
+        vars: {INTEGRATION: wayland}
+
+  nas:
+    desc: Install CIFS support for NAS scripts
+    cmds:
+      - task: install-integration-packages
+        vars: {INTEGRATION: nas}
+
   # =====================
 
   user-packages:
@@ -272,8 +328,8 @@ tasks:
       - echo "ℹ️ Installing system and terminal requirements"
       - task: install-package-manager
       - task: install-system-packages
-      - task: install-custom-packages
       - task: install-custom-packages-sh
+      - task: install-custom-packages
       - task: install-custom-packages-test-file
       - if: '[ {{.USE_SYSTEMD}} == "true" ]'
         task: install-systemd-packages
@@ -544,14 +600,14 @@ tasks:
   ai-local:
     desc: "🫥 Manually install local AI tools and config (Arch/Fedora; not included in all)"
     preconditions:
-      - sh: '[ "{{.OS_TYPE}}" = "arch" ] || [ "{{.OS_TYPE}}" = "fedora" ]'
+      - sh: '[ "{{.OS_CONFIG_SELECTOR}}" = "arch" ] || [ "{{.OS_TYPE}}" = "fedora" ]'
         msg: "ai-local is only supported on Arch Linux or Fedora"
     cmds:
       - echo "ℹ️ Installing local AI tools"
       - |
         set -eu
         case "{{.OS_TYPE}}" in
-          arch)
+          arch|omarchy)
             sudo pacman -S --needed --noconfirm llama-cpp python-huggingface-hub jq nvtop btop
             ;;
           fedora)

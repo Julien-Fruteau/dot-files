@@ -12,11 +12,17 @@ system:
     unzip
     kitty
     pass
+    jq
+    rsync
+    inotifywait,inotify-tools
+  arch: |
     gpgconf,gnupg
     mise
     usage
-  arch: |
+  fedora: |
+    gpgconf,gnupg2
   other: |
+    gpgconf,gnupg
 
 # installed with custom package manager (paru, brew)
 custom:
@@ -32,13 +38,20 @@ custom:
     wt,worktrunk
     fastfetch
     gitleaks
-    gh,github-cli
+    bat
+    eza
+    zoxide
     glab
     tuicr
   arch: |
     docker-credential-pass
-  other: |
+    gh,github-cli
+    yq,go-yq
+  other: &brew_packages |
     docker-credential-pass,docker-credential-helper
+    gh
+    yq
+  fedora: *brew_packages
 
 # installed with distro package manager for os with systemd
 # Directly in Taskfile
@@ -49,18 +62,19 @@ files:
   common: []
   arch:
     - pkg: zsh-theme-powerlevel10k
-      file: "$HOME/.p10k.zsh"
+      file: /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
     - pkg: zsh-history-substring-search
       file: /usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
     - pkg: zsh-autosuggestions
       file: /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
-  other:
+  other: &brew_zsh_plugins
     - pkg: powerlevel10k
-      file: "$HOME/.p10k.zsh"
+      file: $(brew --prefix)/share/powerlevel10k/powerlevel10k.zsh-theme
     - pkg: zsh-history-substring-search
-      file: $(brew --prefix)/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
+      file: $(brew --prefix)/share/zsh-history-substring-search/zsh-history-substring-search.zsh
     - pkg: zsh-autosuggestions
-      file: $(brew --prefix)/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+      file: $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+  fedora: *brew_zsh_plugins
 
 sh:
   common:
@@ -69,13 +83,20 @@ sh:
   - pkg: spf 
     sh: bash -c "$(curl -sLo- https://superfile.dev/install.sh)"
   arch: []
-  other:
+  other: &portable_shell_tools
     - pkg: mise
-      sh: curl https://mise.run | sh
-    - pkg: getnf
-      sh: curl -fsSL https://raw.githubusercontent.com/getnf/getnf/main/install.sh | bash
-    - pkg: wayscriber
-      sh: echo "🛠️ To install wayscriber in current system check `https://wayscriber.com/docs/getting-started/installation.html`"
+      sh: curl -fsSL https://mise.run | sh
+    - pkg: usage
+      sh: mise use -g usage
+  fedora: *portable_shell_tools
+
+# Optional system integrations, installed with the distro package manager.
+wayland:
+  common: |
+    wl-copy,wl-clipboard
+nas:
+  common: |
+    mount.cifs,cifs-utils
 
 # installed with custom package manager
 devops:
@@ -97,6 +118,8 @@ dev:
     node
     go
   sh:
+    - cli: hunk
+      sh: curl -fsSL https://hunk.dev/install.sh | sh
     - cli: rustup
       sh: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh && rustup toolchain install stable
 
@@ -114,6 +137,9 @@ ai:
     - codex
     - pi
   sh:
+    - cli: opencode
+      pkg: OpenCode
+      sh: curl -fsSL https://opencode.ai/install | bash
     - cli: codex
       pkg: Codex
       sh: sh -c 'curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh'
