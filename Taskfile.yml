@@ -2,7 +2,7 @@ version: "3"
 silent: true
 
 env:
-  LOGIN_SHELL: bash
+  LOGIN_SHELL: zsh
   PATH: "{{.TOOL_PATH}}"
 
 vars:
