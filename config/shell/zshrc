@@ -75,10 +75,6 @@ if [ -x /usr/bin/dircolors ]; then
     alias egrep='egrep --color=auto'
 fi
 
-alias ll='ls -alF'
-alias la='ls -A'
-alias l='ls -CF'
-alias lla='ls -la'
 command -v tree >/dev/null && alias lt='tree'
 
 # Omarchy file display, with the GNU ls aliases above as fallback.
@@ -87,9 +83,15 @@ if command -v eza >/dev/null 2>&1; then
     alias lsa='ls -a'
     alias ll='ls -aF'
     alias lla='ls -a'
+    alias la='ls -a'
     alias l='eza --group-directories-first --icons=auto'
     alias lt='eza --tree --level=2 --long --icons --git'
     alias lta='lt -a'
+else 
+  alias ll='ls -alF'
+  alias la='ls -A'
+  alias l='ls -CF'
+  alias lla='ls -la'
 fi
 
 # Colour native Zsh completion listings using the same file colours.
