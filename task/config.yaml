@@ -98,6 +98,32 @@ nas:
   common: |
     mount.cifs,cifs-utils
 
+# Niri + Noctalia v5; Fedora 44+ for the stable Noctalia package.
+desktop:
+  common: |
+    niri
+    noctalia
+    kitty
+    xdg-open,xdg-utils
+    rofi
+    nautilus
+    firefox
+    brightnessctl
+    wpctl,wireplumber
+    playerctl
+    orca
+    wl-copy,wl-clipboard
+  arch: |
+    fd
+    pipewire
+    pipewire-pulse
+    xdg-desktop-portal-gnome
+  fedora: |
+    fd,fd-find
+    pw-cli,pipewire-utils
+    pipewire-pulseaudio
+    xdg-desktop-portal-gnome
+
 # installed with custom package manager
 devops:
   common: |

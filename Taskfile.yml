@@ -320,6 +320,22 @@ tasks:
       - task: install-integration-packages
         vars: {INTEGRATION: nas}
 
+  desktop:
+    desc: Install Niri and Noctalia v5 desktop dependencies (Arch/Omarchy/Fedora 44+)
+    preconditions:
+      - sh: '[ "{{.OS_CONFIG_SELECTOR}}" = "arch" ] || [ "{{.OS_TYPE}}" = "fedora" ]'
+        msg: "desktop supports Arch, Omarchy, and Fedora 44+"
+      - sh: |
+          if [ "{{.OS_TYPE}}" = "fedora" ]; then
+            . /etc/os-release
+            [ "${VERSION_ID%%.*}" -ge 44 ]
+          fi
+        msg: "Noctalia v5 requires Fedora 44+ repositories"
+    cmds:
+      - task: install-integration-packages
+        vars: {INTEGRATION: desktop}
+      - task: install-wayscriber
+
   # =====================
 
   user-packages:

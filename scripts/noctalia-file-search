@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Noctalia v5 file picker, replacing the v4 file-search plugin shortcut.
+set -euo pipefail
+
+# Respect fd's ignore rules; leave caches, hidden files and Git internals out.
+# dmenu cancellation returns 1. Do not execute text that isn't an existing file.
+selection=$(fd --type f --absolute-path . "$HOME" | noctalia dmenu -p "Rechercher un fichier") || exit 0
+[[ -n "$selection" && -f "$selection" ]] || exit 0
+exec xdg-open "$selection"

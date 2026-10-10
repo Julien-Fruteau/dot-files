@@ -110,9 +110,18 @@ GitHub CLI uses `github-cli` on Arch and `gh` on Homebrew. Hunk is included in
 task wayland
 # CIFS support for monter-nas/demonter-nas
 task nas
+# Niri + Noctalia v5, applications, audio, brightness and clipboard tools
+# Supports Arch/Omarchy and Fedora 44+; independent from task all
+task desktop
 # Deploy configurations and the file-search helper after installation
 task user-config
 ```
+
+Niri starts `noctalia` and uses the v5 `noctalia msg` interface. Super+Space
+opens the launcher, Super+Comma settings, Super+Delete the session menu,
+Super+Alt+L locks, and Super+Semicolon opens `/emo` in the launcher. Super+S
+uses `noctalia-file-search` (fd + Noctalia dmenu) to select and open a file.
+The existing `config/noctalia/config.toml` supplies the v5 configuration.
 
 Wayscriber installation enables its user service even when the binary already
 exists. On Fedora, a missing installation adds the signed upstream RPM repository
@@ -120,4 +129,6 @@ from `task/wayscriber.repo`; Arch/Omarchy use the AUR. Fedora keyd installation
 enables the `alternateved/keyd` COPR linked by the upstream keyd project.
 
 Upstream installation references: [Wayscriber](https://github.com/devmobasa/wayscriber#installation),
+[Noctalia v5](https://docs.noctalia.dev/noctalia/getting-started/installation/),
+[Noctalia IPC](https://docs.noctalia.dev/noctalia/ipc/),
 [mise](https://mise.jdx.dev/installing-mise.html).
