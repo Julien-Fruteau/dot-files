@@ -384,9 +384,18 @@ tasks:
 
   # =====================
 
+  omarchy-disable-fcitx:
+    desc: Disable Fcitx autostart and its user service on Omarchy
+    cmds:
+      - |
+        if [ "{{.OS_TYPE}}" = "omarchy" ] || command -v omarchy >/dev/null 2>&1; then
+          bash "{{.ROOT_DIR}}/task/disable-fcitx.sh"
+        fi
+
   user-config:
     desc: Deploy user configuration files
     cmds:
+      - task: omarchy-disable-fcitx
       - |
         set -eu
         echo "ℹ️ Installation des fichiers de configuration"

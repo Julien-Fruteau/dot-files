@@ -99,6 +99,13 @@ Initialize `pass` with your GPG key (`pass init <GPG-key-ID>`) before using
 
 ## Optional system integrations
 
+On Omarchy, `task user-config` (also included in `task user-all` and `task all`)
+disables Fcitx: it hides the XDG autostart entry, masks
+`omarchy-fcitx5.service`, and stops it when the user session is accessible.
+This disables Fcitx suggestions and its XCompose sequences. Apply this setting
+independently with `task omarchy-disable-fcitx`. If the session is inaccessible,
+log out and back in to apply it. Other distributions skip this step.
+
 The terminal setup installs jq, rsync, inotify-tools, bat, eza, zoxide and
 Mike Farah's yq. Fedora uses its own package selection; mise is installed with
 its official installer and usage through mise, before development tasks run.
