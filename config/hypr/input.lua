@@ -61,5 +61,6 @@ hl.config({
   input = {
     kb_layout = "us",
     kb_variant = "altgr-intl",
+    follow_mouse = 0,
   },
 })
