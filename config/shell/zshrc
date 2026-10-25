@@ -298,6 +298,10 @@ if command -v fastfetch >/dev/null 2>&1; then
   fastfetch
 fi
 
+function vpn-isi() {
+  sudo openvpn --config "$HOME/vpn/isi.me.ovpn" --auth-user-pass =(pass show vpn/isi/creds) --auth-nocache
+}
+
 function gh_token() {
   export GITHUB_TOKEN=$(pass github/token)
   export NPM_AUTH_TOKEN=$GITHUB_TOKEN
