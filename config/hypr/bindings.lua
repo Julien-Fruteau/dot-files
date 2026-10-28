@@ -32,6 +32,7 @@ o.bind("SUPER + SHIFT + M", "Google Maps", { webapp = "https://maps.google.com/"
 -- o.bind("SUPER + H", nil, "voxtype record toggle")
 o.bind("SUPER + PERIOD", nil, "omarchy-shell shell toggle omarchy.emojis")
 o.bind("SUPER + E", "Open File Explorer", "nautilus")
+o.bind("CTRL + 2", "Draw on screen", "wayscriber --daemon-toggle")
 
 -- Move the close-window shortcut from Super+W to Super+Q.
 -- hl.unbind("SUPER + W")
