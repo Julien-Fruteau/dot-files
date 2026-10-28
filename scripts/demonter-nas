@@ -2,7 +2,8 @@
 set -u
 
 base="$HOME/nas"
-shares=(archives drive homes library music photo projects surveillance video)
+shares_list=$(pass show nas/shares) || exit "$?"
+read -r -a shares <<< "$shares_list"
 
 if [[ $# -gt 1 ]]; then
     echo "Usage : demonter-nas [partage]" >&2
@@ -10,10 +11,17 @@ if [[ $# -gt 1 ]]; then
 fi
 
 if [[ $# -eq 1 ]]; then
-    case "$1" in
-        archives|drive|homes|library|music|photo|projects|surveillance|video) ;;
-        *) echo "Partage inconnu : $1" >&2; exit 2 ;;
-    esac
+    found=false
+    for share in "${shares[@]}"; do
+        if [[ "$share" == "$1" ]]; then
+            found=true
+            break
+        fi
+    done
+    if [[ "$found" == false ]]; then
+        echo "Partage inconnu : $1" >&2
+        exit 2
+    fi
     shares=("$1")
 fi
 

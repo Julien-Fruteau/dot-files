@@ -2,6 +2,8 @@
 set -euo pipefail
 
 nas="$(pass show nas/ip)"
+shares_list=$(pass show nas/shares)
+read -r -a shares <<< "$shares_list"
 user='julien'
 password="$(pass show nas/julien | head -n1)"
 base="$HOME/nas"
@@ -11,9 +13,11 @@ if ! command -v mount.cifs >/dev/null; then
     exit 1
 fi
 
+sudo -v
+
 mkdir -p "$base"
 
-for share in archives drive homes library music photo projects surveillance video; do
+for share in "${shares[@]}"; do
     target="$base/$share"
     mkdir -p "$target"
 
@@ -22,7 +26,7 @@ for share in archives drive homes library music photo projects surveillance vide
         continue
     fi
 
-    printf '%s' "$password" | sudo -S mount.cifs "//$nas/$share" "$target" \
+    sudo mount.cifs "//$nas/$share" "$target" \
         -o "username=$user,uid=$(id -u),gid=$(id -g),iocharset=utf8,domain=WORKGROUP,password=$(printf '%s' "$password" | sed 's/[,\\]/\\&/g')"
 done
 
