@@ -82,8 +82,16 @@ hl.unbind("SUPER + SHIFT + C")
 o.bind("SUPER + SHIFT + C", "Center current column", hl.dsp.layout("center"))
 
 
-o.bind("SUPER + H", "Focus window left", hl.dsp.focus({ direction = "l" }))
-o.bind("SUPER + L", "Focus window right", hl.dsp.focus({ direction = "r" }))
+-- Use scrolling's own column focus to avoid generic directional-focus stalls.
+-- Super+Left/Right previously used the generic directional focus as well.
+hl.unbind("SUPER + H")
+hl.unbind("SUPER + L")
+hl.unbind("SUPER + LEFT")
+hl.unbind("SUPER + RIGHT")
+o.bind("SUPER + H", "Focus column left", hl.dsp.layout("focus l"))
+o.bind("SUPER + L", "Focus column right", hl.dsp.layout("focus r"))
+o.bind("SUPER + LEFT", "Focus column left", hl.dsp.layout("focus l"))
+o.bind("SUPER + RIGHT", "Focus column right", hl.dsp.layout("focus r"))
 o.bind("SUPER + BRACKETLEFT", "Move window into group on left", hl.dsp.window.move({ into_group = "l" }))
 o.bind("SUPER + BRACKETRIGHT", "Move window into group on right", hl.dsp.window.move({ into_group = "r" }))
 o.bind("SUPER + CTRL + H", "Move window left", hl.dsp.window.swap({ direction = "l" }))
