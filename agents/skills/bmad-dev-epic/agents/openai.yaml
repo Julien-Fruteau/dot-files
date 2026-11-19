@@ -1,4 +1,0 @@
-interface:
-  display_name: "BMad Dev Epic"
-  short_description: "Deliver every story of a BMad spec folder"
-  default_prompt: "Use $bmad-dev-epic to autonomously deliver the remaining stories of this BMad spec folder."
