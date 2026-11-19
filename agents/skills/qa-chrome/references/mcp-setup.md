@@ -9,7 +9,7 @@ Every variant registers the same server, attached to the QA Chrome on port 9222
 (see [`browser.md`](browser.md)) rather than launching its own headless browser:
 
 ```
-npx -y chrome-devtools-mcp@latest --browserUrl=http://127.0.0.1:9222
+npx -y chrome-devtools-mcp@latest --browserUrl=http://127.0.0.1:9222 --no-usage-statistics --no-performance-crux
 ```
 
 ## Claude Code
@@ -17,7 +17,7 @@ npx -y chrome-devtools-mcp@latest --browserUrl=http://127.0.0.1:9222
 Check: `claude mcp list | grep chrome-devtools`. Install:
 
 ```bash
-claude mcp add --scope user chrome-devtools -- npx -y chrome-devtools-mcp@latest --browserUrl=http://127.0.0.1:9222
+claude mcp add --scope user chrome-devtools -- npx -y chrome-devtools-mcp@latest --browserUrl=http://127.0.0.1:9222 --no-usage-statistics --no-performance-crux
 ```
 
 ## Codex
@@ -25,7 +25,7 @@ claude mcp add --scope user chrome-devtools -- npx -y chrome-devtools-mcp@latest
 Check: `codex mcp list | grep chrome-devtools`. Install:
 
 ```bash
-codex mcp add chrome-devtools -- npx -y chrome-devtools-mcp@latest --browserUrl=http://127.0.0.1:9222
+codex mcp add chrome-devtools -- npx -y chrome-devtools-mcp@latest --browserUrl=http://127.0.0.1:9222 --no-usage-statistics --no-performance-crux
 ```
 
 This writes a `[mcp_servers.chrome-devtools]` table to `~/.codex/config.toml`.
@@ -48,7 +48,7 @@ then add the server to `~/.pi/agent/mcp.json` (merge with existing entries):
   "mcpServers": {
     "chrome-devtools": {
       "command": "npx",
-      "args": ["-y", "chrome-devtools-mcp@latest", "--browserUrl=http://127.0.0.1:9222"]
+      "args": ["-y", "chrome-devtools-mcp@latest", "--browserUrl=http://127.0.0.1:9222", "--no-usage-statistics", "--no-performance-crux"]
     }
   }
 }
